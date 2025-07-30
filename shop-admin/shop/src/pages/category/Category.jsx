@@ -92,6 +92,7 @@ export default function Categories() {
       <div className="flex gap-4 h-[100%]">
         {/* Left Column - User Table (70%) */}
         <div className="w-[80%]">
+          <h2 className="text-xl font-bold mb-4">Category</h2>
           {loading ? (
             <div className="p-4">Loading categories...</div>
           ) : error ? (
