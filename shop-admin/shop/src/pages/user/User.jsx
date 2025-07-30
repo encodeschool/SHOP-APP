@@ -176,133 +176,138 @@ export default function Users() {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Users</h2>
-      <div className="mb-6 bg-white p-4 shadow">
-        <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} User</h3>
+    <div className="h-[100%]">
+      <div className="flex gap-4 h-[100%]">
+        {/* Left Column - User Table (70%) */}
+        <div className="w-[80%]">
+          <h2 className="text-xl font-bold mb-4">Users</h2>
+          <table className="w-full border bg-white shadow">
+            <thead>
+              <tr className="bg-gray-200 text-left">
+                <th className="p-2">Profile Image</th>
+                <th className="p-2">Username</th>
+                <th className="p-2">Full name</th>
+                <th className="p-2">Email</th>
+                <th className="p-2">Phone</th>
+                <th className="p-2">Role</th>
+                <th className="p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td className="p-2">
+                    {u.profilePictureUrl ? (
+                      <img
+                        src={`http://localhost:8080${u.profilePictureUrl}`}
+                        alt="Profile"
+                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                  <td className="p-2">{u.username}</td>
+                  <td className="p-2">{u.name}</td>
+                  <td className="p-2">{u.email}</td>
+                  <td className="p-2">{u.phone}</td>
+                  <td className="p-2">
+                    {Array.isArray(u.roles) ? u.roles.join(", ") : u.roles}
+                  </td>
+                  <td className="p-2">
+                    <button
+                      onClick={() => handleEdit(u)}
+                      className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(u.id)}
+                      className="bg-red-500 text-white px-2 py-1 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Right Column - Add/Edit Form (30%) */}
+        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
+            <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} User</h3>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="border p-1 m-1"
-        />
-        {profilePicturePreview && (
-          <img
-            src={profilePicturePreview}
-            alt="Profile Preview"
-            style={{ width: 100, height: 100, objectFit: "cover", marginTop: 10 }}
-          />
-        )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="border p-1 mb-3 w-[100%]"
+            />
+            {profilePicturePreview && (
+              <img
+                src={profilePicturePreview}
+                alt="Profile Preview"
+                style={{ width: 100, height: 100, objectFit: "cover", marginTop: 10 }}
+              />
+            )}
 
-        <input
-          name="username"
-          placeholder="Username"
-          className="border p-1 m-1"
-          value={newUser.username}
-          onChange={handleInputChange}
-        />
-        <input
-          name="name"
-          placeholder="Full name"
-          className="border p-1 m-1"
-          value={newUser.name}
-          onChange={handleInputChange}
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="border p-1 m-1"
-          value={newUser.email}
-          onChange={handleInputChange}
-          disabled={editingId !== null}
-        />
-        <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            className="border p-1 m-1"
-            value={newUser.password}
-            onChange={handleInputChange}
-        />
-        <input
-          name="phone"
-          placeholder="Phone"
-          className="border p-1 m-1"
-          value={newUser.phone || ""}
-          onChange={handleInputChange}
-        />
-        <select
-          name="roles"
-          className="border p-1 m-1"
-          value={newUser.roles}
-          onChange={handleInputChange}
-        >
-          <option value="SELLER">SELLER</option>
-          <option value="ADMIN">ADMIN</option>
-          <option value="BUYER">BUYER</option>
-        </select>
+            <input
+              name="username"
+              placeholder="Username"
+              className="border p-1 mb-3 w-[100%]"
+              value={ newUser.username}
+              onChange={handleInputChange}
+            />
+            <input
+              name="name"
+              placeholder="Full name"
+              className="border p-1 mb-3 w-[100%]"
+              value={newUser.name}
+              onChange={handleInputChange}
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              className="border p-1 mb-3 w-[100%]"
+              value={newUser.email}
+              onChange={handleInputChange}
+              disabled={editingId !== null}
+            />
+            <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                className="border p-1 mb-3 w-[100%]"
+                value={newUser.password}
+                onChange={handleInputChange}
+            />
+            <input
+              name="phone"
+              placeholder="Phone"
+              className="border p-1 mb-3 w-[100%]"
+              value={newUser.phone || ""}
+              onChange={handleInputChange}
+            />
+            <select
+              name="roles"
+              className="border p-1 mb-3 w-[100%]"
+              value={newUser.roles}
+              onChange={handleInputChange}
+            >
+              <option value="SELLER">SELLER</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="BUYER">BUYER</option>
+            </select>
 
-        <button
-          onClick={handleCreateOrUpdate}
-          className="bg-blue-500 text-white px-3 py-1 ml-2"
-        >
-          {editingId ? "Update" : "Create"}
-        </button>
+            <button
+              onClick={handleCreateOrUpdate}
+              className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
+            >
+              {editingId ? "Update" : "Create"}
+            </button>
+        </div>
       </div>
-
-      <table className="w-full border bg-white shadow">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="p-2">Profile Image</th>
-            <th className="p-2">Username</th>
-            <th className="p-2">Full name</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Phone</th>
-            <th className="p-2">Role</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td className="p-2">
-                {u.profilePictureUrl ? (
-                  <img
-                    src={`http://localhost:8080${u.profilePictureUrl}`}
-                    alt="Profile"
-                    style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
-                  />
-                ) : (
-                  "No Image"
-                )}
-              </td>
-              <td className="p-2">{u.username}</td>
-              <td className="p-2">{u.name}</td>
-              <td className="p-2">{u.email}</td>
-              <td className="p-2">{u.phone}</td>
-              <td className="p-2">
-                {Array.isArray(u.roles) ? u.roles.join(", ") : u.roles}
-              </td>
-              <td className="p-2">
-                <button
-                  onClick={() => handleEdit(u)}
-                  className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(u.id)}
-                  className="bg-red-500 text-white px-2 py-1 text-sm"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }

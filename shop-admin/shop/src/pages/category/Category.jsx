@@ -88,122 +88,125 @@ export default function Categories() {
   const parentCategories = categories.filter((cat) => cat.parentId === null);
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Categories</h2>
-
-      <div className="mb-6 bg-white p-4 shadow">
-        <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
-
-        <input
-          type="file"
-          name="icon"
-          onChange={handleChange}
-          className="border p-1 m-1"
-        />
-
-
-        <input
-          name="name"
-          placeholder="Category Name"
-          value={form.name}
-          onChange={handleChange}
-          className="border p-1 m-1"
-        />
-
-        <select
-          name="parentId"
-          value={form.parentId}
-          onChange={handleChange}
-          className="border p-1 m-1"
-        >
-          <option value="">-- Main Category --</option>
-          {parentCategories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-
-        <button
-          onClick={handleSave}
-          className="bg-blue-500 text-white px-3 py-1 ml-2"
-        >
-          {editingId ? "Update" : "Create"}
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="p-4">Loading categories...</div>
-      ) : error ? (
-        <div className="p-4 text-red-500">{error}</div>
-      ) : (
-        <table className="w-full border bg-white shadow">
-          <thead>
-            <tr className="bg-gray-200 text-left">
-              <th className="p-2">Icon</th>
-              <th className="p-2">Main Category</th>
-              <th className="p-2">Subcategories</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {parentCategories.map((parent) => (
-              <tr key={parent.id}>
-                <td className="p-2">
-                {parent.icon ? (
-                  <img
-                    src={`http://localhost:8080${parent.icon}`}
-                    alt="Profile"
-                    style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
-                  />
-                ) : (
-                  "No Image"
-                )}
-              </td>
-                <td className="p-2 font-bold">{parent.name}</td>
-                <td className="p-2">
-                  {categories
-                    .filter((sub) => sub.parentId === parent.id)
-                    .map((sub) => (
-                      <span
-                        key={sub.id}
-                        className="inline-block bg-gray-100 px-2 py-1 m-1 rounded"
+    <div className="h-[100%]">
+      <div className="flex gap-4 h-[100%]">
+        {/* Left Column - User Table (70%) */}
+        <div className="w-[80%]">
+          {loading ? (
+            <div className="p-4">Loading categories...</div>
+          ) : error ? (
+            <div className="p-4 text-red-500">{error}</div>
+          ) : (
+            <table className="w-full border bg-white shadow">
+              <thead>
+                <tr className="bg-gray-200 text-left">
+                  <th className="p-2">Icon</th>
+                  <th className="p-2">Main Category</th>
+                  <th className="p-2">Subcategories</th>
+                  <th className="p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parentCategories.map((parent) => (
+                  <tr key={parent.id}>
+                    <td className="p-2">
+                    {parent.icon ? (
+                      <img
+                        src={`http://localhost:8080${parent.icon}`}
+                        alt="Profile"
+                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                    <td className="p-2 font-bold">{parent.name}</td>
+                    <td className="p-2">
+                      {categories
+                        .filter((sub) => sub.parentId === parent.id)
+                        .map((sub) => (
+                          <span
+                            key={sub.id}
+                            className="inline-block bg-gray-100 px-2 py-1 m-1 rounded"
+                          >
+                            {sub.name}
+                            <button
+                              onClick={() => handleEdit(sub)}
+                              className="text-yellow-600 ml-2 text-sm"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(sub.id)}
+                              className="text-red-500 ml-1 text-sm"
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        ))}
+                    </td>
+                    <td className="p-2">
+                      <button
+                        onClick={() => handleEdit(parent)}
+                        className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1"
                       >
-                        {sub.name}
-                        <button
-                          onClick={() => handleEdit(sub)}
-                          className="text-yellow-600 ml-2 text-sm"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(sub.id)}
-                          className="text-red-500 ml-1 text-sm"
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                </td>
-                <td className="p-2">
-                  <button
-                    onClick={() => handleEdit(parent)}
-                    className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(parent.id)}
-                    className="bg-red-500 text-white px-2 py-1 text-sm"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(parent.id)}
+                        className="bg-red-500 text-white px-2 py-1 text-sm"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+      </div>
+        {/* Right Column - Add/Edit Form (30%) */}
+        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
+          <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
+
+          <input
+            type="file"
+            name="icon"
+            onChange={handleChange}
+            className="border p-1 mb-3 w-[100%]"
+          />
+
+
+          <input
+            name="name"
+            placeholder="Category Name"
+            value={form.name}
+            onChange={handleChange}
+            className="border p-1 mb-3 w-[100%]"
+          />
+
+          <select
+            name="parentId"
+            value={form.parentId}
+            onChange={handleChange}
+            className="border p-1 mb-3 w-[100%]"
+          >
+            <option value="">-- Main Category --</option>
+            {parentCategories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
-          </tbody>
-        </table>
-      )}
+          </select>
+
+          <button
+            onClick={handleSave}
+            className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
+          >
+            {editingId ? "Update" : "Create"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

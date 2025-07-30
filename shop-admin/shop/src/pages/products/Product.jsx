@@ -102,74 +102,78 @@ export default function Products() {
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Products</h2>
-
-      <div className="mb-6 bg-white p-4 shadow">
-        <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
-        <input name="title" placeholder="Title" className="border p-1 m-1" value={newProduct.title} onChange={handleInputChange} />
-        <input name="description" placeholder="Description" className="border p-1 m-1" value={newProduct.description} onChange={handleInputChange} />
-        <input name="price" type="number" placeholder="Price" className="border p-1 m-1" value={newProduct.price} onChange={handleInputChange} />
-        <input name="stock" type="number" placeholder="Stock" className="border p-1 m-1" value={newProduct.stock} onChange={handleInputChange} />
-        <select name="condition" className="border p-1 m-1" value={newProduct.condition} onChange={handleInputChange}>
-          <option value="NEW">New</option>
-          <option value="USED">Used</option>
-        </select>
-
-        <select name="categoryId" className="border p-1 m-1" value={newProduct.categoryId} onChange={handleInputChange}>
-          <option value="">Select Category</option>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-
-        <select name="subcategoryId" className="border p-1 m-1" value={newProduct.subcategoryId} onChange={handleInputChange}>
-          <option value="">Select Subcategory</option>
-          {subcategories.map(sc => (
-            <option key={sc.id} value={sc.id}>{sc.name}</option>
-          ))}
-        </select>
-
-        <select name="userId" className="border p-1 m-1" value={newProduct.userId} onChange={handleInputChange}>
-          <option value="">Select User</option>
-          {users.map(u => (
-            <option key={u.id} value={u.id}>{u.name || u.email}</option>
-          ))}
-        </select>
-
-        <input type="file" multiple accept="image/*" onChange={handleFileChange} className="m-1" />
-        <button onClick={handleCreateOrUpdate} className="bg-blue-500 text-white px-3 py-1 ml-2">{editingId ? 'Update' : 'Create'}</button>
-      </div>
-
-      <table className="w-full border bg-white shadow">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="p-2">Product Img</th>
-            <th className="p-2">Title</th>
-            <th className="p-2">Price</th>
-            <th className="p-2">Stock</th>
-            <th className="p-2">Condition</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map(p => (
-            <tr key={p.id}>
-              <td className="p-2">
-                <img src={`http://localhost:8080${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
-              </td>
-              <td className="p-2">{p.title}</td>
-              <td className="p-2">${p.price}</td>
-              <td className="p-2">{p.stock}</td>
-              <td className="p-2">{p.condition}</td>
-              <td className="p-2">
-                <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
-                <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
-              </td>
+    <div className="h-[100%]">
+      <div className="flex gap-4 h-[100%]">
+        {/* Left Column - User Table (70%) */}
+        <div className="w-[80%]">
+          <h2 className="text-xl font-bold mb-4">Products</h2>
+          <table className="w-full border bg-white shadow">
+          <thead>
+            <tr className="bg-gray-200 text-left">
+              <th className="p-2">Product Img</th>
+              <th className="p-2">Title</th>
+              <th className="p-2">Price</th>
+              <th className="p-2">Stock</th>
+              <th className="p-2">Condition</th>
+              <th className="p-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products.map(p => (
+              <tr key={p.id}>
+                <td className="p-2">
+                  <img src={`http://localhost:8080${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
+                </td>
+                <td className="p-2">{p.title}</td>
+                <td className="p-2">${p.price}</td>
+                <td className="p-2">{p.stock}</td>
+                <td className="p-2">{p.condition}</td>
+                <td className="p-2">
+                  <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
+                  <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Right Column - Add/Edit Form (30%) */}
+        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
+          <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
+          <input name="title" placeholder="Title" className="border p-1 mb-3 w-[100%]" value={newProduct.title} onChange={handleInputChange} />
+          <input name="description" placeholder="Description" className="border p-1 mb-3 w-[100%]" value={newProduct.description} onChange={handleInputChange} />
+          <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-[100%]" value={newProduct.price} onChange={handleInputChange} />
+          <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-[100%]" value={newProduct.stock} onChange={handleInputChange} />
+          <select name="condition" className="border p-1 mb-3 w-[100%]" value={newProduct.condition} onChange={handleInputChange}>
+            <option value="NEW">New</option>
+            <option value="USED">Used</option>
+          </select>
+
+          <select name="categoryId" className="border p-1 mb-3 w-[100%]" value={newProduct.categoryId} onChange={handleInputChange}>
+            <option value="">Select Category</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+
+          <select name="subcategoryId" className="border p-1 mb-3 w-[100%]" value={newProduct.subcategoryId} onChange={handleInputChange}>
+            <option value="">Select Subcategory</option>
+            {subcategories.map(sc => (
+              <option key={sc.id} value={sc.id}>{sc.name}</option>
+            ))}
+          </select>
+
+          <select name="userId" className="border p-1 mb-3 w-[100%]" value={newProduct.userId} onChange={handleInputChange}>
+            <option value="">Select User</option>
+            {users.map(u => (
+              <option key={u.id} value={u.id}>{u.name || u.email}</option>
+            ))}
+          </select>
+
+          <input type="file" multiple accept="image/*" onChange={handleFileChange} className="border p-1 mb-3 w-[100%]" />
+          <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}>{editingId ? 'Update' : 'Create'}</button>
+        </div>
+      </div>
     </div>
   );
 }
