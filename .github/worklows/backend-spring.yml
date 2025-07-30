@@ -1,0 +1,26 @@
+name: Spring Boot CI
+
+on:
+  push:
+    paths:
+      - 'shop-backend/**'
+  pull_request:
+    paths:
+      - 'shop-backend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: mvn clean install
+        working-directory: shop-backend
