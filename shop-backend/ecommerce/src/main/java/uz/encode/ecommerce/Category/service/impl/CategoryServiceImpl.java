@@ -1,15 +1,5 @@
 package uz.encode.ecommerce.Category.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import uz.encode.ecommerce.Category.dto.CategoryCreateDTO;
-import uz.encode.ecommerce.Category.dto.CategoryResponseDTO;
-import uz.encode.ecommerce.Category.entity.Category;
-import uz.encode.ecommerce.Category.repository.CategoryRepository;
-import uz.encode.ecommerce.Category.service.CategoryService;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,9 +9,23 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
+import uz.encode.ecommerce.Category.dto.CategoryCreateDTO;
+import uz.encode.ecommerce.Category.dto.CategoryResponseDTO;
+import uz.encode.ecommerce.Category.entity.Category;
+import uz.encode.ecommerce.Category.repository.CategoryRepository;
+import uz.encode.ecommerce.Category.service.CategoryService;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+
+    @Value("${upload.path}")
+    private String uploadFolderPath;
 
     private final CategoryRepository categoryRepository;
 
@@ -39,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             try {
                 String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
+                Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -89,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             try {
                 String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
+                Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

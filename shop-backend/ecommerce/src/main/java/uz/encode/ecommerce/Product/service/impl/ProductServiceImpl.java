@@ -1,9 +1,19 @@
 package uz.encode.ecommerce.Product.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
@@ -15,18 +25,12 @@ import uz.encode.ecommerce.ProductImage.entity.ProductImage;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+
+    @Value("${upload.path}")
+    private String uploadFolderPath;
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
@@ -55,21 +59,24 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
 
         if (images != null && !images.isEmpty()) {
+            Path uploadPath = Paths.get(uploadFolderPath);
+            Files.createDirectories(uploadPath); // Ensure folder exists
+
             for (MultipartFile image : images) {
                 String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-                Path uploadPath = Path.of("uploads/" + filename);
+                Path filePath = uploadPath.resolve(filename); // <-- build full file path
 
-                Files.createDirectories(uploadPath.getParent());
-                Files.copy(image.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 ProductImage productImage = new ProductImage();
                 productImage.setUrl("/images/" + filename);
 
-                savedProduct.addImage(productImage); // ✅ handles null safely
+                savedProduct.addImage(productImage);
             }
 
             productRepository.save(savedProduct);
         }
+
 
         return mapToDto(savedProduct);
     }

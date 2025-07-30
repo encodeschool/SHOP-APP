@@ -144,6 +144,7 @@ export default function Products() {
       <table className="w-full border bg-white shadow">
         <thead>
           <tr className="bg-gray-200 text-left">
+            <th className="p-2">Product Img</th>
             <th className="p-2">Title</th>
             <th className="p-2">Price</th>
             <th className="p-2">Stock</th>
@@ -154,6 +155,9 @@ export default function Products() {
         <tbody>
           {products.map(p => (
             <tr key={p.id}>
+              <td className="p-2">
+                <img src={`http://localhost:8080${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
+              </td>
               <td className="p-2">{p.title}</td>
               <td className="p-2">${p.price}</td>
               <td className="p-2">{p.stock}</td>

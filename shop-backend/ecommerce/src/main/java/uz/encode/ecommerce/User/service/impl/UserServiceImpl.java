@@ -1,8 +1,17 @@
 package uz.encode.ecommerce.User.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.User.dto.UserCreateDTO;
-import uz.encode.ecommerce.User.dto.UserDTO;
 import uz.encode.ecommerce.User.dto.UserResponseDTO;
 import uz.encode.ecommerce.User.dto.UserUpdateDTO;
 import uz.encode.ecommerce.User.entity.Role;
@@ -23,21 +32,12 @@ import uz.encode.ecommerce.User.mapper.UserMapper;
 import uz.encode.ecommerce.User.repository.UserRepository;
 import uz.encode.ecommerce.User.service.UserService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    @Value("${upload.path}")
+    private String uploadFolderPath;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         if (profilePicture != null && !profilePicture.isEmpty()) {
             try {
                 String fileName = UUID.randomUUID() + "_" + profilePicture.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
+                Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
         if (profilePicture != null && !profilePicture.isEmpty()) {
             try {
                 String fileName = UUID.randomUUID() + "_" + profilePicture.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
+                Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
 
             if (profilePicture != null && !profilePicture.isEmpty()) {
                 String fileName = UUID.randomUUID() + "_" + profilePicture.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
+                Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath); // ← This can throw IOException
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

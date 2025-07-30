@@ -6,6 +6,7 @@ import Users from './pages/user/User';
 import Categories from "./pages/category/Category";
 import Login from './pages/authorization/Login';
 import Register from './pages/authorization/Registration';
+import Orders from "./pages/orders/Order";
 
 // A simple helper to check if user is authenticated
 const isAuthenticated = () => !!localStorage.getItem('token');
@@ -35,6 +36,7 @@ function App() {
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="orders" element={<Orders />} />
         </Route>
 
         {/* Redirect unknown routes to login */}
