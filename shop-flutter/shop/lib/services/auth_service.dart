@@ -69,4 +69,9 @@ class AuthService {
       return false;
     }
   }
+
+  Future<String?> getUserId() async {
+    return await storage.read(key: 'userId');
+  }
+
 }

@@ -1,15 +1,20 @@
 package uz.encode.ecommerce.Favourite.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uz.encode.ecommerce.Product.entity.Product;
-import uz.encode.ecommerce.User.entity.User;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "favorites")
@@ -17,18 +22,20 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Favorite {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    private User user;
+    @Column(nullable = false)
+    private UUID userId;
 
-    @ManyToOne
-    private Product product;
+    @Column(nullable = false)
+    private UUID productId;
 
+    @CreationTimestamp
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

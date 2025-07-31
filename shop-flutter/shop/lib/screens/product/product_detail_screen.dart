@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/services/auth_service.dart';
+import 'package:shop/services/favorite_service.dart';
 import '../../core/cart_provider.dart';
 import '../../models/product_model.dart';
 import '../../services/product_service.dart';
@@ -14,13 +16,57 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final productService = ProductService();
+  final favoriteService = FavoriteService();
+  final authService = AuthService();
+
   Product? _product;
   bool _loading = true;
+  bool _isFavorite = false;
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
     _loadProduct();
+    _init();
+  }
+
+  Future<void> _init() async {
+    _userId = await authService.getUserId();
+    await _loadProduct();
+    if (_userId != null) {
+      await _checkIfFavorite();
+    }
+  }
+
+  Future<void> _checkIfFavorite() async {
+    final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
+    setState(() {
+      _isFavorite = favoriteIds.contains(widget.productId);
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please log in to use favorites.")),
+      );
+      return;
+    }
+
+    if (_isFavorite) {
+      await favoriteService.removeFavorite(_userId!, widget.productId);
+    } else {
+      await favoriteService.addFavorite(_userId!, widget.productId);
+    }
+
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_isFavorite ? "Added to favorites" : "Removed from favorites")),
+    );
   }
 
   Future<void> _loadProduct() async {
@@ -33,7 +79,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cart = context.read<CartProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Product Detail")),
+      appBar: AppBar(
+        title: const Text("Product Detail"),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: _toggleFavorite,
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _product == null
