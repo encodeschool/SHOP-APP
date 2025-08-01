@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shop/core/favorite_provider.dart';
 import 'package:shop/screens/auth/login_screen.dart';
 import 'package:shop/screens/auth/register_screen.dart';
 import 'package:shop/screens/cart/cart_screen.dart';
@@ -20,7 +19,6 @@ import 'package:shop/screens/profile/profile_screen.dart';
 import 'package:shop/screens/settings/settings_screen.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +33,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => FavoriteProvider()),
       ],
       child: MyApp(initialRoute: isLoggedIn ? '/home' : '/login'),
     ),
