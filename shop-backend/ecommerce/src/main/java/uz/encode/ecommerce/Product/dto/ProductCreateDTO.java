@@ -1,11 +1,14 @@
 package uz.encode.ecommerce.Product.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.Data;
-import uz.encode.ecommerce.Product.entity.ProductCondition;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import uz.encode.ecommerce.Product.entity.ProductCondition;
 
 @Data
 public class ProductCreateDTO {
@@ -21,6 +24,8 @@ public class ProductCreateDTO {
 
     @Min(0)
     private int quantity;
+
+    private Integer stock;
 
     @NotNull
     private ProductCondition condition;

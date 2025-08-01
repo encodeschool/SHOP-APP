@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(dto.getPrice());
         product.setQuantity(dto.getQuantity());
         product.setAvailable(dto.getQuantity() > 0);
-        product.setStock(dto.getQuantity());
+        product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
         product.setUser(user);
         product.setCategory(category);
@@ -112,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(dto.getPrice());
         product.setQuantity(dto.getQuantity());
         product.setAvailable(dto.getQuantity() > 0);
-        product.setStock(dto.getQuantity());
+        product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
 
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {

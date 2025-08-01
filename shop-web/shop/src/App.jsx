@@ -6,6 +6,8 @@ import AppBar from './components/AppBar';
 import SearchBar from './components/SearchBar';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
+import Checkout from './pages/Checkout';
+
 import CartView from './pages/CartView';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path='/cart' element={< CartView />} />
+            <Route path='/checkout' element={<Checkout />} />
+            {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>
         </main>

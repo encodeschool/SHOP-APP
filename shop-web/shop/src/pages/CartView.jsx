@@ -1,7 +1,7 @@
 // src/components/CartView.jsx
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart } from '../redux/cartSlice';
+import { removeFromCart, increaseQuantity, decreaseQuantity } from '../redux/cartSlice';
 
 const CartView = () => {
   const cartItems = useSelector(state => state.cart.items);
@@ -38,7 +38,23 @@ const CartView = () => {
                 />
                 <span>{item.title}</span>
               </td>
-              <td className="border border-gray-300 p-2 text-center">{item.quantity}</td>
+              <td className="border border-gray-300 p-2 text-center">
+                <div className="flex justify-center items-center gap-2">
+                  <button
+                    onClick={() => dispatch(decreaseQuantity(item.id))}
+                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded"
+                  >
+                    -
+                  </button>
+                  <span>{item.quantity}</span>
+                  <button
+                    onClick={() => dispatch(increaseQuantity(item.id))}
+                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded"
+                  >
+                    +
+                  </button>
+                </div>
+              </td>
               <td className="border border-gray-300 p-2 text-center">${item.price.toFixed(2)}</td>
               <td className="border border-gray-300 p-2 text-center">${(item.price * item.quantity).toFixed(2)}</td>
               <td className="border border-gray-300 p-2 text-center">
@@ -55,6 +71,16 @@ const CartView = () => {
             <td colSpan="3" className="text-right font-semibold p-2 border border-gray-300">Total:</td>
             <td className="text-center font-semibold p-2 border border-gray-300">${totalPrice.toFixed(2)}</td>
             <td className="border border-gray-300"></td>
+          </tr>
+          <tr>
+            <td colSpan="5" className="text-right p-2">
+              <a
+                href="/checkout"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded"
+              >
+                Proceed to Checkout
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
