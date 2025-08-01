@@ -9,11 +9,17 @@ import {
   FaTimes,
   FaPhone, FaMailBulk
 } from "react-icons/fa";
+import { useSelector } from 'react-redux';
 
 export default function SearchAppBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
 
   return (
     <header className="bg-white border-b shadow-sm w-full">
@@ -51,10 +57,12 @@ export default function SearchAppBar() {
           </Link>
           <Link to="/cart" className="relative flex items-center">
             <FaShoppingBag size={25} className="mr-1" />
-            <span className="absolute -bottom-2 left-[15px] bg-orange-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-              0
-            </span>
-            <span className="ml-2 text-xl">€0.00</span>
+            {totalQuantity > 0 && (
+              <span className="absolute -bottom-3 left-[15px] bg-orange-400 text-white rounded-full px-1 p-1 text-xs font-bold">
+                {totalQuantity}
+              </span>
+            )}
+            <span className="ml-2 text-xl">€{totalPrice.toFixed(2)}</span>
           </Link>
         </div>
       </div>

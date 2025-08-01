@@ -6,10 +6,10 @@ import AppBar from './components/AppBar';
 import SearchBar from './components/SearchBar';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
+import CartView from './pages/CartView';
 
 function App() {
   return (
-    <Router>
       <div className="flex flex-col min-h-screen">
         <AppBar />
         {/* <Navbar /> */}
@@ -18,12 +18,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path='/cart' element={< CartView />} />
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>
         </main>
         <Footer />
       </div>
-    </Router>
   );
 }
 

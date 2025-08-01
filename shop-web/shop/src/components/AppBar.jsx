@@ -22,11 +22,11 @@ export default function AppBar() {
         <div className="hidden md:flex items-center gap-4">
           <span className="flex items-center">
             <FaPhone className="mr-1" />
-            <b>+371 22164949</b>
+            <span>+371 22164949</span>
           </span>
           <span className="flex items-center">
             <FaMailBulk className="mr-1" />
-            <b>4games@4games.lv</b>
+            <span>4games@4games.lv</span>
           </span>
           <Link to="/track-order" className="hover:underline">Track Your Order</Link>
 
