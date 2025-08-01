@@ -16,6 +16,7 @@ export default function Products() {
     categoryId: '',       // root category
     subcategoryId: '',    // actual subcategory to save
     userId: '',
+    featured: false,
     images: []
   });
 
@@ -82,6 +83,7 @@ export default function Products() {
 
     const productPayload = {
       ...rest,
+      featured: newProduct.featured, // ✅ explicitly ensure it's included
       categoryId: finalCategoryId,
       stock: parseInt(newProduct.stock),
       price: parseFloat(newProduct.price)
@@ -110,6 +112,7 @@ export default function Products() {
       categoryId: '',
       subcategoryId: '',
       userId: '',
+      featured: false,
       images: []
     });
 
@@ -137,6 +140,7 @@ export default function Products() {
       categoryId: parentCategoryId || product.categoryId,
       subcategoryId: parentCategoryId ? product.categoryId : '',
       userId: product.userId,
+      featured: product.featured,
       images: []
     });
 
@@ -161,6 +165,7 @@ export default function Products() {
                 <th className="p-2">Price</th>
                 <th className="p-2">Stock</th>
                 <th className="p-2">Condition</th>
+                <th className="p-2">Featured</th>
                 <th className="p-2">Actions</th>
               </tr>
             </thead>
@@ -174,6 +179,7 @@ export default function Products() {
                   <td className="p-2">${p.price}</td>
                   <td className="p-2">{p.stock}</td>
                   <td className="p-2">{p.condition}</td>
+                  <td className="p-2">{p.featured ? 'Is Featured' : 'Not featured'}</td>
                   <td className="p-2">
                     <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
                     <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
@@ -218,6 +224,19 @@ export default function Products() {
               <option key={u.id} value={u.id}>{u.name || u.email}</option>
             ))}
           </select>
+
+          <input
+              type="checkbox"
+              className="p-1 mb-3"
+              checked={newProduct.featured}
+              onChange={(e) =>
+                setNewProduct((prev) => ({
+                  ...prev,
+                  featured: e.target.checked
+                }))
+              }
+          /> Is Featured?
+
 
           <input type="file" multiple accept="image/*" onChange={handleFileChange} className="border p-1 mb-3 w-full" />
           <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-full" : "bg-blue-500 text-white px-3 py-1 w-full"}>

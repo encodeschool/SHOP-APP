@@ -19,7 +19,7 @@ const CartView = () => {
       <h1 className="text-2xl font-semibold mb-4">Your Cart</h1>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
-          <tr className="bg-gray-200">
+          <tr className="bg-indigo-400 text-white text-center">
             <th className="border border-gray-300 p-2 text-left">Product</th>
             <th className="border border-gray-300 p-2">Quantity</th>
             <th className="border border-gray-300 p-2">Price</th>
@@ -76,7 +76,7 @@ const CartView = () => {
             <td colSpan="5" className="text-right p-2">
               <a
                 href="/checkout"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded"
+                className="inline-block bg-indigo-400 hover:bg-indigo-600 text-white font-semibold px-6 py-2 rounded"
               >
                 Proceed to Checkout
               </a>

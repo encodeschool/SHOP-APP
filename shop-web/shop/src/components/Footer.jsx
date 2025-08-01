@@ -10,13 +10,13 @@ export default function Footer() {
         {/* Contact & Address */}
         <div>
           <div className="flex items-center">
-            <MdSupportAgent className='text-orange-400' size={60} />
+            <MdSupportAgent className='text-indigo-400' size={60} />
             <div className='ml-4'>
               <p>info@info.com</p>
               <h1 className='text-2xl'>+123 456789</h1>
             </div>
           </div>
-          <div className="info text-sm mt-5">
+          <div className="info text-sm mt-5 mb-10">
             <p className='mb-3 font-bold'>Ganību dambis 36, Rīga, LV-1005</p>
             <p>Mon-Fri: 11:00 – 19:00</p>
             <p>Sat: 11:00 – 15:00</p>

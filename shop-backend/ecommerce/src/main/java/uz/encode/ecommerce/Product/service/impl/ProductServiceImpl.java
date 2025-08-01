@@ -114,6 +114,7 @@ public class ProductServiceImpl implements ProductService {
         product.setAvailable(dto.getQuantity() > 0);
         product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
+        product.setFeatured(dto.isFeatured());
 
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {
             Category category = categoryRepository.findById(dto.getCategoryId())

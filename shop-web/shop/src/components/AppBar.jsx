@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaPhone, FaMailBulk, FaBars, FaTimes } from "react-icons/fa";
+import { FaMailBulk, FaRegUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { TbTruckDelivery } from "react-icons/tb";
+import { CiMail } from "react-icons/ci";
+import { FaPhone } from "react-icons/fa6";
+
+
 
 export default function AppBar() {
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -24,33 +29,35 @@ export default function AppBar() {
             <FaPhone className="mr-1" />
             <span>+371 22164949</span>
           </span>
+          |
           <span className="flex items-center">
-            <FaMailBulk className="mr-1" />
+            <CiMail className="mr-1" />
             <span>4games@4games.lv</span>
           </span>
-          <Link to="/track-order" className="hover:underline">Track Your Order</Link>
-
+          |
+          <Link to="/track-order" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />Track Your Order</Link>
+          |
           {/* My Account Dropdown */}
           <div className="relative">
-            <button onClick={() => setAccountOpen(!accountOpen)} className="hover:underline">
+            <button onClick={() => setAccountOpen(!accountOpen)} className="flex items-center hover:underline">
+              < FaRegUserCircle className="mr-1" />
               My Account
             </button>
             {accountOpen && (
               <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10 w-40">
                 <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">Login</Link>
                 <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">Register</Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
               </div>
             )}
           </div>
-
+          |
           {/* Language Dropdown */}
           <div className="relative">
             <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
               English
             </button>
             {languageOpen && (
-              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10 w-32">
+              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
                 <button className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
                 <button className="block px-4 py-2 hover:bg-gray-100">Русский</button>
               </div>

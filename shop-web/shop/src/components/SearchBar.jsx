@@ -42,9 +42,9 @@ export default function SearchAppBar() {
           <input
             type="text"
             placeholder="Search for Products"
-            className="flex-1 px-4 py-2 rounded-l-full border border-orange-400 focus:outline-none"
+            className="flex-1 px-4 py-2 rounded-l-full border border-indigo-400 focus:outline-none"
           />
-          <button className="bg-orange-400 px-4 rounded-r-full text-white">
+          <button className="bg-indigo-400 px-4 rounded-r-full text-white">
             <FaSearch />
           </button>
         </div>
@@ -58,7 +58,7 @@ export default function SearchAppBar() {
           <Link to="/cart" className="relative flex items-center">
             <FaShoppingBag size={25} className="mr-1" />
             {totalQuantity > 0 && (
-              <span className="absolute -bottom-3 left-[15px] bg-orange-400 text-white rounded-full px-2 p-1 text-xs font-bold">
+              <span className="absolute -bottom-3 left-[15px] bg-indigo-400 text-white rounded-full px-2 p-1 text-xs font-bold">
                 {totalQuantity}
               </span>
             )}
@@ -80,7 +80,7 @@ export default function SearchAppBar() {
             <Link to="/cart" className="flex items-center gap-2 relative">
               <FaShoppingBag />
               <span>Cart</span>
-              <span className="absolute -top-2 -right-3 bg-orange-400 text-white text-xs font-bold px-1.5 rounded-full">
+              <span className="absolute -top-2 -right-3 bg-indigo-400 text-white text-xs font-bold px-1.5 rounded-full">
                 0
               </span>
             </Link>

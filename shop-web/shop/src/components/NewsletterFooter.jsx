@@ -4,7 +4,7 @@ import { LiaTelegramPlane } from "react-icons/lia";
 
 export default function NewsletterFooter() {
     return (
-        <div className="bg-orange-400 shadow-md text-white px-4 py-3">
+        <div className="bg-indigo-400 shadow-md text-white px-4 py-3">
             <div className="flex justify-between container mx-auto items-center">
                 <div>
                     <p className="flex items-center">
@@ -20,9 +20,9 @@ export default function NewsletterFooter() {
                         <input
                             type="text"
                             placeholder="Subsribe for more..."
-                            className="flex-1 px-4 py-2 rounded-l-full border border-orange-500 focus:outline-none"
+                            className="flex-1 px-4 py-2 rounded-l-full border border-indigo-500 focus:outline-none"
                         />
-                        <button className="bg-orange-500 px-4 rounded-r-full text-white">
+                        <button className="bg-indigo-500 px-4 rounded-r-full text-white">
                             Sign up
                         </button>
                     </div>

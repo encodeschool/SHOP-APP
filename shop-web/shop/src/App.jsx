@@ -7,9 +7,13 @@ import SearchBar from './components/SearchBar';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
+import About from './pages/About';
 
 import CartView from './pages/CartView';
+import CategoryPage from './pages/CategoryPage';
+import TermCondition from './pages/termCondition';
 import NewsletterFooter from './components/NewsletterFooter';
+import FilterPage from './pages/FilterPage';
 
 function App() {
   return (
@@ -23,6 +27,12 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path='/cart' element={< CartView />} />
             <Route path='/checkout' element={<Checkout />} />
+            <Route path="/category/:categoryId" element={<CategoryPage />} />
+            <Route path='/about' element={<About />} />
+            <Route path='/terms' element={<TermCondition />} />
+            {/* <Route path="/filtered" element={<FilterPage />} /> */}
+            {/* <Route path='/login' element={< Login />} />
+            <Route path='/registration' element={< Registration />} /> */}
             {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>

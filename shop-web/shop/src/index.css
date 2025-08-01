@@ -15,3 +15,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Add spacing above pagination dots */
+.swiper-pagination {
+  margin-top: 20px!important;
+}
+
+.swiper-wrapper {
+  margin-bottom: 50px;;
+}
+
+/* Style navigation arrows */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #6366F1!important; /* Tailwind orange-400 */
+  font-weight: bold!important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #6366F1!important;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px;
+}
