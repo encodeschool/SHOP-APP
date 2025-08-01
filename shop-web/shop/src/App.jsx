@@ -9,6 +9,7 @@ import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 
 import CartView from './pages/CartView';
+import NewsletterFooter from './components/NewsletterFooter';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>
         </main>
+        <NewsletterFooter />
         <Footer />
       </div>
   );

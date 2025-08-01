@@ -58,7 +58,7 @@ export default function SearchAppBar() {
           <Link to="/cart" className="relative flex items-center">
             <FaShoppingBag size={25} className="mr-1" />
             {totalQuantity > 0 && (
-              <span className="absolute -bottom-3 left-[15px] bg-orange-400 text-white rounded-full px-1 p-1 text-xs font-bold">
+              <span className="absolute -bottom-3 left-[15px] bg-orange-400 text-white rounded-full px-2 p-1 text-xs font-bold">
                 {totalQuantity}
               </span>
             )}
