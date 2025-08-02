@@ -16,7 +16,7 @@ export default function NewsletterFooter() {
                     <p>... and Be aware of all promotions and events!</p>
                 </div>
                 <div>
-                    <div className="hidden md:flex flex-1 mx-6 max-w-3xl">
+                    <div className="hidden md:flex flex-1 max-w-3xl">
                         <input
                             type="text"
                             placeholder="Subsribe for more..."

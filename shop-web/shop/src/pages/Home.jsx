@@ -8,6 +8,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
+import FeatureStrip from '../components/FeatureStrip';
 
 
 // Redux imports
@@ -85,6 +86,8 @@ const Home = () => {
         </div>
       </div>
       <CarouselBanner />
+      
+      <FeatureStrip />
 
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-xl">All Products</h1>

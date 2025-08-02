@@ -14,6 +14,10 @@ import CategoryPage from './pages/CategoryPage';
 import TermCondition from './pages/termCondition';
 import NewsletterFooter from './components/NewsletterFooter';
 import FilterPage from './pages/FilterPage';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import PrivateRoute from './api/PrivateRoutes';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -31,8 +35,16 @@ function App() {
             <Route path='/about' element={<About />} />
             <Route path='/terms' element={<TermCondition />} />
             {/* <Route path="/filtered" element={<FilterPage />} /> */}
-            {/* <Route path='/login' element={< Login />} />
-            <Route path='/registration' element={< Registration />} /> */}
+            <Route path='/login' element={< Login />} />
+            <Route path='/register' element={< Register />} />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
             {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>

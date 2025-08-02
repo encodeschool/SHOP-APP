@@ -1,16 +1,58 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaMailBulk, FaRegUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { TbTruckDelivery } from "react-icons/tb";
 import { CiMail } from "react-icons/ci";
 import { FaPhone } from "react-icons/fa6";
-
+import { AuthContext } from '../contexts/AuthContext';
+import axios from 'axios';
 
 
 export default function AppBar() {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { isLoggedIn, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+   const [user, setUser] = useState({
+    fullName: "Admin",
+    profileImage: "https://via.placeholder.com/40",
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token || !userId) return;
+
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser) {
+      setUser(JSON.parse(cachedUser));
+      return;
+    }
+
+    axios.get(`http://localhost:8080/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res) => {
+        setUser(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data));
+    })
+    .catch((err) => {
+        console.error("Failed to fetch user", err);
+    });
+  }, [isLoggedIn]); // Add isLoggedIn here
+
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <div className="bg-white text-sm border-b shadow-sm">
@@ -41,12 +83,24 @@ export default function AppBar() {
           <div className="relative">
             <button onClick={() => setAccountOpen(!accountOpen)} className="flex items-center hover:underline">
               < FaRegUserCircle className="mr-1" />
-              My Account
+              {isLoggedIn ? (
+                <>
+                  {user.name}
+                </>
+              ) : (
+                <p>My Account</p>
+              )}
             </button>
             {accountOpen && (
-              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10 w-40">
-                <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">Login</Link>
-                <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">Register</Link>
+              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
+                {isLoggedIn ? (
+                  <>
+                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
+                    <button onClick={handleLogout} className="block px-4 py-2 hover:bg-gray-100">Logout</button>
+                  </>
+                ) : (
+                  <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">Login</Link>
+                )}
               </div>
             )}
           </div>
