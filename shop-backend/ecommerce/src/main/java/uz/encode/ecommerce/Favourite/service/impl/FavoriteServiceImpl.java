@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import uz.encode.ecommerce.Favourite.entity.Favorite;
 import uz.encode.ecommerce.Favourite.repository.FavoriteRepository;
@@ -27,6 +28,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
+    @Transactional
     public void removeFavorite(UUID userId, UUID productId) {
         favoriteRepository.deleteByUserIdAndProductId(userId, productId);
     }

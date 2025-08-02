@@ -18,6 +18,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import PrivateRoute from './api/PrivateRoutes';
 import Profile from './pages/Profile';
+import {ToastContainer} from 'react-toastify';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
         </main>
         <NewsletterFooter />
         <Footer />
+        <ToastContainer position="top-right" autoClose={2000} />
       </div>
   );
 }

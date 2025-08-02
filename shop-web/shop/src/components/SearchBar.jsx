@@ -42,7 +42,7 @@ export default function SearchAppBar() {
           <input
             type="text"
             placeholder="Search for Products"
-            className="flex-1 px-4 py-2 rounded-l-full border border-indigo-400 focus:outline-none"
+            className="flex-1 px-4 py-2 rounded-l-full border-2 border-indigo-400 focus:outline-none"
           />
           <button className="bg-indigo-400 px-4 rounded-r-full text-white">
             <FaSearch />

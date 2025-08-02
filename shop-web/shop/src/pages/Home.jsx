@@ -9,6 +9,7 @@ import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import FeatureStrip from '../components/FeatureStrip';
+import FavoriteButton from '../components/FavoriteButton';
 
 
 // Redux imports
@@ -20,6 +21,8 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [selectedSubImage, setSelectedSubImage] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
@@ -43,6 +46,59 @@ const Home = () => {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (userId && token) {
+        try {
+          const res = await axios.get(`/favorites/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          // Map to productId array
+          const productIds = res.data.map(fav => fav.productId);
+          setFavorites(productIds);
+        } catch (error) {
+          console.error('Failed to fetch favorites:', error);
+        }
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+
+  const handleFavoriteToggle = async (productId) => {
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    if (!userId || !token) {
+      alert('Please log in to add favorites.');
+      return;
+    }
+
+    try {
+      if (favorites.includes(productId)) {
+        await axios.delete(`/favorites`, {
+          params: { userId, productId },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavorites(prev => prev.filter(id => id !== productId));
+      } else {
+        await axios.post(`/favorites`, null, {
+          params: { userId, productId },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavorites(prev => [...prev, productId]);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
+
 
   const handleAddToCart = (product) => {
     dispatch(addToCart(product));
@@ -101,14 +157,17 @@ const Home = () => {
               <p className={product.condition === 'NEW' ? 'absolute top-2 px-3 py-1 left-2 z-10 bg-green-600 text-white rounded' : 'absolute top-2 px-3 py-1 left-2 z-10 bg-yellow-300 text-white rounded'}>{product.condition}</p>
 
               <button
-                className="absolute top-2 right-2 z-10 bg-white rounded-full p-3 hover:text-red-500"
+                className={`absolute top-2 right-2 z-10 bg-white rounded-full p-3 ${
+                  favorites.includes(product.id) ? 'text-red-500' : 'text-gray-400'
+                }`}
                 onClick={(e) => {
                   e.preventDefault();
-                  // handleFavoriteToggle(product.id);
+                  handleFavoriteToggle(product.id);
                 }}
               >
                 <FaHeart size={25} />
               </button>
+
 
               <img
                 src={
@@ -125,15 +184,11 @@ const Home = () => {
                   <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
                   <p className="text-green-600">${product.price}</p>
                 </div>
-                <button
-                  className="bg-indigo-400 p-3 rounded-full text-white hover:bg-indigo-500"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAddToCart(product);
-                  }}
-                >
-                  <FaCartPlus size={15} />
-                </button>
+                <FavoriteButton
+                  productId={product.id}
+                  favorites={favorites}
+                  setFavorites={setFavorites}
+                />
               </div>
             </Link>
           ))}
@@ -191,15 +246,12 @@ const Home = () => {
                     {product.condition}
                   </p>
 
-                  <button
-                    className="absolute top-2 right-2 z-10 bg-white rounded-full p-3 hover:text-red-500"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // handleFavoriteToggle(product.id);
-                    }}
-                  >
-                    <FaHeart size={25} />
-                  </button>
+                  <FavoriteButton
+                    productId={product.id}
+                    favorites={favorites}
+                    setFavorites={setFavorites}
+                  />
+
 
                   <img
                     src={
