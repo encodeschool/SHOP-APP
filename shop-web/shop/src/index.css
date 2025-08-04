@@ -40,3 +40,20 @@ code {
 .swiper-button-prev::after {
   font-size: 18px;
 }
+
+.input {
+  @apply w-full border px-3 py-2 rounded;
+}
+
+.sticky {
+  position: sticky;
+  top: 20px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .sticky {
+    position: static;
+  }
+}

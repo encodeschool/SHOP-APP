@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
 import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
 import uz.encode.ecommerce.Order.service.OrderService;
+import uz.encode.ecommerce.User.service.UserService;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -32,16 +32,17 @@ import uz.encode.ecommerce.Order.service.OrderService;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
 
     @Operation(summary = "Save Order")
-    @PreAuthorize("hasRole('BUYER')")
+    // @PreAuthorize("hasRole('BUYER')")
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO dto) {
         return new ResponseEntity<>(orderService.createOrder(dto), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get Order")
-    @PreAuthorize("hasRole('ADMIN') or @orderSecurity.isOrderOwner(#orderId, authentication.name)")
+    // @PreAuthorize("hasRole('ADMIN') or @orderSecurity.isOrderOwner(#orderId, authentication.name)")
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDTO> getOrder(@PathVariable UUID orderId) {
         return ResponseEntity.ok(orderService.getOrder(orderId));
@@ -54,7 +55,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Get All Orders")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    // @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
@@ -65,7 +66,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Update Order Status")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable UUID orderId,

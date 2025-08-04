@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {AuthContext} from '../contexts/AuthContext';
 import Register from '../pages/Register';
 
@@ -9,6 +9,10 @@ export default function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,12 +31,15 @@ export default function Login() {
       const data = await res.json();
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
-      login(data.token, data.userId);
-      navigate("/");
+
+      login(data.token, data.userId); // From AuthContext
+
+      navigate(from, { replace: true }); // <-- this makes it work properly
     } catch (err) {
       setError(err.message);
     }
   };
+
 
   return (
     <div className="max-w-md mx-auto mt-10  text-center">

@@ -1,30 +1,34 @@
 package uz.encode.ecommerce.Order.service.impl;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.stripe.Stripe;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
-
-import uz.encode.ecommerce.Order.dto.*;
-import uz.encode.ecommerce.Order.entity.*;
-import uz.encode.ecommerce.Order.repository.*;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import uz.encode.ecommerce.Order.dto.OrderItemResponseDTO;
+import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
+import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
+import uz.encode.ecommerce.Order.entity.Order;
+import uz.encode.ecommerce.Order.entity.OrderItem;
+import uz.encode.ecommerce.Order.entity.OrderStatus;
+import uz.encode.ecommerce.Order.repository.OrderItemRepository;
+import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Order.service.OrderService;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -40,69 +44,42 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
-        Stripe.apiKey = stripeSecretKey;
-        
-        User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findById(dto.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         Order order = new Order();
         order.setUser(user);
+        order.setTotalPrice(dto.getTotalPrice());
         order.setStatus(OrderStatus.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
 
-        List<OrderItem> items = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
+        order.setCountry(dto.getCountry());
+        order.setCity(dto.getCity());
+        order.setZip(dto.getZip());
+        order.setNotes(dto.getNotes());
+        order.setShippingMethod(dto.getShippingMethod());
+        order.setPaymentMethod(dto.getPaymentMethod());
+        order.setLegalEntity(dto.isLegalEntity());
+        order.setCompanyName(dto.getCompanyName());
+        order.setRegistrationNr(dto.getRegistrationNr());
+        order.setVatNumber(dto.getVatNumber());
+        order.setLegalAddress(dto.getLegalAddress());
+        order.setAgreeToTerms(dto.isAgreeToTerms());
 
-        for (OrderItemRequestDTO itemDTO : dto.items()) {
-            Product product = productRepository.findById(itemDTO.productId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        List<OrderItem> items = dto.getItems().stream().map(i -> {
+            Product product = productRepository.findById(i.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            if (product.getQuantity() < itemDTO.quantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
-            }
-
-            OrderItem item = new OrderItem();
-            item.setProduct(product);
-            item.setOrder(order);
-            item.setQuantity(itemDTO.quantity());
-            item.setPricePerUnit(product.getPrice());
-
-            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(itemDTO.quantity())));
-            items.add(item);
-
-            product.setQuantity(product.getQuantity() - itemDTO.quantity()); // Update stock
-        }
+            return new OrderItem(null, order, product, i.getQuantity(), i.getPricePerUnit());
+        }).collect(Collectors.toList());
 
         order.setItems(items);
-        order.setTotalPrice(total);
-
-        // Create Stripe PaymentIntent
-        String clientSecret;
-        try {
-            PaymentIntent paymentIntent = PaymentIntent.create(
-                    PaymentIntentCreateParams.builder()
-                            .setAmount(order.getTotalPrice().multiply(BigDecimal.valueOf(100)).longValue())
-                            .setCurrency("usd")
-                            .setAutomaticPaymentMethods(
-                                    PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                            .setEnabled(true)
-                                            .build()
-                            )
-                            .build()
-            );
-            clientSecret = paymentIntent.getClientSecret();
-        } catch (StripeException e) {
-            throw new RuntimeException("Failed to create PaymentIntent: " + e.getMessage());
-        }
-
         orderRepository.save(order);
-        productRepository.saveAll(
-                items.stream().map(OrderItem::getProduct).toList()
-        );
 
-        OrderResponseDTO response = mapToDTO(order);
-        response.setClientSecret(clientSecret);
-        return response;
+        // Send confirmation email
+        // emailService.sendOrderConfirmation(user.getEmail(), order);
+
+        return mapToDTO(order);
     }
 
     @Override

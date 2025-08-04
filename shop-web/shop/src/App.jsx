@@ -19,6 +19,8 @@ import Login from './pages/Login';
 import PrivateRoute from './api/PrivateRoutes';
 import Profile from './pages/Profile';
 import {ToastContainer} from 'react-toastify';
+import ProtectedRoute from './services/ProtectedRoute';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 function App() {
   return (
@@ -31,10 +33,18 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path='/cart' element={< CartView />} />
-            <Route path='/checkout' element={<Checkout />} />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
             <Route path='/about' element={<About />} />
             <Route path='/terms' element={<TermCondition />} />
+            <Route path='/order-confirmation' element={< OrderConfirmation />} />
             {/* <Route path="/filtered" element={<FilterPage />} /> */}
             <Route path='/login' element={< Login />} />
             <Route path='/register' element={< Register />} />

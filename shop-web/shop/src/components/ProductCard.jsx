@@ -1,10 +1,40 @@
-import React from 'react';
+import React, {useEffect,useState} from 'react';
 import { Link } from 'react-router-dom';
+import FavoriteButton from '../components/FavoriteButton';
+import axios from '../api/axios';
+
 
 const ProductCard = ({ product }) => {
+  const [favorites, setFavorites] = useState([]);
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (userId && token) {
+        try {
+          const res = await axios.get(`/favorites/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          // Map to productId array
+          const productIds = res.data.map(fav => fav.productId);
+          setFavorites(productIds);
+        } catch (error) {
+          console.error('Failed to fetch favorites:', error);
+        }
+      }
+    };
+
+    fetchFavorites();
+  }, []);
   return (
     <Link to={`/product/${product.id}`}>
-      <div className="border rounded shadow p-3 hover:shadow-md">
+      <div className="border relative rounded shadow p-3 hover:shadow-md">
+        <FavoriteButton
+          productId={product.id}
+          favorites={favorites}
+          setFavorites={setFavorites}
+        />
         <img
           src={
             product.imageUrls?.[0]
