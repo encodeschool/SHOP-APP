@@ -13,8 +13,27 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState(null);
   const [message, setMessage] = useState('');
   const [favorites, setFavorites] = useState([]);
-
+  const [orders, setOrders] = useState([]);
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+
+    const fetchOrders = async () => {
+      if (activeTab === 'orders' && userId && token) {
+        try {
+          const res = await axios.get(`http://localhost:8080/api/orders/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setOrders(res.data);
+        } catch (err) {
+          console.error('Failed to fetch orders:', err);
+        }
+      }
+    };
+
+    fetchOrders();
+  }, [activeTab, token]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -199,8 +218,32 @@ export default function Profile() {
 
 
       {activeTab === 'orders' && (
-        <div>
-          <p className="text-gray-600">Your orders will appear here.</p>
+        <div className="space-y-4">
+          {orders.length === 0 ? (
+            <p className="text-gray-600">You have no orders yet.</p>
+          ) : (
+            orders.map(order => (
+              <div key={order.id} className="border p-4 rounded-lg">
+                <h3 className="text-lg font-semibold">Order ID: {order.id}</h3>
+                <p>Status: {order.status}</p>
+                <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
+                <p>Shipping Method: {order.shippingMethod}</p>
+                <p>Shipping Cost: ${order.shippingCost}</p>
+                <p className="font-semibold">Total: ${order.totalPrice}</p>
+
+                <div className="mt-2">
+                  <h4 className="font-medium">Items:</h4>
+                  <ul className="list-disc ml-6">
+                    {order.items.map((item, index) => (
+                      <li key={`${order.id}-${index}`}>
+                        {item.productTitle} × {item.quantity} — ${item.pricePerUnit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>

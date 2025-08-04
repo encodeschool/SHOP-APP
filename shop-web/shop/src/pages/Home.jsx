@@ -189,6 +189,15 @@ const Home = () => {
                   favorites={favorites}
                   setFavorites={setFavorites}
                 />
+                <button
+                      className="bg-indigo-400 p-3 rounded-full text-white hover:bg-indigo-500"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddToCart(product);
+                      }}
+                    >
+                    <FaCartPlus size={15} />
+                </button>
               </div>
             </Link>
           ))}
