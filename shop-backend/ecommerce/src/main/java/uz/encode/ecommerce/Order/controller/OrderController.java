@@ -4,6 +4,7 @@ package uz.encode.ecommerce.Order.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
 import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
 import uz.encode.ecommerce.Order.service.OrderService;
@@ -26,13 +26,14 @@ import uz.encode.ecommerce.User.service.UserService;
 
 @RestController
 @RequestMapping("/api/orders")
-@RequiredArgsConstructor
 @Tag(name = "Order API", description = "Order API Management")
 @CrossOrigin(origins = "*")
 public class OrderController {
 
-    private final OrderService orderService;
-    private final UserService userService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private UserService userService;
 
     @Operation(summary = "Save Order")
     // @PreAuthorize("hasRole('BUYER')")

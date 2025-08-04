@@ -1,19 +1,18 @@
 package uz.encode.ecommerce.User.service;
 
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.multipart.MultipartFile;
-
-import uz.encode.ecommerce.User.dto.UserCreateDTO;
-import uz.encode.ecommerce.User.dto.UserDTO;
-import uz.encode.ecommerce.User.dto.UserResponseDTO;
-import uz.encode.ecommerce.User.entity.User;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import uz.encode.ecommerce.User.dto.UserCreateDTO;
+import uz.encode.ecommerce.User.dto.UserResponseDTO;
+
+@Service
 public interface UserService extends UserDetailsService {
 
     UserResponseDTO create(UserCreateDTO dto, MultipartFile profilePicture);

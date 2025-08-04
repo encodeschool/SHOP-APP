@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import uz.encode.ecommerce.Order.dto.OrderItemResponseDTO;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
 import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
@@ -28,15 +27,19 @@ import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Value("${stripe.secret-key}")
     private String stripeSecretKey;
@@ -77,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         // Send confirmation email
-        // emailService.sendOrderConfirmation(user.getEmail(), order);
+        emailService.sendOrderConfirmation(user.getEmail(), order);
 
         return mapToDTO(order);
     }

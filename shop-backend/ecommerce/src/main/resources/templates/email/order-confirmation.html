@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+</head>
+<body>
+    <h2>Thank you for your order!</h2>
+    <p>Order ID: <span th:text="${order.id}"></span></p>
+    <p>Status: <span th:text="${order.status}"></span></p>
+    <p>Order Date: <span th:text="${order.createdAt}"></span></p>
+
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr><th>Product</th><th>Quantity</th><th>Unit Price</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${order.items}">
+                <td th:text="${item.product.title}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${item.pricePerUnit}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>Total:</strong> $<span th:text="${order.totalPrice}"></span></p>
+    <p>We will notify you once your order is shipped.</p>
+    <br>
+    <p>Best regards,<br>Your Shop Team</p>
+</body>
+</html>
