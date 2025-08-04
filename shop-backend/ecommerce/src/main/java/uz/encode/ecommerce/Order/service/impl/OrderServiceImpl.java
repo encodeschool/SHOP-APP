@@ -1,5 +1,6 @@
 package uz.encode.ecommerce.Order.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,7 +54,25 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        order.setTotalPrice(dto.getTotalPrice());
+        BigDecimal productTotal = dto.getItems().stream()
+            .map(item -> item.getPricePerUnit().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Add shipping fee
+        BigDecimal shippingFee;
+        switch (dto.getShippingMethod()) {
+            case "express":
+                shippingFee = BigDecimal.valueOf(15);
+                break;
+            case "standard":
+            default:
+                shippingFee = BigDecimal.valueOf(5);
+                break;
+        }
+
+        BigDecimal totalPrice = productTotal.add(shippingFee);
+        order.setTotalPrice(totalPrice);
+
         order.setStatus(OrderStatus.PENDING);
 
         order.setCountry(dto.getCountry());

@@ -15,8 +15,6 @@ const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
   const {
     register,
     handleSubmit,
@@ -39,7 +37,13 @@ const Checkout = () => {
     }
   }, [user, navigate, location, setValue]);
 
+  // ✅ Updated: calculate shipping price
+  const shippingPrice = shippingMethod === 'express' ? 15 : 5;
+  const itemsTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = itemsTotal + shippingPrice;
+
   const onSubmit = async (data) => {
+    // ✅ Updated: Build checkout payload with full details
     const checkoutPayload = {
       userId: user.id,
       items: cartItems.map((item) => ({
@@ -47,22 +51,39 @@ const Checkout = () => {
         quantity: item.quantity,
         pricePerUnit: item.price,
       })),
+      shippingMethod: data.shippingMethod, // ✅ Updated
+      paymentMethod: data.paymentMethod,   // ✅ Updated
+      shippingPrice: shippingPrice,        // ✅ Updated
+      totalPrice: totalPrice,              // ✅ Updated
+      shippingAddress: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        country: data.country,
+        zip: data.zip,
+        city: data.city,
+        notes: data.notes || '',
+      },
+      paymentInfo: {
+        isLegalEntity: data.isLegalEntity || false,
+        companyName: data.companyName || '',
+        registrationNr: data.registrationNr || '',
+        vatNumber: data.vatNumber || '',
+        legalAddress: data.legalAddress || '',
+      },
     };
 
     try {
-      const response = await axios.post('/orders', checkoutPayload);
-
+      const response = await axios.post('/orders', checkoutPayload); // ✅ Updated
       const order = response.data;
       console.log('Order created:', order);
       dispatch(saveCheckoutInfo(data));
-      localStorage.setItem('checkoutInfo', JSON.stringify(data)); // 👈 Save for refresh-proofing
+      localStorage.setItem('checkoutInfo', JSON.stringify(data)); // ✅ Persistent
       navigate('/order-confirmation');
     } catch (error) {
       console.error('Error submitting checkout:', error.response?.data || error.message);
     }
   };
-
-
 
   if (cartItems.length === 0) {
     return (
@@ -244,7 +265,7 @@ const Checkout = () => {
             <tr className="border-t-2 border-indigo-400 font-bold">
               <td className='py-4'>Total:</td>
               <td className="text-right">
-                ${totalPrice.toFixed(2)}{/* + shipping will be added on backend if needed */}
+                ${totalPrice.toFixed(2)} {/* ✅ Updated: total includes shipping */}
               </td>
             </tr>
 

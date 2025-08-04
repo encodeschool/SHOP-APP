@@ -4,28 +4,50 @@
     <meta charset="UTF-8">
     <title>Order Confirmation</title>
 </head>
-<body>
-    <h2>Thank you for your order!</h2>
-    <p>Order ID: <span th:text="${order.id}"></span></p>
-    <p>Status: <span th:text="${order.status}"></span></p>
-    <p>Order Date: <span th:text="${order.createdAt}"></span></p>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
 
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr><th>Product</th><th>Quantity</th><th>Unit Price</th></tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${order.items}">
-                <td th:text="${item.product.title}"></td>
-                <td th:text="${item.quantity}"></td>
-                <td th:text="${item.pricePerUnit}"></td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <!-- <img src="https://via.placeholder.com/150x50?text=Your+Logo" alt="Shop Logo" style="height: 50px;"> -->
+             Shop
+        </div>
 
-    <p><strong>Total:</strong> $<span th:text="${order.totalPrice}"></span></p>
-    <p>We will notify you once your order is shipped.</p>
-    <br>
-    <p>Best regards,<br>Your Shop Team</p>
+        <!-- Heading -->
+        <h2 style="color: rgb(129, 140, 248);">Thank you for your order!</h2>
+
+        <!-- Order Info -->
+        <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
+        <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
+        <p><strong>Order Date:</strong> <span th:text="${formattedDate}"></span></p>
+
+        <!-- Table -->
+        <h3 style="margin-top: 30px;">Order Summary</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: rgb(129, 140, 248); color: white;">
+                    <th style="padding: 10px; text-align: left;">Product</th>
+                    <th style="padding: 10px; text-align: right;">Quantity</th>
+                    <th style="padding: 10px; text-align: right;">Unit Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${order.items}" style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;" th:text="${item.product.title}"></td>
+                    <td style="padding: 10px; text-align: right;" th:text="${item.quantity}"></td>
+                    <td style="padding: 10px; text-align: right;" th:text="${item.pricePerUnit}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Total -->
+        <p style="margin-top: 20px; font-size: 16px;"><strong>Total:</strong> $<span th:text="${formattedTotal}"></span></p>
+
+        <!-- Message -->
+        <p style="margin-top: 30px;">We will notify you once your order is shipped.</p>
+
+        <!-- Footer -->
+        <p style="margin-top: 40px;">Best regards,<br><strong>Your Shop Team</strong></p>
+    </div>
 </body>
 </html>
