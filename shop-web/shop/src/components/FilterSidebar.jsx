@@ -4,7 +4,10 @@ import { setBrands, setInStock, setPriceRange } from '../redux/filterSlice';
 
 export default function FilterSidebar() {
   const dispatch = useDispatch();
-  const { brands = [], inStock = false, priceRange = [0, 220] } = useSelector((state) => state.filters || {});
+  const brands = useSelector((state) => state.filters.brands);
+  const inStock = useSelector((state) => state.filters.inStock);
+  const priceRange = useSelector((state) => state.filters.priceRange);
+
   const brandsList = ['ABYstyle', 'Bandai Banpresto', 'Blizzard', 'Funko', 'Iron Studios'];
 
   const handleBrandChange = (brand) => {
@@ -17,10 +20,11 @@ export default function FilterSidebar() {
   return (
     <Disclosure>
       {({ open }) => (
-        <>
-          <Disclosure.Button className="md:hidden w-full p-2 bg-indigo-500 text-white">
+        <div>
+          <Disclosure.Button className="w-full p-2 bg-indigo-500 text-white">
             {open ? 'Hide Filters' : 'Show Filters'}
           </Disclosure.Button>
+
           <Disclosure.Panel className="md:block">
             <div className="space-y-6 p-4 border-r">
               <div>
@@ -66,7 +70,7 @@ export default function FilterSidebar() {
               </div>
             </div>
           </Disclosure.Panel>
-        </>
+        </div>
       )}
     </Disclosure>
   );

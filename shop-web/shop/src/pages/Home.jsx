@@ -125,7 +125,7 @@ const Home = () => {
                     : '/placeholder.jpg'
                 }
                 alt={category.name}
-                className="w-[20px] invert-[100%] mr-2 object-contain w-full"
+                className="w-[20px] invert-[100%] mr-2 object-contain"
               />
               <button className="hover:underline">{category.name}</button>
 

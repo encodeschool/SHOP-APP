@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -156,5 +158,34 @@ public class ProductServiceImpl implements ProductService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort) {
+        List<Product> products = productRepository.findAll();
+
+        Stream<Product> stream = products.stream();
+
+        if (brands != null && !brands.isEmpty()) {
+            stream = stream.filter(p -> brands.contains(p.getBrand()));
+        }
+
+        if (inStock != null && inStock) {
+            stream = stream.filter(Product::isInStock);
+        }
+
+        if (maxPrice != null) {
+            stream = stream.filter(p -> p.getPrice().doubleValue() <= maxPrice);
+        }
+
+        if ("price-asc".equals(sort)) {
+            stream = stream.sorted(Comparator.comparing(p -> p.getPrice().doubleValue()));
+        } else if ("price-desc".equals(sort)) {
+            stream = stream.sorted(Comparator.comparing((Product p) -> p.getPrice().doubleValue()).reversed());
+        }
+
+        return stream.map(this::mapToDto).toList();
+    }
+
+
     
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,4 +87,15 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDTO>> getFeatured() {
         return ResponseEntity.ok(productService.getFeatured());
     }
+
+    @GetMapping("/filtered")
+    public ResponseEntity<List<ProductResponseDTO>> getAllFiltered(
+        @RequestParam(required = false) List<String> brands,
+        @RequestParam(required = false) Boolean inStock,
+        @RequestParam(required = false) Double maxPrice,
+        @RequestParam(required = false) String sort
+    ) {
+        return ResponseEntity.ok(productService.getFiltered(brands, inStock, maxPrice, sort));
+    }
+
 }

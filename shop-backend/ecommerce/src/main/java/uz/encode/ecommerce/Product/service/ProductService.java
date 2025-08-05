@@ -1,14 +1,13 @@
 package uz.encode.ecommerce.Product.service;
-import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
-import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import uz.encode.ecommerce.Product.entity.Product;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
+import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 
 @Service
 public interface ProductService {
@@ -20,4 +19,5 @@ public interface ProductService {
     ProductResponseDTO update(UUID id, ProductCreateDTO dto);
     void delete(UUID id);
     List<ProductResponseDTO> getFeatured(); // Add this
+    List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort);
 }

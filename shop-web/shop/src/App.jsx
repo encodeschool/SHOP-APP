@@ -45,7 +45,7 @@ function App() {
             <Route path='/about' element={<About />} />
             <Route path='/terms' element={<TermCondition />} />
             <Route path='/order-confirmation' element={< OrderConfirmation />} />
-            {/* <Route path="/filtered" element={<FilterPage />} /> */}
+            <Route path="/filtered" element={<FilterPage />} />
             <Route path='/login' element={< Login />} />
             <Route path='/register' element={< Register />} />
             <Route
