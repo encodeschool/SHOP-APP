@@ -111,13 +111,22 @@ const Home = () => {
           {categories.map((category) => (
             <div
               key={category.id}
-              className="relative"
+              className="flex relative"
               onMouseEnter={() => setHoveredCategory(category)}
               onMouseLeave={() => {
                 setHoveredCategory(null);
                 setSelectedSubImage(null);
               }}
             >
+              <img
+                src={
+                  category.icon
+                    ? `http://localhost:8080${category.icon}`
+                    : '/placeholder.jpg'
+                }
+                alt={category.name}
+                className="w-[20px] invert-[100%] mr-2 object-contain w-full"
+              />
               <button className="hover:underline">{category.name}</button>
 
               {/* Mega Menu Dropdown */}
