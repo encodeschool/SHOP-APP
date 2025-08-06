@@ -164,7 +164,7 @@ const Home = () => {
               key={product.id}
               className="relative border p-4 rounded-xl hover:shadow group"
             >
-              <p className={product.condition === 'NEW' ? 'absolute top-2 px-3 py-1 left-2 z-10 bg-green-600 text-white rounded' : 'absolute top-2 px-3 py-1 left-2 z-10 bg-yellow-300 text-white rounded'}>{product.condition}</p>
+              <p className={product.condition === 'NEW' ? 'absolute top-0 px-3 py-1 rounded-tl-xl left-0 z-10 bg-green-600 text-white' : 'absolute top-0 px-3 py-1 left-0 z-10 bg-yellow-300 text-white rounded-tl-xl'}>{product.condition}</p>
 
               <button
                 className={`absolute top-2 right-2 z-10 bg-white rounded-full p-3 ${
@@ -189,7 +189,7 @@ const Home = () => {
                 className="h-40 object-contain w-full"
               />
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-stretch justify-between">
                 <div>
                   <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
                   <p className="text-green-600">${product.price}</p>
@@ -201,7 +201,7 @@ const Home = () => {
                   setFavorites={setFavorites}
                 />
                 <button
-                      className="bg-indigo-400 p-3 rounded-full text-white hover:bg-indigo-500"
+                      className="bg-indigo-400 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-indigo-500"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddToCart(product);

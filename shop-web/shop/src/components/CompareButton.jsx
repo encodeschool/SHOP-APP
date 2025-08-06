@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { addToCompare } from '../redux/compareSlice';
+import {FaSyncAlt} from 'react-icons/fa';
 
 const CompareButton = ({ product }) => {
   const dispatch = useDispatch();
@@ -12,8 +13,9 @@ const CompareButton = ({ product }) => {
   return (
     <button
       onClick={handleCompare}
-      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+      className="text-black flex items-center text-gray-400 justify-center mt-2 py-1 rounded hover:underline"
     >
+      <FaSyncAlt className='mr-2' size={13} />
       Compare
     </button>
   );
