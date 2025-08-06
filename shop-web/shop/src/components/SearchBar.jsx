@@ -51,7 +51,9 @@ export default function SearchAppBar() {
 
         {/* Icons: Desktop only */}
         <div className="hidden md:flex items-center gap-6 text-gray-700">
-          <FaSyncAlt size={25} className="cursor-pointer" />
+          <Link to="/compare">
+            <FaSyncAlt size={25} className="cursor-pointer" />
+          </Link>
           <Link to="/favorites">
             <FaHeart size={25} className="cursor-pointer" />
           </Link>
@@ -84,9 +86,11 @@ export default function SearchAppBar() {
                 0
               </span>
             </Link>
-            <div className="flex items-center gap-2">
-              <FaSyncAlt /> Sync
-            </div>
+            <Link to="/compare">
+              <div className="flex items-center gap-2">
+                <FaSyncAlt /> Sync
+              </div>
+            </Link>
           </div>
           <Link to="/terms" className="block hover:underline">Terms & Conditions</Link>
           <Link to="/delivery" className="block hover:underline">Delivery & Payment</Link>

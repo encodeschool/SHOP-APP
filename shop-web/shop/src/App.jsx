@@ -22,6 +22,7 @@ import {ToastContainer} from 'react-toastify';
 import ProtectedRoute from './services/ProtectedRoute';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Favorites from './pages/Favorites';
+import Compare from './pages/Compare';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
             <Route path="/filtered" element={<FilterPage />} />
             <Route path='/login' element={< Login />} />
             <Route path='/register' element={< Register />} />
+            <Route path="/compare" element={<Compare />} />
             <Route
               path="/profile"
               element={

@@ -5,6 +5,7 @@ import { addToCart } from '../redux/cartSlice';
 import { useDispatch } from 'react-redux';
 import { FaCartPlus } from 'react-icons/fa';
 import Breadcrumb from '../components/Breadcrumb';
+import CompareButton from '../components/CompareButton';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -98,6 +99,7 @@ const ProductDetail = () => {
               <FaCartPlus className='mr-2'/>
               Add to Cart
             </button>
+            <CompareButton product={product} />
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import FeatureStrip from '../components/FeatureStrip';
 import FavoriteButton from '../components/FavoriteButton';
+import CompareButton from '../components/CompareButton';
 
 
 // Redux imports
@@ -192,6 +193,7 @@ const Home = () => {
                 <div>
                   <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
                   <p className="text-green-600">${product.price}</p>
+                  <CompareButton product={product} />
                 </div>
                 <FavoriteButton
                   productId={product.id}
