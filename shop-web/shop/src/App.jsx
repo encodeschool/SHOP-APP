@@ -11,7 +11,7 @@ import About from './pages/About';
 
 import CartView from './pages/CartView';
 import CategoryPage from './pages/CategoryPage';
-import TermCondition from './pages/termCondition';
+import TermCondition from './pages/TermCondition';
 import NewsletterFooter from './components/NewsletterFooter';
 import FilterPage from './pages/FilterPage';
 import Register from './pages/Register';
@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import {ToastContainer} from 'react-toastify';
 import ProtectedRoute from './services/ProtectedRoute';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Favorites from './pages/Favorites';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route path='/favorites' element={< Favorites />} />
             {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>
