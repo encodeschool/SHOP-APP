@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import DynamicAttributeForm from '../../components/DynamicAttributeForm';
-
+import {Link} from 'react-router-dom';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -185,6 +185,7 @@ export default function Products() {
       <div className="flex gap-4 h-[100%]">
         <div className="w-[80%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
+          <Link to="/product_attribute">Add Extra Attribute</Link>
           <table className="w-full border bg-white shadow">
             <thead>
               <tr className="bg-gray-200 text-left">

@@ -8,14 +8,43 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (categoryId) {
-      axios.get(`/products/attributes/category/${categoryId}`).then((res) => {
-        setAttributes(res.data);
-        setValues({});
+    const loadAttributesAndValues = async () => {
+      if (!categoryId) return;
+
+      try {
+        // 1. Load attribute schema
+        const attrRes = await axios.get(`/products/attributes/category/${categoryId}`);
+        console.log('Attributes API response:', attrRes.data);
+        console.log('Is array:', Array.isArray(attrRes.data));
+        const attributeDefs = Array.isArray(attrRes.data) ? attrRes.data : [];
+        setAttributes(attributeDefs);
+
+        // 2. Load existing values if editing a product
+        if (productId) {
+          const valueRes = await axios.get(`/products/attributes`, {
+            params: { productId },
+          });
+
+          const existingValues = {};
+          valueRes.data.forEach(attrVal => {
+            existingValues[attrVal.attributeId] = attrVal.value;
+          });
+
+          setValues(existingValues);
+          onChange(existingValues); // update parent
+        } else {
+          setValues({});
+        }
+
         setErrors({});
-      });
-    }
-  }, [categoryId]);
+      } catch (err) {
+        console.error('Failed to load attributes or values', err);
+      }
+    };
+
+    loadAttributesAndValues();
+  }, [categoryId, productId]);
+
 
   const handleChange = (id, value) => {
     const updatedValues = { ...values, [id]: value };

@@ -24,4 +24,7 @@ public interface ProductService {
     List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort);
     List<ProductAttribute> findByCategoryId(UUID categoryId);
     void saveAttributeValues(UUID productId, List<AttributeValueDTO> values);
+    List<AttributeValueDTO> getAttributeValuesByProduct(UUID productId);
+
+    ProductAttribute createAttribute(ProductAttribute productAttribute);
 }

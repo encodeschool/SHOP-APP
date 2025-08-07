@@ -1,5 +1,6 @@
 package uz.encode.ecommerce.Product.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +13,7 @@ import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
 public interface ProductAttributeValueRepository extends JpaRepository<ProductAttributeValue, UUID> {
 
     ProductAttributeValue deleteByProduct(Product product);
+
+    List<ProductAttributeValue> findByProductId(UUID productId);
     
 }

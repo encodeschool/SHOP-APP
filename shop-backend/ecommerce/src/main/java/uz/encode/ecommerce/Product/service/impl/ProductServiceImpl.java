@@ -259,6 +259,22 @@ public class ProductServiceImpl implements ProductService {
         productAttributeValueRepository.saveAll(attributeValues);
     }
 
+    @Override
+    public List<AttributeValueDTO> getAttributeValuesByProduct(UUID productId) {
+        return productAttributeValueRepository.findByProductId(productId)
+            .stream()
+            .map(value -> new AttributeValueDTO(value.getAttribute().getId(), value.getValue()))
+            .collect(Collectors.toList());
+    }
 
+    @Override
+    public ProductAttribute createAttribute(ProductAttribute productAttribute) {
+        if (productAttribute.getCategory() == null || productAttribute.getCategory().getId() == null) {
+            throw new IllegalArgumentException("Category ID is required");
+        }
+        Category category = categoryRepository.findById(productAttribute.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category ID not Found"));
+        productAttribute.setCategory(category);
+        return productAttributeRepository.save(productAttribute);
+    }
     
 }

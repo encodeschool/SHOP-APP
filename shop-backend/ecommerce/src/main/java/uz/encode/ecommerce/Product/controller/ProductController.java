@@ -114,4 +114,18 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Get attribute values for a product")
+    @GetMapping("/attributes")
+    public ResponseEntity<List<AttributeValueDTO>> getAttributeValuesByProduct(@RequestParam UUID productId) {
+        return ResponseEntity.ok(productService.getAttributeValuesByProduct(productId));
+    }
+
+    @PostMapping("/create/attributes")
+    public ResponseEntity<ProductAttribute> createAttribute(@RequestBody ProductAttribute productAttribute) {
+        return ResponseEntity.ok(productService.createAttribute(productAttribute));
+    }
+
+    
+
+
 }
