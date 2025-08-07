@@ -69,10 +69,22 @@ public class Product {
 
     private boolean isInStock;
 
+    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval=true)
+    private List<ProductAttributeValue> attributes = new ArrayList<>();
+
      // Optional helper
     public void addImage(ProductImage image) {
         this.images.add(image);
         image.setProduct(this);
     }
+
+    public void addAttributeValue(ProductAttribute attribute, String value) {
+        ProductAttributeValue pav = new ProductAttributeValue();
+        pav.setAttribute(attribute);
+        pav.setValue(value);
+        pav.setProduct(this);
+        this.attributes.add(pav);
+    }
+
 
 }

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
+import DynamicAttributeForm from '../../components/DynamicAttributeForm';
+
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [users, setUsers] = useState([]);
+  const [attributes, setAttributes] = useState([]);
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -13,11 +16,12 @@ export default function Products() {
     price: '',
     stock: '',
     condition: 'NEW',
-    categoryId: '',       // root category
-    subcategoryId: '',    // actual subcategory to save
+    categoryId: '',
+    subcategoryId: '',
     userId: '',
     featured: false,
-    images: []
+    images: [],
+    attributes: []
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -43,6 +47,12 @@ export default function Products() {
       .catch(console.error);
   };
 
+  const fetchAttributes = (categoryId) => {
+    axios.get(`products/attributes/category/${categoryId}`)
+      .then(res => setAttributes(res.data || []))
+      .catch(console.error);
+  };
+
   const fetchUsers = () => {
     axios.get('/users')
       .then(res => setUsers(res.data))
@@ -62,8 +72,18 @@ export default function Products() {
     if (name === 'categoryId') {
       setNewProduct(prev => ({ ...prev, subcategoryId: '' }));
       fetchSubcategories(value);
+      fetchAttributes(value);
     }
   };
+
+  const handleDynamicAttributesChange = (attributeMap) => {
+    const attrs = Object.entries(attributeMap).map(([attributeId, value]) => ({
+      attributeId,
+      value
+    }));
+    setNewProduct(prev => ({ ...prev, attributes: attrs }));
+  };
+
 
   const handleFileChange = (e) => {
     setNewProduct({ ...newProduct, images: Array.from(e.target.files) });
@@ -71,7 +91,6 @@ export default function Products() {
 
   const handleCreateOrUpdate = async () => {
     const formData = new FormData();
-
     const {
       images,
       subcategoryId,
@@ -83,10 +102,11 @@ export default function Products() {
 
     const productPayload = {
       ...rest,
-      featured: newProduct.featured, // ✅ explicitly ensure it's included
+      featured: newProduct.featured,
       categoryId: finalCategoryId,
       stock: parseInt(newProduct.stock),
-      price: parseFloat(newProduct.price)
+      price: parseFloat(newProduct.price),
+      attributes: newProduct.attributes
     };
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
@@ -98,9 +118,12 @@ export default function Products() {
     if (editingId) {
       await axios.put(`/products/${editingId}`, productPayload);
     } else {
-      await axios.post('/products', formData, {
+      const response = await axios.post('/products', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+
+      const createdProduct = response.data;
+      setEditingId(createdProduct.id); // 👈 Automatically open attributes form
     }
 
     setNewProduct({
@@ -113,9 +136,11 @@ export default function Products() {
       subcategoryId: '',
       userId: '',
       featured: false,
-      images: []
+      images: [],
+      attributes: []
     });
 
+    setAttributes([]);
     setEditingId(null);
     fetchProducts();
   };
@@ -139,13 +164,17 @@ export default function Products() {
       condition: product.condition,
       categoryId: parentCategoryId || product.categoryId,
       subcategoryId: parentCategoryId ? product.categoryId : '',
-      userId: product.userId,
+      userId: product.user?.id || '',
       featured: product.featured,
-      images: []
+      images: [],
+      attributes: product.attributes || []
     });
 
     if (parentCategoryId) {
       fetchSubcategories(parentCategoryId);
+      fetchAttributes(product.categoryId);
+    } else {
+      fetchAttributes(product.categoryId);
     }
 
     setEditingId(product.id);
@@ -154,7 +183,6 @@ export default function Products() {
   return (
     <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
-        {/* Left Column */}
         <div className="w-[80%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
           <table className="w-full border bg-white shadow">
@@ -179,7 +207,7 @@ export default function Products() {
                   <td className="p-2">${p.price}</td>
                   <td className="p-2">{p.stock}</td>
                   <td className="p-2">{p.condition}</td>
-                  <td className="p-2">{p.featured ? 'Is Featured' : 'Not featured'}</td>
+                  <td className="p-2">{p.featured ? 'Yes' : 'No'}</td>
                   <td className="p-2">
                     <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
                     <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
@@ -190,8 +218,7 @@ export default function Products() {
           </table>
         </div>
 
-        {/* Right Column */}
-        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
+        <div className="w-[20%] p-4 bg-white shadow h-fit">
           <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
 
           <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title} onChange={handleInputChange} />
@@ -225,18 +252,29 @@ export default function Products() {
             ))}
           </select>
 
-          <input
-              type="checkbox"
-              className="p-1 mb-3"
-              checked={newProduct.featured}
-              onChange={(e) =>
-                setNewProduct((prev) => ({
-                  ...prev,
-                  featured: e.target.checked
-                }))
-              }
-          /> Is Featured?
+          {editingId && (
+            <div className="mb-4">
+              <DynamicAttributeForm
+                categoryId={newProduct.categoryId}
+                productId={editingId}
+                onChange={handleDynamicAttributesChange}
+              />
+            </div>
+          )}
 
+
+
+          <input
+            type="checkbox"
+            className="p-1 mb-3"
+            checked={newProduct.featured}
+            onChange={(e) =>
+              setNewProduct((prev) => ({
+                ...prev,
+                featured: e.target.checked
+              }))
+            }
+          /> Is Featured?
 
           <input type="file" multiple accept="image/*" onChange={handleFileChange} className="border p-1 mb-3 w-full" />
           <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-full" : "bg-blue-500 text-white px-3 py-1 w-full"}>

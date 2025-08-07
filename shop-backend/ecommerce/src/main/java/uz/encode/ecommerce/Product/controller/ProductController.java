@@ -23,8 +23,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.service.ProductService;
 
 @RestController
@@ -96,6 +98,20 @@ public class ProductController {
         @RequestParam(required = false) String sort
     ) {
         return ResponseEntity.ok(productService.getFiltered(brands, inStock, maxPrice, sort));
+    }
+
+    @GetMapping("/attributes/category/{categoryId}")
+    public ResponseEntity<List<ProductAttribute>> getAttributesByCategory(@PathVariable UUID categoryId) {
+        return ResponseEntity.ok(productService.findByCategoryId(categoryId));
+    }
+
+    @PostMapping("/attributes")
+    public ResponseEntity<Void> saveAttributeValues(
+        @RequestParam UUID productId,
+        @RequestBody List<AttributeValueDTO> values
+    ) {
+        productService.saveAttributeValues(productId, values);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.entity.ProductAttribute;
 
 @Service
 public interface ProductService {
@@ -20,4 +22,6 @@ public interface ProductService {
     void delete(UUID id);
     List<ProductResponseDTO> getFeatured(); // Add this
     List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort);
+    List<ProductAttribute> findByCategoryId(UUID categoryId);
+    void saveAttributeValues(UUID productId, List<AttributeValueDTO> values);
 }

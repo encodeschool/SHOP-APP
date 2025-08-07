@@ -18,9 +18,15 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
+import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
+import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 import uz.encode.ecommerce.Product.entity.Product;
+import uz.encode.ecommerce.Product.entity.ProductAttribute;
+import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
+import uz.encode.ecommerce.Product.repository.ProductAttributeRepository;
+import uz.encode.ecommerce.Product.repository.ProductAttributeValueRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.Product.service.ProductService;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
@@ -37,6 +43,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductAttributeRepository productAttributeRepository;
+    private final ProductAttributeValueRepository productAttributeValueRepository;
 
     public ProductResponseDTO create(ProductCreateDTO dto, List<MultipartFile> images) throws IOException {
         User user = userRepository.findById(dto.getUserId())
@@ -59,6 +67,21 @@ public class ProductServiceImpl implements ProductService {
 
         // Save product first to get ID
         Product savedProduct = productRepository.save(product);
+
+        if (dto.getAttributes() != null) {
+            for (AttributeValueDTO attrDto : dto.getAttributes()) {
+                ProductAttribute attribute = productAttributeRepository.findById(attrDto.getAttributeId())
+                    .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+                ProductAttributeValue pav = new ProductAttributeValue();
+                pav.setAttribute(attribute);
+                pav.setValue(attrDto.getValue());
+                pav.setProduct(savedProduct);
+
+                savedProduct.getAttributes().add(pav);
+            }
+        }
+
 
         if (images != null && !images.isEmpty()) {
             Path uploadPath = Paths.get(uploadFolderPath);
@@ -124,6 +147,24 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
         }
 
+        // Remove old attribute values
+        productAttributeValueRepository.deleteByProduct(product);
+
+        // Save new attribute values
+        if (dto.getAttributes() != null) {
+            for (AttributeValueDTO av : dto.getAttributes()) {
+                ProductAttribute attribute = productAttributeRepository.findById(av.getAttributeId())
+                        .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+                ProductAttributeValue pav = new ProductAttributeValue();
+                pav.setAttribute(attribute);
+                pav.setProduct(product);
+                pav.setValue(av.getValue());
+                product.getAttributes().add(pav);
+            }
+        }
+
+
         return mapToDto(productRepository.save(product));
     }
 
@@ -148,6 +189,15 @@ public class ProductServiceImpl implements ProductService {
         dto.setFeatured(product.isFeatured());
         dto.setImageUrls(
                 product.getImages().stream().map(ProductImage::getUrl).toList()
+        );
+        dto.setAttributes(
+            product.getAttributes().stream()
+                .map(attr -> {
+                    AttributeValueResponseDTO attrDto = new AttributeValueResponseDTO();
+                    attrDto.setAttributeName(attr.getAttribute().getName());
+                    attrDto.setValue(attr.getValue());
+                    return attrDto;
+                }).collect(Collectors.toList())
         );
         return dto;
     }
@@ -184,6 +234,29 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return stream.map(this::mapToDto).toList();
+    }
+
+    @Override
+    public List<ProductAttribute> findByCategoryId(UUID categoryId) {
+        return productAttributeRepository.findByCategoryId(categoryId);
+    }
+
+    @Override
+    public void saveAttributeValues(UUID productId, List<AttributeValueDTO> values) {
+        Product product = productRepository.findById(productId)
+        .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        List<ProductAttributeValue> attributeValues = values.stream().map(dto -> {
+            ProductAttribute attribute = productAttributeRepository.findById(dto.getAttributeId())
+                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+            return ProductAttributeValue.builder()
+                .product(product)
+                .attribute(attribute)
+                .value(dto.getValue())
+                .build();
+        }).toList();
+
+        productAttributeValueRepository.saveAll(attributeValues);
     }
 
 

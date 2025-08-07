@@ -1,6 +1,7 @@
 package uz.encode.ecommerce.Product.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -37,4 +38,7 @@ public class ProductCreateDTO {
     private UUID categoryId;
 
     private boolean featured;
+
+    private List<AttributeValueDTO> attributes; // 👈 add this
+
 }
