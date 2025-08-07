@@ -27,4 +27,7 @@ public class ProductResponseDTO {
 
     private List<AttributeValueResponseDTO> attributes; // 👈 add this
 
+    private String brandName; // ✅ new
+    private UUID brandId;     // optional
+
 }

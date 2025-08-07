@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.entity.Brand;
 import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.service.ProductService;
 
@@ -125,7 +127,27 @@ public class ProductController {
         return ResponseEntity.ok(productService.createAttribute(productAttribute));
     }
 
-    
+        @GetMapping("/brands")
+        public ResponseEntity<List<Brand>> getAllBrands() {
+            return ResponseEntity.ok(productService.getAllBrands());
+        }
 
+        @PostMapping(value = "/brands", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<Brand> saveBrand(@ModelAttribute Brand brand, @RequestPart MultipartFile multipartFile) {
+            return ResponseEntity.ok(productService.saveBrand(brand, multipartFile));
+        }
+
+        @PutMapping(value = "/brands/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<Brand> updateBrand(@PathVariable UUID id,
+                                                @ModelAttribute Brand brand,
+                                                @RequestPart(required = false) MultipartFile multipartFile) {
+            return ResponseEntity.ok(productService.updateBrand(id, brand, multipartFile));
+        }
+
+        @DeleteMapping("/brands/{id}")
+        public ResponseEntity<Void> deleteBrand(@PathVariable UUID id) {
+            productService.deleteBrand(id);
+            return ResponseEntity.noContent().build();
+        }
 
 }

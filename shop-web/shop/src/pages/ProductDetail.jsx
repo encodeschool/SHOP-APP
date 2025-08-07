@@ -59,8 +59,8 @@ const ProductDetail = () => {
       <div className="container mx-auto px-4 py-6">
         <Breadcrumb pathArray={breadcrumbPath} productTitle={product.title} />
 
-        <div className="grid grid-cols-3 gap-6">
-          <div>
+        <div className="grid grid-cols-2 gap-6">
+          <div className='col-span-1'>
             <img
               src={
                 product.imageUrls?.[currentImageIndex]
@@ -68,7 +68,7 @@ const ProductDetail = () => {
                   : '/placeholder.jpg'
               }
               alt={`${product.title} - image ${currentImageIndex + 1}`}
-              className="object-contain h-60 w-full"
+              className="object-contain h-100 w-full"
             />
             <div className="flex mt-4 mx-auto justify-center space-x-2">
               {product.imageUrls?.map((imgUrl, index) => (
@@ -84,11 +84,9 @@ const ProductDetail = () => {
               ))}
             </div>
           </div>
-          <div className="col-span-2">
-            <h1 className="text-2xl font-bold mb-2">{product.title}</h1>
-            <p className="text-green-600 text-xl mb-2">${product.price}</p>
-            <p className="mb-4">{product.description}</p>
-            <p className="mb-4">Available: {product.stock}</p>
+          <div className="col-span-1">
+            <h1 className="text-4xl font-bold mb-2">{product.title}</h1>
+            <p className="text-black-600 text-7xl mt-6 mb-6 font-bold mb-2">${product.price}</p>
             <button 
               className="bg-black text-white px-4 py-2 rounded flex items-center"
               onClick={(e) => {
@@ -99,6 +97,22 @@ const ProductDetail = () => {
               <FaCartPlus className='mr-2'/>
               Add to Cart
             </button>
+            <p className="mb-4">{product.description}</p>
+            <p className="mb-4">Available: {product.stock}</p>
+            {product.attributes && product.attributes.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">Specifications:</h3>
+                <ul className="list-disc list-inside">
+                  {product.attributes.map((attr, index) => (
+                    <li key={index}>
+                      <span className="font-medium">{attr.attributeName}:</span> {attr.value}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            
             <CompareButton product={product} />
           </div>
         </div>

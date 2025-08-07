@@ -1,4 +1,3 @@
-// src/components/DynamicAttributeForm.jsx
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 
@@ -12,14 +11,18 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
       if (!categoryId) return;
 
       try {
-        // 1. Load attribute schema
         const attrRes = await axios.get(`/products/attributes/category/${categoryId}`);
-        console.log('Attributes API response:', attrRes.data);
-        console.log('Is array:', Array.isArray(attrRes.data));
-        const attributeDefs = Array.isArray(attrRes.data) ? attrRes.data : [];
-        setAttributes(attributeDefs);
+        const rawAttributes = Array.isArray(attrRes.data) ? attrRes.data : [];
 
-        // 2. Load existing values if editing a product
+        const uniqueAttributes = Object.values(
+          rawAttributes.reduce((acc, attr) => {
+            acc[attr.id] = attr;
+            return acc;
+          }, {})
+        );
+
+        setAttributes(uniqueAttributes);
+
         if (productId) {
           const valueRes = await axios.get(`/products/attributes`, {
             params: { productId },
@@ -31,7 +34,6 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
           });
 
           setValues(existingValues);
-          onChange(existingValues); // update parent
         } else {
           setValues({});
         }
@@ -45,18 +47,20 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
     loadAttributesAndValues();
   }, [categoryId, productId]);
 
+  useEffect(() => {
+    onChange(values); // Notify parent whenever values change
+  }, [values]);
 
   const handleChange = (id, value) => {
     const updatedValues = { ...values, [id]: value };
     setValues(updatedValues);
-    setErrors((prev) => ({ ...prev, [id]: '' }));
-    onChange(updatedValues); // call directly here
+    setErrors(prev => ({ ...prev, [id]: '' }));
   };
 
   const validate = () => {
     const newErrors = {};
     attributes.forEach(attr => {
-      if (attr.isRequired && !values[attr.id]) {
+      if (attr.required && !values[attr.id]) {
         newErrors[attr.id] = 'This field is required';
       }
     });
@@ -70,12 +74,12 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
 
     const attributeList = Object.entries(values).map(([attributeId, value]) => ({
       attributeId,
-      value: String(value), // ensure checkbox true/false becomes string
+      value: String(value),
     }));
 
     try {
       await axios.post('/products/attributes', attributeList, {
-        params: { productId }, 
+        params: { productId },
       });
       alert('Attributes submitted');
     } catch (err) {
@@ -83,14 +87,14 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
     }
   };
 
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {attributes.map((attr) => (
         <div key={attr.id}>
           <label className="block font-semibold mb-1">
-            {attr.name} {attr.isRequired && '*'}
+            {attr.name} {attr.required && <span className="text-red-500">*</span>}
           </label>
+
           {attr.type === 'STRING' && (
             <input
               type="text"
@@ -99,6 +103,7 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
               className="w-full px-3 py-2 border rounded"
             />
           )}
+
           {attr.type === 'NUMBER' && (
             <input
               type="number"
@@ -107,6 +112,7 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
               className="w-full px-3 py-2 border rounded"
             />
           )}
+
           {attr.type === 'DROPDOWN' && (
             <select
               value={values[attr.id] || ''}
@@ -114,19 +120,24 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
               className="w-full px-3 py-2 border rounded"
             >
               <option value="">Select an option</option>
-              {attr.options?.map((opt, idx) => (
+              {(attr.options || []).map((opt, idx) => (
                 <option key={idx} value={opt}>{opt}</option>
               ))}
             </select>
           )}
+
           {attr.type === 'CHECKBOX' && (
-            <input
-              type="checkbox"
-              checked={values[attr.id] || false}
-              onChange={(e) => handleChange(attr.id, e.target.checked)}
-              className="mr-2"
-            />
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={values[attr.id] === 'true' || values[attr.id] === true}
+                onChange={(e) => handleChange(attr.id, e.target.checked)}
+                className="mr-2"
+              />
+              Enable
+            </label>
           )}
+
           {attr.type === 'DATE' && (
             <input
               type="date"
@@ -135,11 +146,13 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
               className="w-full px-3 py-2 border rounded"
             />
           )}
+
           {errors[attr.id] && (
             <p className="text-red-500 text-sm mt-1">{errors[attr.id]}</p>
           )}
         </div>
       ))}
+
       <button
         type="submit"
         className="bg-black text-white px-4 py-2 rounded"

@@ -65,7 +65,10 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductImage> images = new ArrayList<>();
 
-    private String brand;
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 
     private boolean isInStock;
 

@@ -9,6 +9,7 @@ export default function Products() {
   const [subcategories, setSubcategories] = useState([]);
   const [users, setUsers] = useState([]);
   const [attributes, setAttributes] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -21,6 +22,7 @@ export default function Products() {
     userId: '',
     featured: false,
     images: [],
+    brandId: '', // 👈 New
     attributes: []
   });
 
@@ -29,6 +31,12 @@ export default function Products() {
   const fetchProducts = () => {
     axios.get('/products')
       .then(res => setProducts(res.data))
+      .catch(console.error);
+  };
+
+  const fetchBrands = () => {
+    axios.get('/products/brands')
+      .then(res => setBrands(res.data))
       .catch(console.error);
   };
 
@@ -49,7 +57,9 @@ export default function Products() {
 
   const fetchAttributes = (categoryId) => {
     axios.get(`products/attributes/category/${categoryId}`)
-      .then(res => setAttributes(res.data || []))
+      .then(res => {
+        setAttributes(res.data || [])
+      })
       .catch(console.error);
   };
 
@@ -63,6 +73,7 @@ export default function Products() {
     fetchProducts();
     fetchCategories();
     fetchUsers();
+    fetchBrands(); // 👈
   }, []);
 
   const handleInputChange = (e) => {
@@ -70,10 +81,20 @@ export default function Products() {
     setNewProduct(prev => ({ ...prev, [name]: value }));
 
     if (name === 'categoryId') {
-      setNewProduct(prev => ({ ...prev, subcategoryId: '' }));
+      const updated = { ...newProduct, categoryId: value, subcategoryId: '', attributes: [] };
+      setNewProduct(updated);
+      setAttributes([]);
       fetchSubcategories(value);
       fetchAttributes(value);
     }
+
+    if (name === 'subcategoryId') {
+      const effectiveCategoryId = value || newProduct.categoryId;
+      setNewProduct(prev => ({ ...prev, subcategoryId: value }));
+      fetchAttributes(effectiveCategoryId);
+    }
+
+
   };
 
   const handleDynamicAttributesChange = (attributeMap) => {
@@ -106,7 +127,8 @@ export default function Products() {
       categoryId: finalCategoryId,
       stock: parseInt(newProduct.stock),
       price: parseFloat(newProduct.price),
-      attributes: newProduct.attributes
+      attributes: newProduct.attributes,
+      brandId: newProduct.brandId, // 👈 add this
     };
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
@@ -137,7 +159,7 @@ export default function Products() {
       userId: '',
       featured: false,
       images: [],
-      attributes: []
+      attributes: [],
     });
 
     setAttributes([]);
@@ -167,15 +189,17 @@ export default function Products() {
       userId: product.user?.id || '',
       featured: product.featured,
       images: [],
-      attributes: product.attributes || []
+      attributes: product.attributes || [],
+      brandId: product.brand?.id || '', // 👈
     });
 
     if (parentCategoryId) {
       fetchSubcategories(parentCategoryId);
-      fetchAttributes(product.categoryId);
-    } else {
-      fetchAttributes(product.categoryId);
     }
+
+    const effectiveCategoryId = product.categoryId;
+    fetchAttributes(effectiveCategoryId);
+
 
     setEditingId(product.id);
   };
@@ -185,7 +209,10 @@ export default function Products() {
       <div className="flex gap-4 h-[100%]">
         <div className="w-[80%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
-          <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
+          <div className="flex">
+            <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
+            <Link to="/brand" className='bg-green-500 hover:bg-green-700 text-white font-bold ml-6 py-2 px-4 rounded'>Add brand</Link>
+          </div>
           <table className="w-full border bg-white shadow mt-6">
             <thead>
               <tr className="bg-gray-200 text-left">
@@ -253,14 +280,19 @@ export default function Products() {
             ))}
           </select>
 
-          {editingId && (
-            <div className="mb-4">
-              <DynamicAttributeForm
-                categoryId={newProduct.categoryId}
-                productId={editingId}
-                onChange={handleDynamicAttributesChange}
-              />
-            </div>
+          <select name="brandId" className="border p-1 mb-3 w-full" value={newProduct.brandId} onChange={handleInputChange}>
+            <option value="">Select Brand</option>
+            {brands.map(brand => (
+              <option key={brand.id} value={brand.id}>{brand.name}</option>
+            ))}
+          </select>
+
+          {(editingId || newProduct.categoryId) && (
+            <DynamicAttributeForm
+              categoryId={newProduct.subcategoryId || newProduct.categoryId}
+              productId={editingId}
+              onChange={handleDynamicAttributesChange}
+            />
           )}
 
 
@@ -281,6 +313,18 @@ export default function Products() {
           <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-full" : "bg-blue-500 text-white px-3 py-1 w-full"}>
             {editingId ? 'Update' : 'Create'}
           </button>
+          {/* {editingId && (
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setNewProduct(initialState);
+                setAttributes([]);
+              }}
+              className="bg-gray-400 text-white px-3 py-1 w-full mt-2"
+            >
+              Cancel Edit
+            </button>
+          )} */}
         </div>
       </div>
     </div>

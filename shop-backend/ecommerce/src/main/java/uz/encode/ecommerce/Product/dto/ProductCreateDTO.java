@@ -41,4 +41,6 @@ public class ProductCreateDTO {
 
     private List<AttributeValueDTO> attributes; // 👈 add this
 
+    private UUID brandId; // ✅ new
+
 }

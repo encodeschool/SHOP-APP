@@ -5,8 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,9 +26,11 @@ import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.entity.Brand;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
+import uz.encode.ecommerce.Product.repository.BrandRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeValueRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
@@ -45,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductAttributeRepository productAttributeRepository;
     private final ProductAttributeValueRepository productAttributeValueRepository;
+    private final BrandRepository brandRepository;
 
     public ProductResponseDTO create(ProductCreateDTO dto, List<MultipartFile> images) throws IOException {
         User user = userRepository.findById(dto.getUserId())
@@ -64,6 +71,11 @@ public class ProductServiceImpl implements ProductService {
         product.setUser(user);
         product.setCategory(category);
         product.setFeatured(dto.isFeatured());
+
+        // Load and set brand
+        Brand brand = brandRepository.findById(dto.getBrandId())
+            .orElseThrow(() -> new RuntimeException("Brand not found"));
+        product.setBrand(brand);
 
         // Save product first to get ID
         Product savedProduct = productRepository.save(product);
@@ -141,6 +153,11 @@ public class ProductServiceImpl implements ProductService {
         product.setCondition(dto.getCondition());
         product.setFeatured(dto.isFeatured());
 
+        // Load and set brand
+        Brand brand = brandRepository.findById(dto.getBrandId())
+            .orElseThrow(() -> new RuntimeException("Brand not found"));
+        product.setBrand(brand);
+
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {
             Category category = categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -199,6 +216,11 @@ public class ProductServiceImpl implements ProductService {
                     return attrDto;
                 }).collect(Collectors.toList())
         );
+        // Add brand info
+        if (product.getBrand() != null) {
+            dto.setBrandName(product.getBrand().getName());
+            dto.setBrandId(product.getBrand().getId());
+        }
         return dto;
     }
 
@@ -238,7 +260,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductAttribute> findByCategoryId(UUID categoryId) {
-        return productAttributeRepository.findByCategoryId(categoryId);
+        Set<ProductAttribute> attributes = new HashSet<>();
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        
+        while (category != null) {
+            attributes.addAll(productAttributeRepository.findAllByCategoryId(category.getId()));
+            category = category.getParent(); // Assume you have getParent()
+        }
+
+        return new ArrayList<>(attributes);
     }
 
     @Override
@@ -275,6 +305,69 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(productAttribute.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category ID not Found"));
         productAttribute.setCategory(category);
         return productAttributeRepository.save(productAttribute);
+    }
+
+    @Override
+    public List<Brand> getAllBrands() {
+        return brandRepository.findAll();
+    }
+
+    @Override
+    public Optional<Brand> findBrandById(UUID brandId) {
+        return brandRepository.findById(brandId);
+    }
+
+    @Override
+    public Optional<Brand> findBrandByName(String brandName) {
+        return brandRepository.findByName(brandName);
+    }
+
+    @Override
+    public Brand saveBrand(Brand brand, MultipartFile multipartFile) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadFolderPath);
+                Files.createDirectories(uploadPath);
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(multipartFile.getInputStream(), filePath,StandardCopyOption.REPLACE_EXISTING);
+                brand.setIcon("/images/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload icon");
+            }
+        }
+        return brandRepository.save(brand);
+    }
+
+    @Override
+    public Brand updateBrand(UUID id, Brand updatedBrand, MultipartFile file) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+
+        brand.setName(updatedBrand.getName());
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadFolderPath);
+                Files.createDirectories(uploadPath);
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                brand.setIcon("/images/" + fileName);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to upload icon");
+            }
+        }
+
+        return brandRepository.save(brand);
+    }
+
+    @Override
+    public void deleteBrand(UUID id) {
+        if (!brandRepository.existsById(id)) {
+            throw new RuntimeException("Brand not found");
+        }
+        brandRepository.deleteById(id);
     }
     
 }
