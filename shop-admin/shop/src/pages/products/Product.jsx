@@ -185,8 +185,8 @@ export default function Products() {
       <div className="flex gap-4 h-[100%]">
         <div className="w-[80%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
-          <Link to="/product_attribute">Add Extra Attribute</Link>
-          <table className="w-full border bg-white shadow">
+          <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
+          <table className="w-full border bg-white shadow mt-6">
             <thead>
               <tr className="bg-gray-200 text-left">
                 <th className="p-2">Product Img</th>
