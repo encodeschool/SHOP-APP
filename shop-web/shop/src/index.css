@@ -57,3 +57,41 @@ code {
     position: static;
   }
 }
+
+.carousel {
+  height: 400px;
+}
+
+.carousel.carousel-slider .control-arrow {
+  top: 45%!important;
+  bottom: 45%!important;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background-color: #6366F1!important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel.carousel-slider {
+  position: relative;
+}
+
+.control-prev {
+  left: 25px!important;
+}
+
+.control-next {
+  right: 25px!important;
+}
+
+.dot.selected {
+  background-color: #6366F1!important;
+  width: 25px!important;
+  border-radius: 2px!important;
+}
+
+.carousel .control-dots .dot {
+  box-shadow: 0!important;
+}

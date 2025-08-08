@@ -11,16 +11,16 @@ export default function CarouselBanner() {
         showThumbs={false}
         showStatus={false}
         interval={5000}
-        className="rounded-lg shadow"
+        className=""
       >
         <div>
-          <img src="https://cdn.4games.pro/storage/upload-b/2025/06/1920x422-canyon.png?v=1751639846" alt="Banner 1" />
+          <img src="https://www.rdveikals.lv/images/banners/c299249fdec2791591e037fb672ab263.jpg" alt="Banner 1" />
         </div>
         <div>
-          <img src="https://cdn.4games.pro/storage/upload-b/2025/06/1920x422-canyon.png?v=1751639846" alt="Banner 2" />
+          <img src="https://www.rdveikals.lv/images/banners/36a3d9c245419040ca4ea681e36ec3ae.jpg" alt="Banner 2" />
         </div>
         <div>
-          <img src="https://cdn.4games.pro/storage/upload-b/2025/06/1920x422-canyon.png?v=1751639846" alt="Banner 3" />
+          <img src="https://www.rdveikals.lv/images/banners/dda34b3f9d0aba7a6d0ca662c2abc498.jpg" alt="Banner 3" />
         </div>
       </Carousel>
     </div>

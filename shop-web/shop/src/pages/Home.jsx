@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef  } from 'react';
 import axios from '../api/axios';
 import { Link } from 'react-router-dom';
 import CarouselBanner from '../components/CarouselBanner';
-import { FaCartPlus, FaHeart } from 'react-icons/fa';
+import { FaCartPlus, FaHeart, FaStar, FaRecycle } from 'react-icons/fa';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -176,8 +176,21 @@ const Home = () => {
               key={product.id}
               className="relative border p-4 rounded-xl hover:shadow group"
             >
-              <p className={product.condition === 'NEW' ? 'absolute top-0 px-3 py-1 rounded-tl-xl left-0 z-10 bg-green-600 text-white' : 'absolute top-0 px-3 py-1 left-0 z-10 bg-yellow-300 text-white rounded-tl-xl'}>{product.condition}</p>
-
+                <p
+                  className={`absolute top-0 px-3 flex items-center justify-center py-1 left-0 z-10 bg-gray-100 text-indigo-400 rounded-tl-xl`}
+                >
+                  {product.condition === 'NEW' ? (
+                    <>
+                      <FaStar className="inline mr-1" />
+                      NEW
+                    </>
+                  ) : (
+                    <>
+                      <FaRecycle className="inline mr-1" />
+                      USED
+                    </>
+                  )}
+                </p>
               <button
                 className={`absolute top-2 right-2 z-10 bg-white rounded-full p-3 ${
                   favorites.includes(product.id) ? 'text-red-500' : 'text-gray-400'
@@ -320,7 +333,21 @@ const Home = () => {
                   to={`/product/${product.id}`}
                   className="relative border p-4 rounded-xl hover:shadow group h-full block"
                 >
-                  <p className={product.condition === 'NEW' ? 'absolute top-0 px-3 py-1 rounded-tl-xl left-0 z-10 bg-green-600 text-white' : 'absolute top-0 px-3 py-1 left-0 z-10 bg-yellow-300 text-white rounded-tl-xl'}>{product.condition}</p>
+                  <p
+                    className={`absolute top-0 px-3 py-1 flex items-center justify-center left-0 z-10 bg-gray-100 text-indigo-400 rounded-tl-xl`}
+                  >
+                    {product.condition === 'NEW' ? (
+                      <>
+                        <FaStar className="inline mr-1" />
+                        NEW
+                      </>
+                    ) : (
+                      <>
+                        <FaRecycle className="inline mr-1" />
+                        USED
+                      </>
+                    )}
+                  </p>
 
                   <FavoriteButton
                     productId={product.id}
