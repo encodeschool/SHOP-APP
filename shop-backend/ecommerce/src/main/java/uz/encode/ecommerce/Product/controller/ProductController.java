@@ -2,6 +2,7 @@ package uz.encode.ecommerce.Product.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
@@ -127,27 +128,32 @@ public class ProductController {
         return ResponseEntity.ok(productService.createAttribute(productAttribute));
     }
 
-        @GetMapping("/brands")
-        public ResponseEntity<List<Brand>> getAllBrands() {
-            return ResponseEntity.ok(productService.getAllBrands());
-        }
+    @GetMapping("/brands")
+    public ResponseEntity<List<Brand>> getAllBrands() {
+        return ResponseEntity.ok(productService.getAllBrands());
+    }
 
-        @PostMapping(value = "/brands", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ResponseEntity<Brand> saveBrand(@ModelAttribute Brand brand, @RequestPart MultipartFile multipartFile) {
-            return ResponseEntity.ok(productService.saveBrand(brand, multipartFile));
-        }
+    @PostMapping(value = "/brands", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Brand> saveBrand(@ModelAttribute Brand brand, @RequestPart MultipartFile multipartFile) {
+        return ResponseEntity.ok(productService.saveBrand(brand, multipartFile));
+    }
 
-        @PutMapping(value = "/brands/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ResponseEntity<Brand> updateBrand(@PathVariable UUID id,
+    @PutMapping(value = "/brands/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Brand> updateBrand(@PathVariable UUID id,
                                                 @ModelAttribute Brand brand,
                                                 @RequestPart(required = false) MultipartFile multipartFile) {
-            return ResponseEntity.ok(productService.updateBrand(id, brand, multipartFile));
-        }
+        return ResponseEntity.ok(productService.updateBrand(id, brand, multipartFile));
+    }
 
-        @DeleteMapping("/brands/{id}")
-        public ResponseEntity<Void> deleteBrand(@PathVariable UUID id) {
-            productService.deleteBrand(id);
-            return ResponseEntity.noContent().build();
-        }
+    @DeleteMapping("/brands/{id}")
+    public ResponseEntity<Void> deleteBrand(@PathVariable UUID id) {
+        productService.deleteBrand(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/brands/{id}")
+    public ResponseEntity<Optional<Brand>> getBrandById(@PathVariable UUID id) {
+        return ResponseEntity.ok(productService.findBrandById(id));
+    }
 
 }

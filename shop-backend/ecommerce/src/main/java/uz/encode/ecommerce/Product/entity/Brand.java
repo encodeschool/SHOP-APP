@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +34,7 @@ public class Brand {
     private String icon;
 
     // Optional helper: list of products with this brand
+    @JsonIgnore
     @OneToMany(mappedBy="brand", cascade=CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
 

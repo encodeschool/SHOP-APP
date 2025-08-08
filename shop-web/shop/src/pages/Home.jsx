@@ -23,9 +23,13 @@ const Home = () => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [selectedSubImage, setSelectedSubImage] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [brands, setBrands] = useState([]);
 
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  const brandPrevRef = useRef(null);
+  const brandNextRef = useRef(null);
+  const featuredPrevRef = useRef(null);
+  const featuredNextRef = useRef(null);
+
 
   const dispatch = useDispatch();
 
@@ -35,6 +39,14 @@ const Home = () => {
       setProducts(res.data);
     };
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const res = await axios.get('/products/brands');
+      setBrands(res.data);
+    }
+    fetchBrands();
   }, []);
 
   useEffect(() => {
@@ -156,7 +168,7 @@ const Home = () => {
       <FeatureStrip />
 
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-xl">All Products</h1>
+        <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl">All Products</h1>
         <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           {products.map(product => (
             <Link
@@ -214,14 +226,66 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      {/* Brands GO here */}
+      <div className="container mx-auto px-4 py-6 relative">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="border-b-[4px] border-indigo-400 text-xl">Our Brands</h1>
+          <div className="flex gap-2">
+            <button ref={brandPrevRef} className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
+              ❮
+            </button>
+            <button ref={brandNextRef} className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
+              ❯
+            </button>
+          </div>
+        </div>
+
+        <Swiper
+          modules={[Navigation, Pagination]}
+          spaceBetween={20}
+          slidesPerView={1}
+          navigation={{
+            prevEl: brandPrevRef.current,
+            nextEl: brandNextRef.current,
+          }}
+          onBeforeInit={(swiper) => {
+            swiper.params.navigation.prevEl = brandPrevRef.current;
+            swiper.params.navigation.nextEl = brandNextRef.current;
+          }}
+          pagination={{ clickable: true }}
+          className="pb-10" // adds bottom padding for pagination
+          breakpoints={{
+            640: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 6 },
+          }}
+        >
+          {brands.map(brand => (
+                <SwiperSlide key={brand.id}>
+                  <div className="p-[50px] w-full h-[150px] border-[3px] border-indigo-400 rounded-xl hover:shadow">
+                    <div
+                      className="bg-contain h-[100%] grayscale bg-no-repeat bg-center"
+                      style={{
+                        backgroundImage: `url(${
+                          brand.icon ? `http://localhost:8080${brand.icon}` : '/placeholder.jpg'
+                        })`,
+                      }}
+                    ></div>
+                  </div>
+                </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
       <div className="container mx-auto px-4 py-6 relative">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl">Featured Products</h1>
+        <h1 className="border-b-[4px] border-indigo-400 text-xl">Featured Products</h1>
         <div className="flex gap-2">
-          <button ref={prevRef} className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
+          <button ref={featuredPrevRef } className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
             ❮
           </button>
-          <button ref={nextRef} className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
+          <button ref={featuredNextRef } className="swiper-button-prev-custom bg-indigo-400 p-2 px-4 text-white rounded-full hover:bg-indigo-600 hover:custor-pointer">
             ❯
           </button>
         </div>
@@ -232,12 +296,12 @@ const Home = () => {
         spaceBetween={20}
         slidesPerView={1}
         navigation={{
-          prevEl: prevRef.current,
-          nextEl: nextRef.current,
+          prevEl: featuredPrevRef.current,
+          nextEl: featuredNextRef.current,
         }}
         onBeforeInit={(swiper) => {
-          swiper.params.navigation.prevEl = prevRef.current;
-          swiper.params.navigation.nextEl = nextRef.current;
+          swiper.params.navigation.prevEl = featuredPrevRef.current;
+          swiper.params.navigation.nextEl = featuredNextRef.current;
         }}
         pagination={{ clickable: true }}
         className="pb-10" // adds bottom padding for pagination
@@ -256,15 +320,7 @@ const Home = () => {
                   to={`/product/${product.id}`}
                   className="relative border p-4 rounded-xl hover:shadow group h-full block"
                 >
-                  <p
-                    className={
-                      product.condition === 'NEW'
-                        ? 'absolute top-2 px-3 py-1 left-2 z-10 bg-green-600 text-white rounded'
-                        : 'absolute top-2 px-3 py-1 left-2 z-10 bg-yellow-300 text-white rounded'
-                    }
-                  >
-                    {product.condition}
-                  </p>
+                  <p className={product.condition === 'NEW' ? 'absolute top-0 px-3 py-1 rounded-tl-xl left-0 z-10 bg-green-600 text-white' : 'absolute top-0 px-3 py-1 left-0 z-10 bg-yellow-300 text-white rounded-tl-xl'}>{product.condition}</p>
 
                   <FavoriteButton
                     productId={product.id}
@@ -287,9 +343,10 @@ const Home = () => {
                     <div>
                       <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
                       <p className="text-green-600">${product.price}</p>
+                      <CompareButton product={product} />
                     </div>
                     <button
-                      className="bg-indigo-400 p-3 rounded-full text-white hover:bg-indigo-500"
+                      className="bg-indigo-400 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-indigo-500"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddToCart(product);

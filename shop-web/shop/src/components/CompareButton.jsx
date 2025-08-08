@@ -13,7 +13,7 @@ const CompareButton = ({ product }) => {
   return (
     <button
       onClick={handleCompare}
-      className="text-black flex items-center text-gray-400 justify-center mt-2 py-1 rounded hover:underline"
+      className="text-black flex items-center text-gray-400 justify-center mt-2 py-1 rounded text-indigo-400 hover:underline"
     >
       <FaSyncAlt className='mr-2' size={13} />
       Compare
