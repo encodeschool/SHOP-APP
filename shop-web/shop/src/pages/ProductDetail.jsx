@@ -13,6 +13,7 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [activeTab, setActiveTab] = useState('product_detail');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -68,7 +69,7 @@ const ProductDetail = () => {
                   : '/placeholder.jpg'
               }
               alt={`${product.title} - image ${currentImageIndex + 1}`}
-              className="object-contain h-100 w-full"
+              className="object-contain h-[400px] w-full"
             />
             <div className="flex mt-4 mx-auto justify-center space-x-2">
               {product.imageUrls?.map((imgUrl, index) => (
@@ -87,8 +88,10 @@ const ProductDetail = () => {
           <div className="col-span-1">
             <h1 className="text-4xl font-bold mb-2">{product.title}</h1>
             <p className="text-black-600 text-7xl mt-6 mb-6 font-bold mb-2">${product.price}</p>
+            <p className="mb-4">{product.description}</p>
+            <p className="mb-4">Available: {product.stock}</p>
             <button 
-              className="bg-black text-white px-4 py-2 rounded flex items-center"
+              className="bg-black text-white px-4 mb-3 py-2 rounded flex items-center"
               onClick={(e) => {
                 e.preventDefault();
                 handleAddToCart(product);
@@ -96,26 +99,51 @@ const ProductDetail = () => {
             >
               <FaCartPlus className='mr-2'/>
               Add to Cart
-            </button>
-            <p className="mb-4">{product.description}</p>
-            <p className="mb-4">Available: {product.stock}</p>
-            {product.attributes && product.attributes.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-2">Specifications:</h3>
-                <ul className="list-disc list-inside">
-                  {product.attributes.map((attr, index) => (
-                    <li key={index}>
-                      <span className="font-medium">{attr.attributeName}:</span> {attr.value}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            
+            </button>      
             <CompareButton product={product} />
           </div>
         </div>
+
+        {['specification', 'warehouse', 'together'].map((tab) => (
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 mt-10 mx-6 ml-0 rounded ${activeTab === tab ? 'bg-black text-white' : 'bg-gray-100'}`}>
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+
+        {/* Adding tabs - first tabe */}
+        {activeTab === 'specification' && (
+          product.attributes && product.attributes.length > 0 && (
+            <div className="mt-10">
+              {/* Group attributes */}
+              {Object.entries(
+                product.attributes.reduce((groups, attr) => {
+                  const group = attr.group || "Общие характеристики";
+                  if (!groups[group]) groups[group] = [];
+                  groups[group].push(attr);
+                  return groups;
+                }, {})
+              ).map(([groupName, attrs]) => (
+                <div key={groupName} className="mb-8">
+                  <h3 className="text-lg font-semibold mb-3">{groupName.toUpperCase()}</h3>
+                  <table className="w-full border-separate border-spacing-y-2">
+                    <tbody>
+                      {attrs.map((attr, idx) => (
+                        <tr key={idx}>
+                          <td className="text-gray-600 w-1/3">{attr.attributeName}:</td>
+                          <td className="text-black font-medium">{attr.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          )
+        )}
+        
+        {/* Second tab */}
+
+        {/* Third tab */}
       </div>
     </div>
   );
