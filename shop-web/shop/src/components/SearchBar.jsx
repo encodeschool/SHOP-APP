@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaSyncAlt,
   FaHeart,
@@ -20,9 +20,20 @@ export default function SearchAppBar() {
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm(""); // Optional: reset after search
+      setMobileMenuOpen(false); // Optional: close mobile menu
+    }
+  };
+
 
   return (
-    <header className="bg-white border-b shadow-sm w-full">
+    <header className="bg-white border-b shadow-sm w-full py-3">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo + Hamburger */}
         <div className="flex items-center gap-4">
@@ -42,9 +53,13 @@ export default function SearchAppBar() {
           <input
             type="text"
             placeholder="Search for Products"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="flex-1 px-4 py-2 rounded-l-full border-2 border-indigo-400 focus:outline-none"
           />
-          <button className="bg-indigo-400 px-4 rounded-r-full text-white">
+
+          <button onClick={handleSearch} className="bg-indigo-400 px-4 rounded-r-full text-white">
             <FaSearch />
           </button>
         </div>
@@ -73,9 +88,10 @@ export default function SearchAppBar() {
       {mobileMenuOpen && (
         <div className="md:hidden px-4 pb-4">
           <div className="flex flex-col gap-3 items-start text-gray-700">
-            <Link to="/search" className="flex items-center gap-2">
-              <FaSearch /> Search
-            </Link>
+            <div className="flex items-center gap-2">
+              <FaSearch />
+              <button onClick={handleSearch}>Search</button>
+            </div>
             <Link to="/favorites" className="flex items-center gap-2">
               <FaHeart /> Favorites
             </Link>

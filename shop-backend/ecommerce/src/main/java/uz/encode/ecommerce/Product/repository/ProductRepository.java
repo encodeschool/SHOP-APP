@@ -1,16 +1,15 @@
 package uz.encode.ecommerce.Product.repository;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import uz.encode.ecommerce.Analytics.dto.CategoryDistirbutionDTO;
-import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Product.entity.Product;
-
-import java.util.List;
-import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
@@ -24,4 +23,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("SELECT new uz.encode.ecommerce.Analytics.dto.CategoryDistirbutionDTO(c.name, COUNT(p)) FROM Product p JOIN p.category c GROUP BY c.name")
     List<CategoryDistirbutionDTO> countByCategory();
+
+    List<Product> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description);
 }

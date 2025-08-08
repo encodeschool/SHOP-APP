@@ -369,5 +369,14 @@ public class ProductServiceImpl implements ProductService {
         }
         brandRepository.deleteById(id);
     }
+
+    @Override
+    public List<ProductResponseDTO> search(String query) {
+        return productRepository
+            .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query)
+            .stream()
+            .map(this::mapToDto)
+            .toList();
+    }
     
 }

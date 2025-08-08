@@ -156,4 +156,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.findBrandById(id));
     }
 
+    @GetMapping("/search")
+    public List<ProductResponseDTO> searchProducts(@RequestParam("q") String query) {
+        return productService.search(query);
+    }
+
 }

@@ -38,4 +38,6 @@ public interface ProductService {
     Brand updateBrand(UUID id, Brand updatedBrand, MultipartFile file);
 
     void deleteBrand(UUID id);
+
+    List<ProductResponseDTO> search(String query);
 }

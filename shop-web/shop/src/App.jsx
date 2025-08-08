@@ -23,6 +23,7 @@ import ProtectedRoute from './services/ProtectedRoute';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Favorites from './pages/Favorites';
 import Compare from './pages/Compare';
+import SearchResults from './pages/SearchResults';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
             <Route path='/login' element={< Login />} />
             <Route path='/register' element={< Register />} />
             <Route path="/compare" element={<Compare />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route
               path="/profile"
               element={
