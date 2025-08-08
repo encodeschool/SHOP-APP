@@ -123,24 +123,10 @@ export default function FilterPage() {
           </select>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {products.map((p) => (
-            <div key={p.id} className="border relative flex justify-between p-4 rounded shadow">
-              <div className="content_wrapper">
-                <h2 className="font-bold">{p.title}</h2>
-                <p>Brand: {p.brand}</p>
-                <p>€{p.price.toFixed(2)}</p>
-                <button
-                      className="flex items-center bg-indigo-400 py-2 my-3 px-3 rounded-2 text-white hover:bg-indigo-500"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(p);
-                      }}
-                    >
-                    Add to Cart <FaCartPlus className='ml-2' size={15} />
-                </button>
-              </div>
-              <div className="img_wrapper">
+            <div key={p.id} className="border relative items-center grid grid-cols-2 justify-between p-4 rounded-xl shadow">
+              <div className="mr-3 img_wrapper">
                 <img
                   src={
                     p.imageUrls?.[0]
@@ -148,8 +134,21 @@ export default function FilterPage() {
                       : '/placeholder.jpg'
                   }
                   alt={p.title}
-                  className="h-40 mr-2 object-contain"
+                  className="h-40 object-contain"
                 />
+              </div>
+              <div className="content_wrapper p-2">
+                <h2 className="font-bold">{p.title}</h2>
+                <p className='text-indigo-600 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
+                <button
+                      className="flex items-center absolute bottom-0 right-0 bg-indigo-400 p-5 rounded-br-xl rounded-2 text-white hover:bg-indigo-500"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddToCart(p);
+                      }}
+                    >
+                    <FaCartPlus size={15} />
+                </button>
               </div>
                 <FavoriteButton
                   productId={p.id}

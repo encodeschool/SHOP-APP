@@ -217,7 +217,7 @@ const Home = () => {
               <div className="flex items-stretch justify-between">
                 <div>
                   <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
-                  <p className="text-green-600">${product.price}</p>
+                  <p className="text-indigo-600 text-3xl font-bold mt-2">${product.price}</p>
                   <CompareButton product={product} />
                 </div>
                 <FavoriteButton
@@ -276,16 +276,18 @@ const Home = () => {
         >
           {brands.map(brand => (
                 <SwiperSlide key={brand.id}>
-                  <div className="p-[50px] w-full h-[150px] border-[3px] border-indigo-400 rounded-xl hover:shadow">
-                    <div
-                      className="bg-contain h-[100%] grayscale bg-no-repeat bg-center"
-                      style={{
-                        backgroundImage: `url(${
-                          brand.icon ? `http://localhost:8080${brand.icon}` : '/placeholder.jpg'
-                        })`,
-                      }}
-                    ></div>
-                  </div>
+                  <Link to='/filtered'>
+                    <div className="p-[50px] w-full h-[150px] border-[3px] border-indigo-400 rounded-xl hover:shadow">
+                      <div
+                        className="bg-contain h-[100%] grayscale bg-no-repeat bg-center"
+                        style={{
+                          backgroundImage: `url(${
+                            brand.icon ? `http://localhost:8080${brand.icon}` : '/placeholder.jpg'
+                          })`,
+                        }}
+                      ></div>
+                    </div>
+                  </Link>
                 </SwiperSlide>
           ))}
         </Swiper>
@@ -369,7 +371,7 @@ const Home = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
-                      <p className="text-green-600">${product.price}</p>
+                      <p className="text-indigo-600 text-3xl font-bold mt-2">${product.price}</p>
                       <CompareButton product={product} />
                     </div>
                     <button
