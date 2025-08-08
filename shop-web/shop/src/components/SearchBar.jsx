@@ -37,8 +37,8 @@ export default function SearchAppBar() {
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo + Hamburger */}
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-xl font-bold">
-            Shop
+          <Link to="/" className="text-3xl font-bold logo">
+            SHOP
           </Link>
           <button
             className="md:hidden text-xl ml-auto"
@@ -56,10 +56,10 @@ export default function SearchAppBar() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="flex-1 px-4 py-2 rounded-l-full border-2 border-indigo-400 focus:outline-none"
+            className="flex-1 px-4 py-2 rounded-l-xl border-2 border-indigo-400 focus:outline-none"
           />
 
-          <button onClick={handleSearch} className="bg-indigo-400 px-4 rounded-r-full text-white">
+          <button onClick={handleSearch} className="bg-indigo-400 px-4 rounded-r-xl text-white">
             <FaSearch />
           </button>
         </div>

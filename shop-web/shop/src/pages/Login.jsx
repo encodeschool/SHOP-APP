@@ -42,7 +42,7 @@ export default function Login() {
 
 
   return (
-    <div className="max-w-md mx-auto mt-10  text-center">
+    <div className="max-w-md mx-auto m-10  text-center">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
       <form onSubmit={handleLogin} className="space-y-4">
         <input

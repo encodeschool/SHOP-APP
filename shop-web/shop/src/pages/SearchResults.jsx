@@ -70,6 +70,7 @@ export default function SearchResults() {
           {results.map(product => (
             
             <Link
+                  key={product.id}
                   to={`/product/${product.id}`}
                   className="relative border p-4 rounded-xl hover:shadow group h-full block"
                 >

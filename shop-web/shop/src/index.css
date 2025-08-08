@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap');
+
+.logo {
+  font-family: "Playwrite HU", cursive;
+}
 
 body {
   margin: 0;
