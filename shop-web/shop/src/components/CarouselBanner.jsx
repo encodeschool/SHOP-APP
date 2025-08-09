@@ -4,7 +4,7 @@ import { Carousel } from "react-responsive-carousel";
 
 export default function CarouselBanner() {
   return (
-    <div className="w-full">
+    <div className="w-full border-[4px] p-4 rounded-xl border-indigo-400">
       <Carousel
         autoPlay
         infiniteLoop
@@ -20,7 +20,7 @@ export default function CarouselBanner() {
         ].map((url, index) => (
           <div
             key={index}
-            className="h-[300px] md:h-[450px] bg-center bg-no-repeat bg-cover"
+            className="h-[300px] md:h-[500px] bg-center bg-no-repeat bg-contain"
             style={{ backgroundImage: `url(${url})` }}
           ></div>
         ))}

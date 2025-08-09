@@ -183,7 +183,7 @@ export default function Products() {
       description: product.description,
       price: product.price,
       stock: product.stock,
-      condition: product.condition,
+      condition: product.condition || 'NEW',
       categoryId: parentCategoryId || product.categoryId,
       subcategoryId: parentCategoryId ? product.categoryId : '',
       userId: product.user?.id || '',

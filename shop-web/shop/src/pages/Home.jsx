@@ -144,51 +144,67 @@ const Home = () => {
 
   return (
     <div>
-      <div className="w-full bg-indigo-400 relative">
-        <div className="container mx-auto flex gap-6 px-4 py-3 text-white text-base font-medium">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="flex relative"
-              onMouseEnter={() => setHoveredCategory(category)}
-              onMouseLeave={() => {
-                setHoveredCategory(null);
-                setSelectedSubImage(null);
-              }}
-            >
-              <img
-                src={
-                  category.icon
-                    ? `http://localhost:8080${category.icon}`
-                    : '/placeholder.jpg'
-                }
-                alt={category.name}
-                className="w-[20px] invert-[100%] mr-2 object-contain"
-              />
-              <button className="hover:underline">{category.name}</button>
+      <div className="container mx-auto mt-5 px-4 py-3">
+        <div className="flex gap-6">
+          {/* Categories sidebar - 20% width */}
+          <div className="w-1/5 relative border-[4px] border-indigo-400 p-4 rounded-xl">
+            <p className='text-black text-xl mb-2 font-bold'>All Category</p>
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="flex items-center text-black relative mb-2 cursor-pointer"
+                onMouseEnter={() => setHoveredCategory(category)}
+                onMouseLeave={() => {
+                  setHoveredCategory(null);
+                  setSelectedSubImage(null);
+                }}
+              >
+                <img
+                  src={
+                    category.icon
+                      ? `http://localhost:8080${category.icon}`
+                      : '/placeholder.jpg'
+                  }
+                  alt={category.name}
+                  className="w-[20px] mr-2 object-contain"
+                />
+                <button className="hover:underline">{category.name}</button>
 
-              {/* Mega Menu Dropdown */}
-              {hoveredCategory?.id === category.id && (
-                <div className="absolute top-full left-0 bg-white text-black shadow-lg z-50 flex p-6 mt-1 rounded w-auto">
-                  <div className="grid gap-4 w-auto flex-1">
-                    {category.subcategories?.map((sub) => (
-                      <Link
-                        key={sub.id}
-                        to={`/category/${sub.id}`}
-                        className="hover:underline"
-                        onMouseEnter={() => setSelectedSubImage(sub.imageUrl)}
-                      >
-                        {sub.name}
-                      </Link>
-                    ))}
+                {/* Mega Menu Dropdown */}
+                {hoveredCategory?.id === category.id && (
+                  <div
+                    className="absolute top-0 left-full bg-white text-black shadow-lg z-50 p-6 rounded-r-md w-[100%]"
+                    style={{ overflowY: 'auto' }}
+                    onMouseEnter={() => setHoveredCategory(category)} // to keep it open when hovered
+                    onMouseLeave={() => {
+                      setHoveredCategory(null);
+                      setSelectedSubImage(null);
+                    }}
+                  >
+                    <div className="grid gap-4">
+                      {category.subcategories?.map((sub) => (
+                        <Link
+                          key={sub.id}
+                          to={`/category/${sub.id}`}
+                          className="hover:underline block"
+                          onMouseEnter={() => setSelectedSubImage(sub.imageUrl)}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Carousel - 80% width */}
+          <div className="w-4/5">
+            <CarouselBanner />
+          </div>
         </div>
       </div>
-      <CarouselBanner />
       
       <FeatureStrip />
 
