@@ -1,24 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
-
-// Dummy DynamicAttributeForm for demonstration
-function DynamicAttributeForm({ attributes, values, onChange }) {
-  return (
-    <div>
-      {attributes.map((attr) => (
-        <div key={attr.id} className="mb-2">
-          <label className="block font-medium">{attr.name}:</label>
-          <input
-            type="text"
-            value={values?.[attr.id] || ''}
-            onChange={(e) => onChange(attr.id, e.target.value)}
-            className="border px-2 py-1 rounded w-full"
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
+import DynamicAttributeForm from '../components/DynamicAttributeForm';
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -35,7 +17,20 @@ export default function Profile() {
   const [orders, setOrders] = useState([]);
   const token = localStorage.getItem('token');
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: '', price: '', description: '', attributes: {}, });
+  const [newProduct, setNewProduct] = useState({
+    title: '',
+    description: '',
+    price: '',
+    stock: '',
+    condition: 'NEW',
+    categoryId: '',
+    subcategoryId: '',
+    userId: '',
+    featured: false,
+    images: [],
+    brandId: '', // 👈 New
+    attributes: []
+  });
   const userId = localStorage.getItem('userId');
   const [productImage, setProductImage] = useState(null);
 
@@ -79,9 +74,12 @@ export default function Profile() {
     const res = await axios.get(`/categories/${categoryId}/subcategories`);
     setSubcategories(res.data);
   };
-  const fetchAttributes = async (subcategoryId) => {
-    const res = await axios.get(`/products/attributes/category/${subcategoryId}`);
-    setAttributes(res.data);
+  const fetchAttributes = (categoryId) => {
+    axios.get(`products/attributes/category/${categoryId}`)
+      .then(res => {
+        setAttributes(res.data || [])
+      })
+      .catch(console.error);
   };
   const fetchBrands = async () => {
     const res = await axios.get('/products/brands');
@@ -110,7 +108,7 @@ export default function Profile() {
   useEffect(() => {
     
 
-    const fetchOrders = async () => {
+  const fetchOrders = async () => {
       if (activeTab === 'orders' && userId && token) {
         try {
           const res = await axios.get(`/orders/user/${userId}`, {
@@ -232,33 +230,38 @@ export default function Profile() {
   const handleCategoryChange = (e) => {
     const categoryId = e.target.value;
     setSelectedCategory(categoryId);
+    setNewProduct(prev => ({ ...prev, categoryId })); // sync here
     setSelectedSubcategory('');
+    setNewProduct(prev => ({ ...prev, subcategoryId: '' }));
     setAttributes([]);
     if (categoryId) {
       fetchSubcategories(categoryId);
     }
   };
 
-  // Handle subcategory change
   const handleSubcategoryChange = (e) => {
     const subcategoryId = e.target.value;
     setSelectedSubcategory(subcategoryId);
+    setNewProduct(prev => ({ ...prev, subcategoryId }));
     if (subcategoryId) {
       fetchAttributes(subcategoryId);
     }
   };
-    
-  // Handle brand change
+
   const handleBrandChange = (e) => {
-    setSelectedBrand(e.target.value);
+    const brandId = e.target.value;
+    setSelectedBrand(brandId);
+    setNewProduct(prev => ({ ...prev, brandId }));
   };
 
+
   // Handle dynamic attribute change
-  const handleAttributeChange = (attrId, value) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      attributes: { ...prev.attributes, [attrId]: value },
+  const handleDynamicAttributesChange = (attributeMap) => {
+    const attrs = Object.entries(attributeMap).map(([attributeId, value]) => ({
+      attributeId,
+      value
     }));
+    setNewProduct(prev => ({ ...prev, attributes: attrs }));
   };
 
   // Create or update product
@@ -278,6 +281,7 @@ export default function Profile() {
             subcategoryId: selectedSubcategory,
             brandId: selectedBrand,
             attributes: newProduct.attributes,
+            userId: userId || null,      // <== add userId here
           }),
         ],
         { type: 'application/json' }
@@ -297,14 +301,26 @@ export default function Profile() {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
       }
-      setNewProduct({ title: '', price: '', description: '', attributes: {} });
+      setNewProduct({
+        title: '',
+        description: '',
+        price: '',
+        stock: '',
+        condition: 'NEW',
+        categoryId: '',
+        subcategoryId: '',
+        userId: userId || '',
+        featured: false,
+        images: [],
+        brandId: '',
+        attributes: []
+      });
       setSelectedCategory('');
       setSelectedSubcategory('');
       setSelectedBrand('');
       setAttributes([]);
       setProductImages([]);
       setEditingId(null);
-      fetchUserProducts();
     } catch (err) {
       console.error('Error saving product', err);
     }
@@ -336,7 +352,7 @@ export default function Profile() {
     try {
       await fetchSubcategories(product.categoryId);
       setSelectedSubcategory(product.subcategoryId);
-      await fetchAttributes(product.subcategoryId);
+      // await fetchAttributes(product.subcategoryId);
     } catch (err) {
       console.error('Failed to load subcategories or attributes', err);
     }
@@ -592,11 +608,11 @@ export default function Profile() {
               </select>
 
               {/* Attributes */}
-              {attributes.length > 0 && (
+              {(selectedSubcategory || selectedCategory) && (
                 <DynamicAttributeForm
-                  attributes={attributes}
-                  values={newProduct.attributes}
-                  onChange={handleAttributeChange}
+                  categoryId={newProduct.subcategoryId || newProduct.categoryId}
+                  productId={editingId}
+                  onChange={handleDynamicAttributesChange}
                 />
               )}
 
@@ -605,6 +621,7 @@ export default function Profile() {
                 type="file"
                 accept="image/*"
                 multiple
+                className='w-full border px-2 py-1 rounded'
                 onChange={(e) => setProductImages(Array.from(e.target.files))}
               />
 
