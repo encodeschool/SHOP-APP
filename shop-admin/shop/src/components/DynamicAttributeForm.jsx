@@ -153,12 +153,12 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
         </div>
       ))}
 
-      <button
+      {/* <button
         type="submit"
         className="bg-black text-white px-4 py-2 rounded"
       >
         Save Attributes
-      </button>
+      </button> */}
     </form>
   );
 }

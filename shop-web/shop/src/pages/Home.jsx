@@ -11,7 +11,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import FeatureStrip from '../components/FeatureStrip';
 import FavoriteButton from '../components/FavoriteButton';
 import CompareButton from '../components/CompareButton';
-
+import {useLoading} from '../contexts/LoadingContext';
 
 // Redux imports
 import { useDispatch } from 'react-redux';
@@ -29,38 +29,61 @@ const Home = () => {
   const brandNextRef = useRef(null);
   const featuredPrevRef = useRef(null);
   const featuredNextRef = useRef(null);
+  const { setLoading } = useLoading();
 
 
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setLoading(true);
     const fetchProducts = async () => {
-      const res = await axios.get('/products');
-      setProducts(res.data);
+      try {
+        const res = await axios.get('/products');
+        setProducts(res.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchProducts();
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     const fetchBrands = async () => {
-      const res = await axios.get('/products/brands');
-      setBrands(res.data);
+      try {
+        const res = await axios.get('/products/brands');
+        setBrands(res.data);
+      } catch(error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchBrands();
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     const fetchCategories = async () => {
-      const res = await axios.get('/categories');
-      const topCategories = res.data.filter(cat =>
-        cat.subcategories && cat.subcategories.length > 0
-      );
-      setCategories(topCategories);
+      try {
+        const res = await axios.get('/categories');
+        const topCategories = res.data.filter(cat =>
+          cat.subcategories && cat.subcategories.length > 0
+        );
+        setCategories(topCategories);
+      } catch(error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCategories();
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     const fetchFavorites = async () => {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
@@ -75,6 +98,8 @@ const Home = () => {
           setFavorites(productIds);
         } catch (error) {
           console.error('Failed to fetch favorites:', error);
+        } finally {
+          setLoading(false);
         }
       }
     };

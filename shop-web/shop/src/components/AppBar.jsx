@@ -59,14 +59,14 @@ export default function AppBar() {
       <div className="container mx-auto md:px-4 md:py-2 flex justify-between items-center">
         {/* Left Links - Desktop */}
         <div className="hidden md:flex gap-4">
-          <Link to="/terms" className="hover:underline">Terms & Conditions</Link>
-          <Link to="/delivery" className="hover:underline">Delivery & Payment</Link>
-          <Link to="/about" className="hover:underline">About Us</Link>
-          <Link to="/contacts" className="hover:underline">Contacts</Link>
+          <Link to="/terms" className="font-[200] hover:underline">Terms & Conditions</Link>
+          <Link to="/delivery" className="font-[200] hover:underline">Delivery & Payment</Link>
+          <Link to="/about" className="font-[200] hover:underline">About Us</Link>
+          <Link to="/contacts" className="font-[200] hover:underline">Contacts</Link>
         </div>
 
         {/* Right - Desktop */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden font-[200] md:flex items-center gap-4">
           <span className="flex items-center">
             <FaPhone className="mr-1" />
             <span>+371 22164949</span>

@@ -1,19 +1,39 @@
 import { Disclosure } from '@headlessui/react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import axios from '../api/axios'; // your centralized axios instance
 import { setBrands, setInStock, setPriceRange } from '../redux/filterSlice';
+import {useLoading} from '../contexts/LoadingContext';
 
 export default function FilterSidebar() {
   const dispatch = useDispatch();
-  const brands = useSelector((state) => state.filters.brands);
+  const selectedBrands = useSelector((state) => state.filters.brands);
   const inStock = useSelector((state) => state.filters.inStock);
   const priceRange = useSelector((state) => state.filters.priceRange);
 
-  const brandsList = ['ABYstyle', 'Bandai Banpresto', 'Blizzard', 'Funko', 'Iron Studios'];
+  const [brands, setBrandsList] = useState([]);
+  const { setLoading } = useLoading();
 
-  const handleBrandChange = (brand) => {
-    const newBrands = brands.includes(brand)
-      ? brands.filter((b) => b !== brand)
-      : [...brands, brand];
+  // Fetch brands from backend
+  useEffect(() => {
+    const fetchBrands = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get('/products/brands');
+        setBrandsList(res.data); // expects array like [{id, name}, ...]
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrands();
+  }, [setLoading]);
+
+  const handleBrandChange = (brandName) => {
+    const newBrands = selectedBrands.includes(brandName)
+      ? selectedBrands.filter((b) => b !== brandName)
+      : [...selectedBrands, brandName];
     dispatch(setBrands(newBrands));
   };
 
@@ -27,21 +47,24 @@ export default function FilterSidebar() {
 
           <Disclosure.Panel className="md:block">
             <div className="space-y-6 p-4 border-r">
+              
+              {/* Brands Filter */}
               <div>
                 <h2 className="font-bold">Brands</h2>
-                {brandsList.map((brand) => (
-                  <label key={brand} className="block">
+                {brands.map((brand) => (
+                  <label key={brand.id} className="block">
                     <input
                       type="checkbox"
-                      checked={brands.includes(brand)}
-                      onChange={() => handleBrandChange(brand)}
+                      checked={selectedBrands.includes(brand.name)}
+                      onChange={() => handleBrandChange(brand.name)}
                       className="mr-2"
                     />
-                    {brand}
+                    {brand.name}
                   </label>
                 ))}
               </div>
 
+              {/* In Stock Filter */}
               <div>
                 <h2 className="font-bold">In stock</h2>
                 <label>
@@ -55,6 +78,7 @@ export default function FilterSidebar() {
                 </label>
               </div>
 
+              {/* Price Range Filter */}
               <div>
                 <h2 className="font-bold">Price range</h2>
                 <input

@@ -435,6 +435,7 @@ export default function Profile() {
                 ))}
               </select>
               <input
+                multiple
                 type="file"
                 accept="image/*"
                 onChange={(e) => setProductImage(e.target.files[0])}

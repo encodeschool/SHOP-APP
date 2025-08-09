@@ -24,9 +24,11 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import Favorites from './pages/Favorites';
 import Compare from './pages/Compare';
 import SearchResults from './pages/SearchResults';
+import { LoadingProvider } from './contexts/LoadingContext';
 
 function App() {
   return (
+    <LoadingProvider>
       <div className="flex flex-col min-h-screen">
         <AppBar />
         {/* <Navbar /> */}
@@ -70,6 +72,7 @@ function App() {
         <Footer />
         <ToastContainer position="top-right" autoClose={2000} />
       </div>
+    </LoadingProvider>
   );
 }
 

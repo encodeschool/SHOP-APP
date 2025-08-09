@@ -10,6 +10,8 @@ import {
   FaPhone, FaMailBulk
 } from "react-icons/fa";
 import { useSelector } from 'react-redux';
+import { BsShop } from "react-icons/bs";
+
 
 export default function SearchAppBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,8 +39,9 @@ export default function SearchAppBar() {
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo + Hamburger */}
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-3xl font-bold logo">
-            SHOP
+          <Link to="/" className="text-3xl font-bold flex items-center justify-center">
+            <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
+            BAZAARLY
           </Link>
           <button
             className="md:hidden text-xl ml-auto"
