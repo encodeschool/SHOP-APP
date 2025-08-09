@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
+
+// Dummy DynamicAttributeForm for demonstration
+function DynamicAttributeForm({ attributes, values, onChange }) {
+  return (
+    <div>
+      {attributes.map((attr) => (
+        <div key={attr.id} className="mb-2">
+          <label className="block font-medium">{attr.name}:</label>
+          <input
+            type="text"
+            value={values?.[attr.id] || ''}
+            onChange={(e) => onChange(attr.id, e.target.value)}
+            className="border px-2 py-1 rounded w-full"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -16,7 +35,7 @@ export default function Profile() {
   const [orders, setOrders] = useState([]);
   const token = localStorage.getItem('token');
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: '', price: '', description: '' });
+  const [newProduct, setNewProduct] = useState({ title: '', price: '', description: '', attributes: {}, });
   const userId = localStorage.getItem('userId');
   const [productImage, setProductImage] = useState(null);
 
@@ -26,18 +45,61 @@ export default function Profile() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
 
+  const [subcategories, setSubcategories] = useState([]);
+  const [attributes, setAttributes] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [productImages, setProductImages] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+
+  // fetch functions (similar to Products.jsx)
+  useEffect(() => {
+    fetchCategories();
+    fetchBrands();
+    fetchUserProducts(); // your seller products
+  }, []);
+
+  const fetchUserProducts = async () => {
+    if (!userId || !token) return;
+    try {
+      const res = await axios.get(`/products/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch user products:', err);
+    }
+  };
+
+
+  const fetchCategories = async () => {
+    const res = await axios.get('/categories');
+    setCategories(res.data);
+  };
+  const fetchSubcategories = async (categoryId) => {
+    const res = await axios.get(`/categories/${categoryId}/subcategories`);
+    setSubcategories(res.data);
+  };
+  const fetchAttributes = async (subcategoryId) => {
+    const res = await axios.get(`/products/attributes/category/${subcategoryId}`);
+    setAttributes(res.data);
+  };
+  const fetchBrands = async () => {
+    const res = await axios.get('/products/brands');
+    setBrands(res.data);
+  };
+
   // Fetch categories and brands on mount
   useEffect(() => {
     if (token) {
       axios
-        .get('http://localhost:8080/api/categories', {
+        .get('/categories', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setCategories(res.data))
         .catch((err) => console.error('Failed to fetch categories', err));
 
       axios
-        .get('http://localhost:8080/api/products/brands', {
+        .get('/products/brands', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setBrands(res.data))
@@ -51,7 +113,7 @@ export default function Profile() {
     const fetchOrders = async () => {
       if (activeTab === 'orders' && userId && token) {
         try {
-          const res = await axios.get(`http://localhost:8080/api/orders/user/${userId}`, {
+          const res = await axios.get(`/orders/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setOrders(res.data);
@@ -68,7 +130,7 @@ export default function Profile() {
     const fetchFavorites = async () => {
       if (activeTab === 'favorites' && userId && token) {
         try {
-          const res = await axios.get(`http://localhost:8080/api/favorites/user/${userId}`, {
+          const res = await axios.get(`/favorites/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -76,7 +138,7 @@ export default function Profile() {
 
           // Fetch product details for each favorite
           const productPromises = favoriteItems.map((fav) =>
-            axios.get(`http://localhost:8080/api/products/${fav.productId}`, {
+            axios.get(`/products/${fav.productId}`, {
               headers: { Authorization: `Bearer ${token}` },
             }).then(res => res.data)
           );
@@ -94,7 +156,7 @@ export default function Profile() {
 
   const handleRemoveFavorite = async (productId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/favorites`, {
+      await axios.delete(`/favorites`, {
         params: { userId, productId },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -107,7 +169,7 @@ export default function Profile() {
   useEffect(() => {
     if (userId && token) {
       axios
-        .get(`http://localhost:8080/api/users/${userId}`, {
+        .get(`/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setUser(res.data))
@@ -131,7 +193,7 @@ export default function Profile() {
     if (profileImage) formData.append('profilePicture', profileImage);
 
     try {
-      const res = await axios.put(`http://localhost:8080/api/users/update-profile`, formData, {
+      const res = await axios.put(`/users/update-profile`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -149,7 +211,7 @@ export default function Profile() {
     const fetchProducts = async () => {
       if (activeTab === 'Product') {
         try {
-          const res = await axios.get(`http://localhost:8080/api/products/user/${userId}`, {
+          const res = await axios.get(`/products/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setProducts(res.data);
@@ -161,63 +223,126 @@ export default function Profile() {
     fetchProducts();
   }, [activeTab, token]);
 
-  const handleNewProductChange = (e) =>
-    setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+  const handleNewProductChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
-  const handleBrandChange = (e) => setSelectedBrand(e.target.value);
+  // Handle category change
+  const handleCategoryChange = (e) => {
+    const categoryId = e.target.value;
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory('');
+    setAttributes([]);
+    if (categoryId) {
+      fetchSubcategories(categoryId);
+    }
+  };
 
+  // Handle subcategory change
+  const handleSubcategoryChange = (e) => {
+    const subcategoryId = e.target.value;
+    setSelectedSubcategory(subcategoryId);
+    if (subcategoryId) {
+      fetchAttributes(subcategoryId);
+    }
+  };
+    
+  // Handle brand change
+  const handleBrandChange = (e) => {
+    setSelectedBrand(e.target.value);
+  };
+
+  // Handle dynamic attribute change
+  const handleAttributeChange = (attrId, value) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      attributes: { ...prev.attributes, [attrId]: value },
+    }));
+  };
+
+  // Create or update product
   const handleProductSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-
     formData.append(
       'product',
       new Blob(
         [
           JSON.stringify({
-            ...newProduct,
-            userId,
+            title: newProduct.title,
+            price: parseFloat(newProduct.price),
+            description: newProduct.description,
             categoryId: selectedCategory,
+            subcategoryId: selectedSubcategory,
             brandId: selectedBrand,
+            attributes: newProduct.attributes,
           }),
         ],
         { type: 'application/json' }
       )
     );
-
-    if (productImage) {
-      formData.append('images', productImage);
-    }
+    productImages.forEach((file) => {
+      formData.append('images', file);
+    });
 
     try {
-      await axios.post('http://localhost:8080/api/products', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setNewProduct({ title: '', price: '', description: '' });
+      if (editingId) {
+        await axios.put(`/products/${editingId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        await axios.post('/products', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+      setNewProduct({ title: '', price: '', description: '', attributes: {} });
       setSelectedCategory('');
+      setSelectedSubcategory('');
       setSelectedBrand('');
-      setProductImage(null);
-      setActiveTab('Product'); // Refresh products list
+      setAttributes([]);
+      setProductImages([]);
+      setEditingId(null);
+      fetchUserProducts();
     } catch (err) {
-      console.error('Failed to add product', err);
+      console.error('Error saving product', err);
     }
   };
 
-
-  const handleDeleteProduct = async (productId) => {
+  // Delete product
+  const handleDeleteProduct = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/products/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      await axios.delete(`/products/${id}`);
+      fetchUserProducts();
     } catch (err) {
-      console.error('Failed to delete product', err);
+      console.error('Error deleting product', err);
     }
   };
+
+  // Edit product (load data into form)
+  const handleEditProduct = async (product) => {
+    setEditingId(product.id);
+    setNewProduct({
+      title: product.title,
+      price: product.price,
+      description: product.description,
+      attributes: product.attributes?.reduce((acc, attr) => {
+        acc[attr.attributeId] = attr.value;
+        return acc;
+      }, {}) || {},
+    });
+    setSelectedCategory(product.categoryId);
+    try {
+      await fetchSubcategories(product.categoryId);
+      setSelectedSubcategory(product.subcategoryId);
+      await fetchAttributes(product.subcategoryId);
+    } catch (err) {
+      console.error('Failed to load subcategories or attributes', err);
+    }
+    setSelectedBrand(product.brandId);
+  };
+
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -349,6 +474,7 @@ export default function Profile() {
 
       {activeTab === 'Product' && (
         <div className="flex flex-col lg:flex-row gap-6">
+          {/* Product List */}
           <div className="w-full lg:w-4/5">
             {products.length === 0 ? (
               <p className="text-gray-600">You haven't added any products yet.</p>
@@ -361,6 +487,12 @@ export default function Profile() {
                       onClick={() => handleDeleteProduct(product.id)}
                     >
                       Delete
+                    </button>
+                    <button
+                      className="absolute top-2 right-14 text-blue-600"
+                      onClick={() => handleEditProduct(product)}
+                    >
+                      Edit
                     </button>
                     <img
                       src={
@@ -380,8 +512,11 @@ export default function Profile() {
             )}
           </div>
 
+          {/* Product Form */}
           <div className="w-full lg:w-1/5 border p-4 rounded">
-            <h3 className="text-lg font-semibold mb-2">Add Product</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {editingId ? 'Edit Product' : 'Add Product'}
+            </h3>
             <form onSubmit={handleProductSubmit} className="space-y-2">
               <input
                 type="text"
@@ -408,6 +543,8 @@ export default function Profile() {
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
               />
+
+              {/* Category */}
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
@@ -421,6 +558,25 @@ export default function Profile() {
                   </option>
                 ))}
               </select>
+
+              {/* Subcategory */}
+              {subcategories.length > 0 && (
+                <select
+                  value={selectedSubcategory}
+                  onChange={handleSubcategoryChange}
+                  className="w-full border px-2 py-1 rounded"
+                  required
+                >
+                  <option value="">Select Subcategory</option>
+                  {subcategories.map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Brand */}
               <select
                 value={selectedBrand}
                 onChange={handleBrandChange}
@@ -434,15 +590,44 @@ export default function Profile() {
                   </option>
                 ))}
               </select>
+
+              {/* Attributes */}
+              {attributes.length > 0 && (
+                <DynamicAttributeForm
+                  attributes={attributes}
+                  values={newProduct.attributes}
+                  onChange={handleAttributeChange}
+                />
+              )}
+
+              {/* Images */}
               <input
-                multiple
                 type="file"
                 accept="image/*"
-                onChange={(e) => setProductImage(e.target.files[0])}
-                className="w-full"
+                multiple
+                onChange={(e) => setProductImages(Array.from(e.target.files))}
               />
-              <button type="submit" className="bg-black text-white w-full py-1 rounded">
-                Create
+
+              {productImages.length > 0 && (
+                <div className="flex gap-2 mt-2 overflow-x-auto">
+                  {productImages.map((file, idx) => (
+                    <img
+                      key={idx}
+                      src={URL.createObjectURL(file)}
+                      alt={`preview-${idx}`}
+                      className="h-16 w-16 object-cover rounded"
+                    />
+                  ))}
+                </div>
+              )}
+
+
+
+              <button
+                type="submit"
+                className="bg-black text-white w-full py-1 rounded"
+              >
+                {editingId ? 'Update' : 'Create'}
               </button>
             </form>
           </div>
