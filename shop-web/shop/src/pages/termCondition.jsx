@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TermCondition() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="container mx-auto px-6 py-10">
       <h1 className="text-3xl font-bold mb-6 text-center">Terms & Conditions</h1>
 
       <p className="mb-4">

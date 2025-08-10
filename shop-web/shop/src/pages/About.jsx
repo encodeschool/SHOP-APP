@@ -2,7 +2,7 @@ import React from "react";
 
 export default function About() {
   return (
-    <div className="my-8 px-4 max-w-4xl mx-auto">
+    <div className="my-8 px-4 container mx-auto">
       <h1 className="text-center text-3xl font-bold mb-6">About Us</h1>
       <p className="mb-4">
         17 years with you! In the 17 years we have been with you, our idea and objective have not changed – we work hard and try to make sure our clients can easily receive items without overpaying for them.
