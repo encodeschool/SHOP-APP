@@ -33,4 +33,6 @@ public interface UserService extends UserDetailsService {
 
     UserResponseDTO updateUserProfile(String email, String dataJson, MultipartFile imageFile);
 
+    UserResponseDTO subscribe(String email);
+
 }

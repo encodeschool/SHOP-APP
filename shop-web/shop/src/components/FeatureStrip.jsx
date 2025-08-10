@@ -32,9 +32,9 @@ const FeatureStrip = () => {
   return (
     <div className="container mx-auto px-4 mt-6 mb-2">
       <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl mb-5">Why Us?</h1>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 bg-white shadow-sm rounded-xl border-[3px] border-indigo-400 py-4">
+      <div className="grid p-4 md:p-0 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 bg-white shadow-sm rounded-xl border-[3px] border-indigo-400 md:py-4">
         {features.map((f, index) => (
-          <div key={index} className="flex justify-center items-center text-center border-indigo">
+          <div key={index} className="flex justify-left md:justify-center items-center text-left md:text-center border-indigo">
             {f.icon}
             <div>
               <p className="font-semibold text-sm mt-2">{f.title}</p>

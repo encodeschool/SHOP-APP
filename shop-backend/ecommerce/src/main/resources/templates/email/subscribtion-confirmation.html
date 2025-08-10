@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <!-- <img src="https://via.placeholder.com/150x50?text=Your+Logo" alt="Shop Logo" style="height: 50px;"> -->
+             Shop
+        </div>
+
+        <!-- Heading -->
+        <h2 style="color: rgb(129, 140, 248);">Thank you for subscription!</h2>
+
+        <!-- Order Info -->
+        <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+        
+        <!-- Message -->
+        <p style="margin-top: 30px;">We will notify you once we have something for you.</p>
+
+        <!-- Footer -->
+        <p style="margin-top: 40px;">Best regards,<br><strong>Your Shop Team</strong></p>
+    </div>
+</body>
+</html>

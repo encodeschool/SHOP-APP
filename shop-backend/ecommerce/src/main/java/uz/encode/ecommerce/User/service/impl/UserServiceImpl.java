@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${upload.path}")
     private String uploadFolderPath;
+
+    @Autowired
+    private SubscribeEmailService emailService;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -204,5 +209,22 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Failed to parse JSON or save image: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    @Transactional
+    public UserResponseDTO subscribe(String email) {
+        User user = userRepository.getByEmail(email);
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+        }
+
+        userRepository.save(user);
+        emailService.sendSubscribtionConfirmation(email);
+
+        return userMapper.mapToDto(user);
+    }
+
 
 }
