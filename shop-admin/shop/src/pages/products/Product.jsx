@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import DynamicAttributeForm from '../../components/DynamicAttributeForm';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -10,6 +10,7 @@ export default function Products() {
   const [users, setUsers] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -22,7 +23,7 @@ export default function Products() {
     userId: '',
     featured: false,
     images: [],
-    brandId: '', // 👈 New
+    brandId: '',
     attributes: []
   });
 
@@ -57,9 +58,7 @@ export default function Products() {
 
   const fetchAttributes = (categoryId) => {
     axios.get(`products/attributes/category/${categoryId}`)
-      .then(res => {
-        setAttributes(res.data || [])
-      })
+      .then(res => setAttributes(res.data || []))
       .catch(console.error);
   };
 
@@ -73,7 +72,7 @@ export default function Products() {
     fetchProducts();
     fetchCategories();
     fetchUsers();
-    fetchBrands(); // 👈
+    fetchBrands();
   }, []);
 
   const handleInputChange = (e) => {
@@ -96,8 +95,6 @@ export default function Products() {
       setNewProduct(prev => ({ ...prev, subcategoryId: value }));
       fetchAttributes(effectiveCategoryId);
     }
-
-
   };
 
   const handleDynamicAttributesChange = (attributeMap) => {
@@ -107,7 +104,6 @@ export default function Products() {
     }));
     setNewProduct(prev => ({ ...prev, attributes: attrs }));
   };
-
 
   const handleFileChange = (e) => {
     setNewProduct({ ...newProduct, images: Array.from(e.target.files) });
@@ -170,6 +166,7 @@ export default function Products() {
 
       setAttributes([]);
       setEditingId(null);
+      setIsDrawerOpen(false);
       fetchProducts();
 
     } catch (err) {
@@ -191,7 +188,7 @@ export default function Products() {
     setNewProduct({
       title: product.title || '',
       description: product.description || '',
-      price: product.price ?? '',  // Use ?? to catch undefined/null and set ''
+      price: product.price ?? '',
       stock: product.stock ?? '',
       condition: product.condition || 'NEW',
       categoryId: parentCategoryId || product.categoryId || '',
@@ -203,7 +200,7 @@ export default function Products() {
         attributeId: attr.attribute?.id || attr.attributeId,
         value: attr.value ?? ''
       })),
-      brandId: product.brand?.id || '',   // Make sure this isn't null
+      brandId: product.brand?.id || '',
     });
 
     if (parentCategoryId) {
@@ -214,14 +211,38 @@ export default function Products() {
     fetchAttributes(effectiveCategoryId);
 
     setEditingId(product.id);
+    setIsDrawerOpen(true); // 👈 open drawer on edit
   };
 
   return (
     <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
-        <div className="w-[80%]">
+        <div className="w-[100%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
           <div className="flex">
+            <button
+              className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
+              onClick={() => {
+                setEditingId(null);
+                setNewProduct({
+                  title: '',
+                  description: '',
+                  price: '',
+                  stock: '',
+                  condition: 'NEW',
+                  categoryId: '',
+                  subcategoryId: '',
+                  userId: '',
+                  featured: false,
+                  images: [],
+                  attributes: [],
+                  brandId: '',
+                });
+                setIsDrawerOpen(true);
+              }}
+            >
+              +
+            </button>
             <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
             <Link to="/brand" className='bg-green-500 hover:bg-green-700 text-white font-bold ml-6 py-2 px-4 rounded'>Add brand</Link>
           </div>
@@ -258,85 +279,91 @@ export default function Products() {
           </table>
         </div>
 
-        <div className="w-[20%] p-4 bg-white shadow h-fit">
-          <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
+        {/* Drawer Overlay */}
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+            isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsDrawerOpen(false)}
+        ></div>
 
-          <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title || ''} onChange={handleInputChange} />
-          <input name="description" placeholder="Description" className="border p-1 mb-3 w-full" value={newProduct.description} onChange={handleInputChange} />
-          <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-full" value={newProduct.price} onChange={handleInputChange} />
-          <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-full" value={newProduct.stock} onChange={handleInputChange} />
+        {/* Drawer Panel */}
+        <div
+          className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+            isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+          } w-[100%] md:w-[500px] overflow-y-scroll`}
+        >
+          <div className="p-4">
+            <div className="p-4 bg-white shadow h-fit">
+              <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
 
-          <select name="condition" className="border p-1 mb-3 w-full" value={newProduct.condition} onChange={handleInputChange}>
-            <option value="NEW">New</option>
-            <option value="USED">Used</option>
-          </select>
+              <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title || ''} onChange={handleInputChange} />
+              <input name="description" placeholder="Description" className="border p-1 mb-3 w-full" value={newProduct.description} onChange={handleInputChange} />
+              <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-full" value={newProduct.price} onChange={handleInputChange} />
+              <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-full" value={newProduct.stock} onChange={handleInputChange} />
 
-          <select name="categoryId" className="border p-1 mb-3 w-full" value={newProduct.categoryId} onChange={handleInputChange}>
-            <option value="">Select Category</option>
-            {categories.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+              <select name="condition" className="border p-1 mb-3 w-full" value={newProduct.condition} onChange={handleInputChange}>
+                <option value="NEW">New</option>
+                <option value="USED">Used</option>
+              </select>
 
-          <select name="subcategoryId" className="border p-1 mb-3 w-full" value={newProduct.subcategoryId} onChange={handleInputChange}>
-            <option value="">Select Subcategory</option>
-            {subcategories.map(sc => (
-              <option key={sc.id} value={sc.id}>{sc.name}</option>
-            ))}
-          </select>
+              <select name="categoryId" className="border p-1 mb-3 w-full" value={newProduct.categoryId} onChange={handleInputChange}>
+                <option value="">Select Category</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
 
-          <select name="userId" className="border p-1 mb-3 w-full" value={newProduct.userId} onChange={handleInputChange}>
-            <option value="">Select User</option>
-            {users.map(u => (
-              <option key={u.id} value={u.id}>{u.name || u.email}</option>
-            ))}
-          </select>
+              <select name="subcategoryId" className="border p-1 mb-3 w-full" value={newProduct.subcategoryId} onChange={handleInputChange}>
+                <option value="">Select Subcategory</option>
+                {subcategories.map(sc => (
+                  <option key={sc.id} value={sc.id}>{sc.name}</option>
+                ))}
+              </select>
 
-          <select name="brandId" className="border p-1 mb-3 w-full" value={newProduct.brandId} onChange={handleInputChange}>
-            <option value="">Select Brand</option>
-            {brands.map(brand => (
-              <option key={brand.id} value={brand.id}>{brand.name}</option>
-            ))}
-          </select>
+              <select name="userId" className="border p-1 mb-3 w-full" value={newProduct.userId} onChange={handleInputChange}>
+                <option value="">Select User</option>
+                {users.map(u => (
+                  <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                ))}
+              </select>
 
-          {(editingId || newProduct.categoryId) && (
-            <DynamicAttributeForm
-              categoryId={newProduct.subcategoryId || newProduct.categoryId}
-              productId={editingId}
-              onChange={handleDynamicAttributesChange}
-            />
-          )}
+              <select name="brandId" className="border p-1 mb-3 w-full" value={newProduct.brandId} onChange={handleInputChange}>
+                <option value="">Select Brand</option>
+                {brands.map(brand => (
+                  <option key={brand.id} value={brand.id}>{brand.name}</option>
+                ))}
+              </select>
 
+              {(editingId || newProduct.categoryId) && (
+                <DynamicAttributeForm
+                  categoryId={newProduct.subcategoryId || newProduct.categoryId}
+                  productId={editingId}
+                  onChange={handleDynamicAttributesChange}
+                />
+              )}
 
+              <label className="flex items-center gap-2 mb-3">
+                <input
+                  type="checkbox"
+                  checked={newProduct.featured}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      featured: e.target.checked
+                    }))
+                  }
+                />
+                Is Featured?
+              </label>
 
-          <input
-            type="checkbox"
-            className="p-1 mb-3"
-            checked={newProduct.featured}
-            onChange={(e) =>
-              setNewProduct((prev) => ({
-                ...prev,
-                featured: e.target.checked
-              }))
-            }
-          /> Is Featured?
+              <input type="file" multiple accept="image/*" onChange={handleFileChange} className="border p-1 mb-3 w-full" />
 
-          <input type="file" multiple accept="image/*" onChange={handleFileChange} className="border p-1 mb-3 w-full" />
-          <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-full" : "bg-blue-500 text-white px-3 py-1 w-full"}>
-            {editingId ? 'Update' : 'Create'}
-          </button>
-          {/* {editingId && (
-            <button
-              onClick={() => {
-                setEditingId(null);
-                setNewProduct(initialState);
-                setAttributes([]);
-              }}
-              className="bg-gray-400 text-white px-3 py-1 w-full mt-2"
-            >
-              Cancel Edit
-            </button>
-          )} */}
+              <button onClick={handleCreateOrUpdate} className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-full" : "bg-blue-500 text-white px-3 py-1 w-full"}>
+                {editingId ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
