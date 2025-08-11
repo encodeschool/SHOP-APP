@@ -5,6 +5,7 @@ export default function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     username: "",
     name: "",
@@ -107,6 +108,7 @@ export default function Users() {
     }
 
     setEditingId(user.id);
+    setIsDrawerOpen(true);
   };
 
   const handleCreateOrUpdate = async () => {
@@ -153,6 +155,7 @@ export default function Users() {
       setProfilePictureFile(null);
       setProfilePicturePreview(null);
       setIsObjectUrl(false);
+      setIsDrawerOpen(false);
       setEditingId(null);
       fetchUsers();
     } catch (error) {
@@ -179,8 +182,25 @@ export default function Users() {
     <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
         {/* Left Column - User Table (70%) */}
-        <div className="w-[80%]">
+        <div className="w-[100%]">
           <h2 className="text-xl font-bold mb-4">Users</h2>
+          <button
+              className='bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
+                onClick={() => {
+                  setEditingId(null);
+                  setNewUser({ 
+                    username: "",
+                    name: "",
+                    email: "",
+                    password: "",
+                    phone: "",
+                    roles: "BUYER", 
+                  });
+                  setIsDrawerOpen(true);
+                }}
+          >
+                +
+          </button>
           <table className="w-full border bg-white shadow">
             <thead>
               <tr className="bg-gray-200 text-left">
@@ -233,80 +253,99 @@ export default function Users() {
             </tbody>
           </table>
         </div>
-        {/* Right Column - Add/Edit Form (30%) */}
-        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
-            <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} User</h3>
+        {/* Drawer Overlay */}
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+            isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsDrawerOpen(false)}
+        ></div>
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="border p-1 mb-3 w-[100%]"
-            />
-            {profilePicturePreview && (
-              <img
-                src={profilePicturePreview}
-                alt="Profile Preview"
-                style={{ width: 100, height: 100, objectFit: "cover", marginTop: 10 }}
-              />
-            )}
+        {/* Drawer Panel */}
+        <div
+          className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+            isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+          } w-[100%] md:w-[500px] overflow-y-scroll`}
+        >
+          <div className="p-4">
+            <div className="w-[100%] p-4 bg-white shadow h-[auto]">
+              <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} User</h3>
 
-            <input
-              name="username"
-              placeholder="Username"
-              className="border p-1 mb-3 w-[100%]"
-              value={ newUser.username}
-              onChange={handleInputChange}
-            />
-            <input
-              name="name"
-              placeholder="Full name"
-              className="border p-1 mb-3 w-[100%]"
-              value={newUser.name}
-              onChange={handleInputChange}
-            />
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              className="border p-1 mb-3 w-[100%]"
-              value={newUser.email}
-              onChange={handleInputChange}
-              disabled={editingId !== null}
-            />
-            <input
-                name="password"
-                type="password"
-                placeholder="Password"
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
                 className="border p-1 mb-3 w-[100%]"
-                value={newUser.password}
-                onChange={handleInputChange}
-            />
-            <input
-              name="phone"
-              placeholder="Phone"
-              className="border p-1 mb-3 w-[100%]"
-              value={newUser.phone || ""}
-              onChange={handleInputChange}
-            />
-            <select
-              name="roles"
-              className="border p-1 mb-3 w-[100%]"
-              value={newUser.roles}
-              onChange={handleInputChange}
-            >
-              <option value="SELLER">SELLER</option>
-              <option value="ADMIN">ADMIN</option>
-              <option value="BUYER">BUYER</option>
-            </select>
+              />
+              {profilePicturePreview && (
+                <img
+                  src={profilePicturePreview}
+                  alt="Profile Preview"
+                  style={{ width: 100, height: 100, objectFit: "cover", marginTop: 10 }}
+                />
+              )}
 
-            <button
-              onClick={handleCreateOrUpdate}
-              className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
-            >
-              {editingId ? "Update" : "Create"}
-            </button>
+              <input
+                name="username"
+                placeholder="Username"
+                className="border p-1 mb-3 w-[100%]"
+                value={ newUser.username}
+                onChange={handleInputChange}
+              />
+              <input
+                name="name"
+                placeholder="Full name"
+                className="border p-1 mb-3 w-[100%]"
+                value={newUser.name}
+                onChange={handleInputChange}
+              />
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                className="border p-1 mb-3 w-[100%]"
+                value={newUser.email}
+                onChange={handleInputChange}
+                disabled={editingId !== null}
+              />
+              <input
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  className="border p-1 mb-3 w-[100%]"
+                  value={newUser.password}
+                  onChange={handleInputChange}
+              />
+              <input
+                name="phone"
+                placeholder="Phone"
+                className="border p-1 mb-3 w-[100%]"
+                value={newUser.phone || ""}
+                onChange={handleInputChange}
+              />
+              <select
+                name="roles"
+                className="border p-1 mb-3 w-[100%]"
+                value={newUser.roles}
+                onChange={handleInputChange}
+              >
+                <option value="SELLER">SELLER</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="BUYER">BUYER</option>
+              </select>
+
+              <button
+                onClick={handleCreateOrUpdate}
+                className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
+              >
+                {editingId ? "Update" : "Create"}
+              </button>
+          </div>
+          </div>
         </div>
+
+        {/* Right Column - Add/Edit Form (30%) */}
+        
       </div>
     </div>
   );
