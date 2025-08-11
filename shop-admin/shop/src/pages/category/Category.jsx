@@ -6,6 +6,7 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -62,6 +63,7 @@ export default function Categories() {
 
       setForm({ name: "", parentId: "", icon: null });
       setEditingId(null);
+      setIsDrawerOpen(false);
       fetchCategories();
     } catch (err) {
       console.error("Save failed:", err);
@@ -83,6 +85,7 @@ export default function Categories() {
   const handleEdit = (cat) => {
     setForm({ name: cat.name, parentId: cat.parentId || "" });
     setEditingId(cat.id);
+    setIsDrawerOpen(true);
   };
 
   const parentCategories = categories.filter((cat) => cat.parentId === null);
@@ -91,8 +94,18 @@ export default function Categories() {
     <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
         {/* Left Column - User Table (70%) */}
-        <div className="w-[80%]">
+        <div className="w-[100%]">
           <h2 className="text-xl font-bold mb-4">Category</h2>
+          <button
+                className='bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
+                onClick={() => {
+                  setEditingId(null);
+                  setForm({ name: "", parentId: "", icon: null });
+                  setIsDrawerOpen(true);
+                }}
+          >
+                +
+          </button>
           {loading ? (
             <div className="p-4">Loading categories...</div>
           ) : error ? (
@@ -166,47 +179,66 @@ export default function Categories() {
             </table>
           )}
       </div>
-        {/* Right Column - Add/Edit Form (30%) */}
-        <div className="w-[20%] p-4 bg-white shadow h-[auto]">
-          <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
+      {/* Drawer Overlay */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+          isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsDrawerOpen(false)}
+      ></div>
 
-          <input
-            type="file"
-            name="icon"
-            onChange={handleChange}
-            className="border p-1 mb-3 w-[100%]"
-          />
+      {/* Drawer Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+        } w-[100%] md:w-[500px] overflow-y-scroll`}
+      >
+        <div className="p-4">
+          <div className="w-[100%] p-4 bg-white shadow h-[auto]">
+            <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
+
+            <input
+              type="file"
+              name="icon"
+              onChange={handleChange}
+              className="border p-1 mb-3 w-[100%]"
+            />
 
 
-          <input
-            name="name"
-            placeholder="Category Name"
-            value={form.name}
-            onChange={handleChange}
-            className="border p-1 mb-3 w-[100%]"
-          />
+            <input
+              name="name"
+              placeholder="Category Name"
+              value={form.name}
+              onChange={handleChange}
+              className="border p-1 mb-3 w-[100%]"
+            />
 
-          <select
-            name="parentId"
-            value={form.parentId}
-            onChange={handleChange}
-            className="border p-1 mb-3 w-[100%]"
-          >
-            <option value="">-- Main Category --</option>
-            {parentCategories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            <select
+              name="parentId"
+              value={form.parentId}
+              onChange={handleChange}
+              className="border p-1 mb-3 w-[100%]"
+            >
+              <option value="">-- Main Category --</option>
+              {parentCategories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
 
-          <button
-            onClick={handleSave}
-            className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
-          >
-            {editingId ? "Update" : "Create"}
-          </button>
+            <button
+              onClick={handleSave}
+              className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
+            >
+              {editingId ? "Update" : "Create"}
+            </button>
+          </div>
         </div>
+      </div>
+
+        {/* Right Column - Add/Edit Form (30%) */}
+        
       </div>
     </div>
   );
