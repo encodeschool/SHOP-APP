@@ -6,6 +6,7 @@ export default function Brand() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", icon: null });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const fetchBrands = () => {
     setLoading(true);
@@ -36,6 +37,7 @@ export default function Brand() {
   const handleEdit = (brand) => {
     setForm({ name: brand.name, icon: null });
     setEditingId(brand.id);
+    setIsDrawerOpen(true);
   };
 
   const handleDelete = async (id) => {
@@ -67,6 +69,7 @@ export default function Brand() {
 
       setForm({ name: "", icon: null });
       setEditingId(null);
+      setIsDrawerOpen(false);
       fetchBrands();
     } catch (err) {
       console.error("Save failed:", err);
@@ -77,8 +80,18 @@ export default function Brand() {
   return (
     <div className="h-full flex gap-4">
       {/* Left - Brand List */}
-      <div className="w-[75%]">
+      <div className="w-[100%]">
         <h2 className="text-xl font-bold mb-4">Brands</h2>
+        <button
+              className='bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
+              onClick={() => {
+                setEditingId(null);
+                setForm({ name: "", icon: null });
+                setIsDrawerOpen(true);
+              }}
+        >
+              +
+        </button>
         {loading ? (
           <div>Loading...</div>
         ) : (
@@ -126,31 +139,48 @@ export default function Brand() {
         )}
       </div>
 
-      {/* Right - Add/Edit Brand Form */}
-      <div className="w-[25%] p-4 bg-white shadow h-fit">
-        <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Brand</h3>
+      {/* Drawer Overlay */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+          isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsDrawerOpen(false)}
+      ></div>
 
-        <input
-          type="file"
-          name="icon"
-          onChange={handleChange}
-          className="border p-1 mb-3 w-full"
-        />
+      {/* Drawer Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+        } w-[100%] md:w-[500px] overflow-y-scroll`}
+      >
+        <div className="p-4">
+          {/* Right - Add/Edit Brand Form */}
+          <div className="w-[100%] p-4 bg-white shadow h-fit">
+            <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Brand</h3>
 
-        <input
-          name="name"
-          placeholder="Brand Name"
-          value={form.name}
-          onChange={handleChange}
-          className="border p-1 mb-3 w-full"
-        />
+            <input
+              type="file"
+              name="icon"
+              onChange={handleChange}
+              className="border p-1 mb-3 w-full"
+            />
 
-        <button
-          onClick={handleSave}
-          className={`w-full px-3 py-1 text-white ${editingId ? "bg-yellow-500" : "bg-blue-500"}`}
-        >
-          {editingId ? "Update" : "Create"}
-        </button>
+            <input
+              name="name"
+              placeholder="Brand Name"
+              value={form.name}
+              onChange={handleChange}
+              className="border p-1 mb-3 w-full"
+            />
+
+            <button
+              onClick={handleSave}
+              className={`w-full px-3 py-1 text-white ${editingId ? "bg-yellow-500" : "bg-blue-500"}`}
+            >
+              {editingId ? "Update" : "Create"}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
