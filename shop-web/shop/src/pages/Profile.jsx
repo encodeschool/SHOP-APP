@@ -271,21 +271,19 @@ export default function Profile() {
     const formData = new FormData();
     formData.append(
       'product',
-      new Blob(
-        [
-          JSON.stringify({
-            title: newProduct.title,
-            price: parseFloat(newProduct.price),
-            description: newProduct.description,
-            categoryId: selectedCategory,
-            subcategoryId: selectedSubcategory,
-            brandId: selectedBrand,
-            attributes: newProduct.attributes,
-            userId: userId || null,      // <== add userId here
-          }),
-        ],
-        { type: 'application/json' }
-      )
+      new Blob([JSON.stringify({
+        title: newProduct.title,
+        description: newProduct.description,
+        price: parseFloat(newProduct.price),
+        stock: parseInt(newProduct.stock, 10),
+        condition: newProduct.condition,
+        categoryId: selectedCategory,
+        subcategoryId: selectedSubcategory,
+        userId: userId,
+        featured: newProduct.featured,
+        brandId: selectedBrand,
+        attributes: newProduct.attributes || [],
+      })], { type: 'application/json' })
     );
     productImages.forEach((file) => {
       formData.append('images', file);
@@ -341,8 +339,16 @@ export default function Profile() {
     setEditingId(product.id);
     setNewProduct({
       title: product.title,
-      price: product.price,
       description: product.description,
+      price: product.price,
+      stock: product.stock,
+      condition: product.condition,
+      categoryId: product.categoryId,
+      subcategoryId: product.subcategoryId,
+      userId: product.userId,
+      featured: product.featured,
+      brandId: product.brandId,
+      // Convert attributes array to map for DynamicAttributeForm usage
       attributes: product.attributes?.reduce((acc, attr) => {
         acc[attr.attributeId] = attr.value;
         return acc;

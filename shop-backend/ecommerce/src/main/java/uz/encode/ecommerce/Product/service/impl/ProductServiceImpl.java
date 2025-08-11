@@ -140,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponseDTO update(UUID id, ProductCreateDTO dto) {
+    public ProductResponseDTO update(UUID id, ProductCreateDTO dto, List<MultipartFile> images) throws IOException {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -158,18 +158,17 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
 
+        // Change category if different
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {
             Category category = categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product.setCategory(category);
         }
 
-        // Remove old attribute values
-        // productAttributeValueRepository.deleteByProduct(product);
-
+        // Clear old attribute values
         product.getAttributes().clear();
 
-        // Save new attribute values
+        // Add new attribute values
         if (dto.getAttributes() != null) {
             for (AttributeValueDTO av : dto.getAttributes()) {
                 ProductAttribute attribute = productAttributeRepository.findById(av.getAttributeId())
@@ -183,7 +182,28 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        return mapToDto(productRepository.save(product));
+        // Handle images upload if any
+        if (images != null && !images.isEmpty()) {
+            Path uploadPath = Paths.get(uploadFolderPath);
+            Files.createDirectories(uploadPath); // Ensure folder exists
+
+            for (MultipartFile image : images) {
+                String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+                Path filePath = uploadPath.resolve(filename);
+
+                Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                ProductImage productImage = new ProductImage();
+                productImage.setUrl("/images/" + filename);
+                productImage.setProduct(product); // set back reference
+
+                product.getImages().add(productImage); // add to product's images
+            }
+        }
+
+        Product savedProduct = productRepository.save(product);
+
+        return mapToDto(savedProduct);
     }
 
     @Override

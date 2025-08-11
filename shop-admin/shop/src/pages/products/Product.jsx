@@ -131,7 +131,7 @@ export default function Products() {
       stock: parseInt(newProduct.stock),
       price: parseFloat(newProduct.price),
       attributes: newProduct.attributes,
-      brandId: newProduct.brandId, // 👈 add this
+      brandId: newProduct.brandId,
     };
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
@@ -140,34 +140,41 @@ export default function Products() {
 
     images.forEach(img => formData.append('images', img));
 
-    if (editingId) {
-      await axios.put(`/products/${editingId}`, productPayload);
-    } else {
-      const response = await axios.post('/products', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+    try {
+      if (editingId) {
+        await axios.put(`/products/${editingId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        const response = await axios.post('/products', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        const createdProduct = response.data;
+        setEditingId(createdProduct.id);
+      }
+
+      setNewProduct({
+        title: '',
+        description: '',
+        price: '',
+        stock: '',
+        condition: 'NEW',
+        categoryId: '',
+        subcategoryId: '',
+        userId: '',
+        featured: false,
+        images: [],
+        attributes: [],
+        brandId: '',
       });
 
-      const createdProduct = response.data;
-      setEditingId(createdProduct.id); // 👈 Automatically open attributes form
+      setAttributes([]);
+      setEditingId(null);
+      fetchProducts();
+
+    } catch (err) {
+      console.error('Error saving product', err);
     }
-
-    setNewProduct({
-      title: '',
-      description: '',
-      price: '',
-      stock: '',
-      condition: 'NEW',
-      categoryId: '',
-      subcategoryId: '',
-      userId: '',
-      featured: false,
-      images: [],
-      attributes: [],
-    });
-
-    setAttributes([]);
-    setEditingId(null);
-    fetchProducts();
   };
 
   const handleDelete = async (id) => {

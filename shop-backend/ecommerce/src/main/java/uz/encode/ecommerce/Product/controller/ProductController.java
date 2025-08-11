@@ -44,9 +44,8 @@ public class ProductController {
     @Operation(summary = "Save Product with Images")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDTO> create(
-        @RequestPart("product") ProductCreateDTO dto,
-        @RequestPart("images") List<MultipartFile> images
-    ) throws IOException {
+            @RequestPart("product") ProductCreateDTO dto,
+            @RequestPart("images") List<MultipartFile> images) throws IOException {
         return ResponseEntity.ok(productService.create(dto, images));
     }
 
@@ -75,9 +74,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Update Product Details")
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> update(@PathVariable UUID id, @Valid @RequestBody ProductCreateDTO dto) {
-        return ResponseEntity.ok(productService.update(id, dto));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponseDTO> update(
+            @PathVariable UUID id,
+            @Valid @RequestPart("product") ProductCreateDTO dto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+
+        return ResponseEntity.ok(productService.update(id, dto, images));
     }
 
     @Operation(summary = "Delete Product By ID")
@@ -95,11 +98,10 @@ public class ProductController {
 
     @GetMapping("/filtered")
     public ResponseEntity<List<ProductResponseDTO>> getAllFiltered(
-        @RequestParam(required = false) List<String> brands,
-        @RequestParam(required = false) Boolean inStock,
-        @RequestParam(required = false) Double maxPrice,
-        @RequestParam(required = false) String sort
-    ) {
+            @RequestParam(required = false) List<String> brands,
+            @RequestParam(required = false) Boolean inStock,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sort) {
         return ResponseEntity.ok(productService.getFiltered(brands, inStock, maxPrice, sort));
     }
 
@@ -110,9 +112,8 @@ public class ProductController {
 
     @PostMapping("/attributes")
     public ResponseEntity<Void> saveAttributeValues(
-        @RequestParam UUID productId,
-        @RequestBody List<AttributeValueDTO> values
-    ) {
+            @RequestParam UUID productId,
+            @RequestBody List<AttributeValueDTO> values) {
         productService.saveAttributeValues(productId, values);
         return ResponseEntity.ok().build();
     }
@@ -140,8 +141,8 @@ public class ProductController {
 
     @PutMapping(value = "/brands/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Brand> updateBrand(@PathVariable UUID id,
-                                                @ModelAttribute Brand brand,
-                                                @RequestPart(required = false) MultipartFile multipartFile) {
+            @ModelAttribute Brand brand,
+            @RequestPart(required = false) MultipartFile multipartFile) {
         return ResponseEntity.ok(productService.updateBrand(id, brand, multipartFile));
     }
 
