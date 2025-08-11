@@ -17,14 +17,30 @@ export default function Orders() {
             .catch(() => {
                 setError("Failed to fetch orders");
                 setLoading(false);
-            })
+            });
     };
 
-     useEffect(() => {
+    const updateStatus = (orderId, newStatus) => {
+        axios
+            .patch(`/orders/${orderId}/status`, null, { params: { status: newStatus } })
+            .then((res) => {
+                // Update status in state without refetching all
+                setOrders(prev =>
+                    prev.map(o =>
+                        o.id === orderId ? { ...o, status: res.data.status } : o
+                    )
+                );
+            })
+            .catch(() => {
+                alert("Failed to update status");
+            });
+    };
+
+    useEffect(() => {
         fetchOrders();
     }, []);
 
-    if (loading) return <div className="p-4">Loading users...</div>;
+    if (loading) return <div className="p-4">Loading orders...</div>;
     if (error) return <div className="p-4 text-red-500">{error}</div>;
 
     return (
@@ -34,7 +50,6 @@ export default function Orders() {
             <table className="w-full border bg-white shadow">
                 <thead>
                     <tr className="bg-gray-200 text-left">
-                        {/* <th className="p-2">ID</th> */}
                         <th className="p-2">Product Title & Quantity</th>
                         <th className="p-2">Total Price</th>
                         <th className="p-2">Created Date</th>
@@ -43,25 +58,39 @@ export default function Orders() {
                 </thead>
                 <tbody>
                     {orders.map((o) => (
-                        <tr key={o.id}>
-                            {/* <td className="p-2">{o.id}</td> */}
+                        <tr key={o.id} className="hover:bg-gray-100">
                             <td className="p-2">
                                 {o.items.map((item, index) => (
-                                <div key={index}>
-                                    {item.productTitle} × {item.quantity}
-                                </div>
+                                    <div key={index}>
+                                        {item.productTitle} × {item.quantity}
+                                    </div>
                                 ))}
                             </td>
                             <td className="p-2">
-                                {o.totalPrice ?? o.items.reduce((sum, item) => sum + item.quantity * item.pricePerUnit, 0).toFixed(2)}
+                                {o.totalPrice ??
+                                    o.items.reduce(
+                                        (sum, item) => sum + item.quantity * item.pricePerUnit,
+                                        0
+                                    ).toFixed(2)}
                             </td>
                             <td className="p-2">{new Date(o.createdAt).toLocaleString()}</td>
-                            <td className="p-2">{o.status}</td>
+                            <td className="p-2">
+                                <select
+                                    value={o.status}
+                                    onChange={(e) => updateStatus(o.id, e.target.value)}
+                                    className="border rounded px-2 py-1"
+                                >
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PROCESSING">PROCESSING</option>
+                                    <option value="SHIPPED">SHIPPED</option>
+                                    <option value="DELIVERED">DELIVERED</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-
         </div>
     );
 }
