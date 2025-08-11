@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Load and set brand
         Brand brand = brandRepository.findById(dto.getBrandId())
-            .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
 
         // Save product first to get ID
@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getAttributes() != null) {
             for (AttributeValueDTO attrDto : dto.getAttributes()) {
                 ProductAttribute attribute = productAttributeRepository.findById(attrDto.getAttributeId())
-                    .orElseThrow(() -> new RuntimeException("Attribute not found"));
+                        .orElseThrow(() -> new RuntimeException("Attribute not found"));
 
                 ProductAttributeValue pav = new ProductAttributeValue();
                 pav.setAttribute(attribute);
@@ -94,7 +94,6 @@ public class ProductServiceImpl implements ProductService {
                 savedProduct.getAttributes().add(pav);
             }
         }
-
 
         if (images != null && !images.isEmpty()) {
             Path uploadPath = Paths.get(uploadFolderPath);
@@ -114,7 +113,6 @@ public class ProductServiceImpl implements ProductService {
 
             productRepository.save(savedProduct);
         }
-
 
         return mapToDto(savedProduct);
     }
@@ -157,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Load and set brand
         Brand brand = brandRepository.findById(dto.getBrandId())
-            .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
 
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {
@@ -167,7 +165,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Remove old attribute values
-        productAttributeValueRepository.deleteByProduct(product);
+        // productAttributeValueRepository.deleteByProduct(product);
+
+        product.getAttributes().clear();
 
         // Save new attribute values
         if (dto.getAttributes() != null) {
@@ -182,7 +182,6 @@ public class ProductServiceImpl implements ProductService {
                 product.getAttributes().add(pav);
             }
         }
-
 
         return mapToDto(productRepository.save(product));
     }
@@ -208,17 +207,15 @@ public class ProductServiceImpl implements ProductService {
         dto.setCategoryId(product.getCategory().getId());
         dto.setFeatured(product.isFeatured());
         dto.setImageUrls(
-                product.getImages().stream().map(ProductImage::getUrl).toList()
-        );
+                product.getImages().stream().map(ProductImage::getUrl).toList());
         dto.setAttributes(
-            product.getAttributes().stream()
-                .map(attr -> {
-                    AttributeValueResponseDTO attrDto = new AttributeValueResponseDTO();
-                    attrDto.setAttributeName(attr.getAttribute().getName());
-                    attrDto.setValue(attr.getValue());
-                    return attrDto;
-                }).collect(Collectors.toList())
-        );
+                product.getAttributes().stream()
+                        .map(attr -> {
+                            AttributeValueResponseDTO attrDto = new AttributeValueResponseDTO();
+                            attrDto.setAttributeName(attr.getAttribute().getName());
+                            attrDto.setValue(attr.getValue());
+                            return attrDto;
+                        }).collect(Collectors.toList()));
         // Add brand info
         if (product.getBrand() != null) {
             dto.setBrandName(product.getBrand().getName());
@@ -265,7 +262,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductAttribute> findByCategoryId(UUID categoryId) {
         Set<ProductAttribute> attributes = new HashSet<>();
         Category category = categoryRepository.findById(categoryId).orElseThrow();
-        
+
         while (category != null) {
             attributes.addAll(productAttributeRepository.findAllByCategoryId(category.getId()));
             category = category.getParent(); // Assume you have getParent()
@@ -277,16 +274,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void saveAttributeValues(UUID productId, List<AttributeValueDTO> values) {
         Product product = productRepository.findById(productId)
-        .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         List<ProductAttributeValue> attributeValues = values.stream().map(dto -> {
             ProductAttribute attribute = productAttributeRepository.findById(dto.getAttributeId())
-                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+                    .orElseThrow(() -> new RuntimeException("Attribute not found"));
             return ProductAttributeValue.builder()
-                .product(product)
-                .attribute(attribute)
-                .value(dto.getValue())
-                .build();
+                    .product(product)
+                    .attribute(attribute)
+                    .value(dto.getValue())
+                    .build();
         }).toList();
 
         productAttributeValueRepository.saveAll(attributeValues);
@@ -295,9 +292,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<AttributeValueDTO> getAttributeValuesByProduct(UUID productId) {
         return productAttributeValueRepository.findByProductId(productId)
-            .stream()
-            .map(value -> new AttributeValueDTO(value.getAttribute().getId(), value.getValue()))
-            .collect(Collectors.toList());
+                .stream()
+                .map(value -> new AttributeValueDTO(value.getAttribute().getId(), value.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -305,7 +302,8 @@ public class ProductServiceImpl implements ProductService {
         if (productAttribute.getCategory() == null || productAttribute.getCategory().getId() == null) {
             throw new IllegalArgumentException("Category ID is required");
         }
-        Category category = categoryRepository.findById(productAttribute.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category ID not Found"));
+        Category category = categoryRepository.findById(productAttribute.getCategory().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Category ID not Found"));
         productAttribute.setCategory(category);
         return productAttributeRepository.save(productAttribute);
     }
@@ -333,7 +331,7 @@ public class ProductServiceImpl implements ProductService {
                 Path uploadPath = Paths.get(uploadFolderPath);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
-                Files.copy(multipartFile.getInputStream(), filePath,StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                 brand.setIcon("/images/" + fileName);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to upload icon");
@@ -376,10 +374,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDTO> search(String query) {
         return productRepository
-            .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query)
-            .stream()
-            .map(this::mapToDto)
-            .toList();
+                .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
-    
+
 }

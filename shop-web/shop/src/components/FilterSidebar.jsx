@@ -21,6 +21,7 @@ export default function FilterSidebar() {
       try {
         const res = await axios.get('/products/brands');
         setBrandsList(res.data); // expects array like [{id, name}, ...]
+        console.log(res.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -41,12 +42,12 @@ export default function FilterSidebar() {
     <Disclosure>
       {({ open }) => (
         <div>
-          <Disclosure.Button className="w-full p-2 bg-indigo-500 text-white">
+          <Disclosure.Button className="w-full rounded-t-xl p-2 bg-indigo-400 text-white">
             {open ? 'Hide Filters' : 'Show Filters'}
           </Disclosure.Button>
 
           <Disclosure.Panel className="md:block">
-            <div className="space-y-6 p-4 border-r">
+            <div className="space-y-6 p-4 border-[4px] border-indigo-400 rounded-b-xl">
               
               {/* Brands Filter */}
               <div>

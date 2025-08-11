@@ -78,7 +78,10 @@ export default function Products() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct(prev => ({ ...prev, [name]: value }));
+    setNewProduct(prev => ({
+      ...prev,
+      [name]: value ?? ''
+    }));
 
     if (name === 'categoryId') {
       const updated = { ...newProduct, categoryId: value, subcategoryId: '', attributes: [] };
@@ -179,18 +182,21 @@ export default function Products() {
     const parentCategoryId = product.category?.parentId;
 
     setNewProduct({
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
+      title: product.title || '',
+      description: product.description || '',
+      price: product.price ?? '',  // Use ?? to catch undefined/null and set ''
+      stock: product.stock ?? '',
       condition: product.condition || 'NEW',
-      categoryId: parentCategoryId || product.categoryId,
+      categoryId: parentCategoryId || product.categoryId || '',
       subcategoryId: parentCategoryId ? product.categoryId : '',
       userId: product.user?.id || '',
-      featured: product.featured,
+      featured: product.featured ?? false,
       images: [],
-      attributes: product.attributes || [],
-      brandId: product.brand?.id || '', // 👈
+      attributes: (product.attributes || []).map(attr => ({
+        attributeId: attr.attribute?.id || attr.attributeId,
+        value: attr.value ?? ''
+      })),
+      brandId: product.brand?.id || '',   // Make sure this isn't null
     });
 
     if (parentCategoryId) {
@@ -199,7 +205,6 @@ export default function Products() {
 
     const effectiveCategoryId = product.categoryId;
     fetchAttributes(effectiveCategoryId);
-
 
     setEditingId(product.id);
   };
@@ -249,7 +254,7 @@ export default function Products() {
         <div className="w-[20%] p-4 bg-white shadow h-fit">
           <h3 className="font-semibold mb-2">{editingId ? 'Edit' : 'Add'} Product</h3>
 
-          <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title} onChange={handleInputChange} />
+          <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title || ''} onChange={handleInputChange} />
           <input name="description" placeholder="Description" className="border p-1 mb-3 w-full" value={newProduct.description} onChange={handleInputChange} />
           <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-full" value={newProduct.price} onChange={handleInputChange} />
           <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-full" value={newProduct.stock} onChange={handleInputChange} />

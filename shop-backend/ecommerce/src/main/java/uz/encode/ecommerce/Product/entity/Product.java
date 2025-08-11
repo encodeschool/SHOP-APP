@@ -11,6 +11,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -65,17 +66,16 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductImage> images = new ArrayList<>();
 
-
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
     private boolean isInStock;
 
-    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductAttributeValue> attributes = new ArrayList<>();
 
-     // Optional helper
+    // Optional helper
     public void addImage(ProductImage image) {
         this.images.add(image);
         image.setProduct(this);
@@ -88,6 +88,5 @@ public class Product {
         pav.setProduct(this);
         this.attributes.add(pav);
     }
-
 
 }

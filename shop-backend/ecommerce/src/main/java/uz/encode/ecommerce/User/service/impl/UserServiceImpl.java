@@ -135,13 +135,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.mapToDto(user);
     }
 
-
-
     @Override
     public void delete(UUID id) {
         userRepository.deleteById(id);
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -225,6 +222,5 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.mapToDto(user);
     }
-
 
 }

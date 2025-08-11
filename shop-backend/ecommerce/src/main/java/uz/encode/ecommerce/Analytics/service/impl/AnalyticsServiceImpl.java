@@ -14,6 +14,7 @@ import uz.encode.ecommerce.Analytics.dto.MonthlyCountDTO;
 import uz.encode.ecommerce.Analytics.service.AnalyticsService;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
+import uz.encode.ecommerce.User.repository.UserRepository;
 
 @Service
 @AllArgsConstructor
@@ -21,30 +22,29 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<MonthlyCountDTO> getProductCreationStats() {
         return IntStream.rangeClosed(1, 12)
-                        .mapToObj(month -> new MonthlyCountDTO(
-                            Month.of(month).name(),
-                            productRepository.countByMonth(month)                            
-                        ))
-                        .collect(Collectors.toList());
+                .mapToObj(month -> new MonthlyCountDTO(
+                        Month.of(month).name(),
+                        productRepository.countByMonth(month)))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<MonthlyCountDTO> getOrderStats() {
         return IntStream.rangeClosed(1, 12)
-                        .mapToObj(month -> new MonthlyCountDTO(
-                            Month.of(month).name(),
-                            orderRepository.countByMonth(month)    
-                        ))
-                        .collect(Collectors.toList());
+                .mapToObj(month -> new MonthlyCountDTO(
+                        Month.of(month).name(),
+                        orderRepository.countByMonth(month)))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<CategoryDistirbutionDTO> getProductCategoryStats() {
         return productRepository.countByCategory();
     }
-    
+
 }

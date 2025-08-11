@@ -42,8 +42,8 @@ public class UserController {
     @Operation(summary = "Create a new user (supports image upload)")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponseDTO> create(
-        @RequestPart("data") String dataJson,
-        @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             UserCreateDTO dto = objectMapper.readValue(dataJson, UserCreateDTO.class);
@@ -71,8 +71,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable UUID id,
             @RequestPart("data") String dataJson,
-            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
-    ) {
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             UserCreateDTO dto = objectMapper.readValue(dataJson, UserCreateDTO.class);
@@ -83,8 +82,6 @@ public class UserController {
         }
     }
 
-
-    
     @Operation(summary = "Delete user by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
@@ -96,8 +93,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updateProfile(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
-            Principal principal
-    ) {
+            Principal principal) {
         System.out.println("Authenticated user: " + principal.getName()); // ← DEBUG
         return ResponseEntity.ok(userService.updateUserProfile(principal.getName(), dataJson, profilePicture));
     }
@@ -107,4 +103,3 @@ public class UserController {
         return ResponseEntity.ok(userService.subscribe(request.getEmail()));
     }
 }
-

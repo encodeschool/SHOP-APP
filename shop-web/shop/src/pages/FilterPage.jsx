@@ -104,7 +104,7 @@ export default function FilterPage() {
 
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 container mx-auto px-4 py-3">
+    <div className="flex flex-col md:flex-row my-5 gap-6 container mx-auto px-4 py-3">
       <div className="w-full md:w-64">
         <FilterSidebar />
       </div>
