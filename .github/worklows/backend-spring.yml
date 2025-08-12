@@ -1,26 +1,42 @@
-name: Spring Boot CI
+name: Deploy Spring Boot to VDS
 
 on:
   push:
-    paths:
-      - 'shop-backend/**'
-  pull_request:
-    paths:
-      - 'shop-backend/**'
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with Maven
-        run: mvn clean install
-        working-directory: shop-backend
+      - name: Build Jar
+        run: mvn clean package -DskipTests
+
+      - name: Deploy to VDS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          source: "target/*.jar"
+          target: "~/app"
+
+      - name: Restart Application
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          script: |
+            pkill -f 'java -jar' || true
+            nohup java -jar ~/app/yourapp.jar > ~/app/log.txt 2>&1 &
