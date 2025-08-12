@@ -77,7 +77,7 @@ export default function AppBar() {
             <span>4games@4games.lv</span>
           </span>
           |
-          <Link to="/track-order" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />Track Your Order</Link>
+          <Link to="/track" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />Track Your Order</Link>
           |
           {/* My Account Dropdown */}
           <div className="relative">

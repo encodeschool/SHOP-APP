@@ -14,13 +14,13 @@ export default function CarouselBanner() {
         className="w-full"
       >
         {[
-          "https://www.rdveikals.lv/images/banners/c299249fdec2791591e037fb672ab263.jpg",
-          "https://www.rdveikals.lv/images/banners/36a3d9c245419040ca4ea681e36ec3ae.jpg",
-          "https://www.rdveikals.lv/images/banners/36a3d9c245419040ca4ea681e36ec3ae.jpg"
+          "https://cdn.4games.pro/storage/upload-b/2025/07/1920x422%20Eng.png?v=1751640058",
+          "https://cdn.4games.pro/storage/upload-b/2025/03/1920x422%20-%20RK.png?v=1751639832",
+          "https://cdn.4games.pro/storage/upload-b/2025/02/1920x422%20cases.jpg?v=1747587507"
         ].map((url, index) => (
           <div
             key={index}
-            className="h-[300px] md:h-[450px] bg-center bg-no-repeat bg-cover"
+            className="h-[300px] md:h-[300px] bg-center bg-no-repeat bg-cover"
             style={{ backgroundImage: `url(${url})` }}
           ></div>
         ))}
