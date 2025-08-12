@@ -26,6 +26,7 @@ import Compare from './pages/Compare';
 import SearchResults from './pages/SearchResults';
 import { LoadingProvider } from './contexts/LoadingContext';
 import TrackOrder from './pages/TrackOrder';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
             />
             <Route path='/favorites' element={< Favorites />} />
             <Route path='/track' element={<TrackOrder />} />
+            <Route path='/contacts' element={<Contact />} />
             {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
             {/* Add other routes like /cart, /favorites, /login, etc. */}
           </Routes>

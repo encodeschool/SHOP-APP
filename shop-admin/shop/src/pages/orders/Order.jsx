@@ -81,7 +81,7 @@ export default function Orders() {
                                     className="border rounded px-2 py-1"
                                 >
                                     <option value="PENDING">PENDING</option>
-                                    <option value="PROCESSING">PROCESSING</option>
+                                    <option value="PAID">PAID</option>
                                     <option value="SHIPPED">SHIPPED</option>
                                     <option value="DELIVERED">DELIVERED</option>
                                     <option value="CANCELLED">CANCELLED</option>

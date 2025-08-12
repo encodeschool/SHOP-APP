@@ -6,20 +6,49 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(null);
-
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
     parentId: "",
-    icon: null
+    subParentId: "",
+    icon: null,
   });
+
+  // 🔹 CHANGE: Enhanced duplicate prevention and logging
+  const flattenCategories = (cats, parentId = null) => {
+    const seenIds = new Set();
+    const seenNameParentPairs = new Set(); // Track name + parentId to catch duplicates
+    let flat = [];
+    cats.forEach((cat) => {
+      const nameParentKey = `${cat.name}:${cat.parentId || parentId || "null"}`;
+      if (!seenIds.has(cat.id) && !seenNameParentPairs.has(nameParentKey)) {
+        seenIds.add(cat.id);
+        seenNameParentPairs.add(nameParentKey);
+        flat.push({
+          id: cat.id,
+          name: cat.name,
+          parentId: cat.parentId || parentId,
+          icon: cat.icon,
+        });
+        if (cat.subcategories && cat.subcategories.length > 0) {
+          flat = flat.concat(flattenCategories(cat.subcategories, cat.id));
+        }
+      } else {
+        console.warn(`Duplicate category detected: ID=${cat.id}, Name=${cat.name}, ParentID=${cat.parentId || parentId}`);
+      }
+    });
+    return flat;
+  };
 
   const fetchCategories = () => {
     setLoading(true);
     axios
       .get("/categories")
       .then((res) => {
-        setCategories(res.data);
+        console.log("API Response:", JSON.stringify(res.data, null, 2)); // 🔹 Log raw API response
+        const flatCategories = flattenCategories(res.data);
+        console.log("Flattened Categories:", flatCategories); // 🔹 Log flattened data
+        setCategories(flatCategories);
         setLoading(false);
       })
       .catch(() => {
@@ -31,6 +60,10 @@ export default function Categories() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    console.log("Categories State:", categories); // 🔹 Log state changes
+  }, [categories]);
 
   const handleChange = (e) => {
     if (e.target.name === "icon") {
@@ -44,24 +77,21 @@ export default function Categories() {
     try {
       const formData = new FormData();
       formData.append("name", form.name);
-      if (form.parentId) formData.append("parentId", form.parentId);
+      const finalParentId = form.subParentId || form.parentId;
+      if (finalParentId) formData.append("parentId", finalParentId);
       if (form.icon) formData.append("icon", form.icon);
 
       if (editingId) {
         await axios.put(`/categories/${editingId}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         await axios.post("/categories", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
       }
 
-      setForm({ name: "", parentId: "", icon: null });
+      setForm({ name: "", parentId: "", subParentId: "", icon: null });
       setEditingId(null);
       setIsDrawerOpen(false);
       fetchCategories();
@@ -70,7 +100,6 @@ export default function Categories() {
       alert("Failed to save category");
     }
   };
-
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
@@ -83,28 +112,38 @@ export default function Categories() {
   };
 
   const handleEdit = (cat) => {
-    setForm({ name: cat.name, parentId: cat.parentId || "" });
+    const parent = categories.find((c) => c.id === cat.parentId);
+    if (parent && parent.parentId) {
+      setForm({ name: cat.name, parentId: parent.parentId, subParentId: parent.id, icon: null });
+    } else {
+      setForm({ name: cat.name, parentId: cat.parentId || "", subParentId: "", icon: null });
+    }
     setEditingId(cat.id);
     setIsDrawerOpen(true);
   };
 
   const parentCategories = categories.filter((cat) => cat.parentId === null);
+  const subCategories = (parentId) => {
+    const subs = categories.filter((cat) => cat.parentId === parentId);
+    console.log(`subCategories for parentId ${parentId}:`, subs); // 🔹 Log subcategories
+    return subs;
+  };
 
   return (
     <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
-        {/* Left Column - User Table (70%) */}
+        {/* Left Column */}
         <div className="w-[100%]">
           <h2 className="text-xl font-bold mb-4">Category</h2>
           <button
-                className='bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
-                onClick={() => {
-                  setEditingId(null);
-                  setForm({ name: "", parentId: "", icon: null });
-                  setIsDrawerOpen(true);
-                }}
+            className="bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded"
+            onClick={() => {
+              setEditingId(null);
+              setForm({ name: "", parentId: "", subParentId: "", icon: null });
+              setIsDrawerOpen(true);
+            }}
           >
-                +
+            +
           </button>
           {loading ? (
             <div className="p-4">Loading categories...</div>
@@ -124,25 +163,22 @@ export default function Categories() {
                 {parentCategories.map((parent) => (
                   <tr key={parent.id}>
                     <td className="p-2">
-                    {parent.icon ? (
-                      <img
-                        src={`http://localhost:8080${parent.icon}`}
-                        alt="Profile"
-                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
-                      />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td>
+                      {parent.icon ? (
+                        <img
+                          src={`http://localhost:8080${parent.icon}`}
+                          alt="Profile"
+                          style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
+                        />
+                      ) : (
+                        "No Image"
+                      )}
+                    </td>
                     <td className="p-2 font-bold">{parent.name}</td>
                     <td className="p-2">
-                      {categories
-                        .filter((sub) => sub.parentId === parent.id)
-                        .map((sub) => (
-                          <span
-                            key={sub.id}
-                            className="inline-block bg-gray-100 px-2 py-1 m-1 rounded"
-                          >
+                      {/* 🔹 CHANGE: Deduplicate subcategories by ID */}
+                      {[...new Map(subCategories(parent.id).map((sub) => [sub.id, sub])).values()].map((sub) => (
+                        <div key={sub.id} className="ml-2">
+                          <span className="inline-block bg-gray-100 px-2 py-1 m-1 rounded">
                             {sub.name}
                             <button
                               onClick={() => handleEdit(sub)}
@@ -157,7 +193,29 @@ export default function Categories() {
                               ✕
                             </button>
                           </span>
-                        ))}
+                          {/* 🔹 CHANGE: Deduplicate sub-subcategories */}
+                          {[...new Map(subCategories(sub.id).map((subsub) => [subsub.id, subsub])).values()].map((subsub) => (
+                            <span
+                              key={subsub.id}
+                              className="inline-block bg-gray-200 px-2 py-1 m-1 rounded ml-4"
+                            >
+                              {subsub.name}
+                              <button
+                                onClick={() => handleEdit(subsub)}
+                                className="text-yellow-600 ml-2 text-sm"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(subsub.id)}
+                                className="text-red-500 ml-1 text-sm"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      ))}
                     </td>
                     <td className="p-2">
                       <button
@@ -178,67 +236,82 @@ export default function Categories() {
               </tbody>
             </table>
           )}
-      </div>
-      {/* Drawer Overlay */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
-          isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setIsDrawerOpen(false)}
-      ></div>
+        </div>
 
-      {/* Drawer Panel */}
-      <div
-        className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
-          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
-        } w-[100%] md:w-[500px] overflow-y-scroll`}
-      >
-        <div className="p-4">
-          <div className="w-[100%] p-4 bg-white shadow h-[auto]">
-            <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
+        {/* Drawer Overlay */}
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+            isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setIsDrawerOpen(false)}
+        ></div>
 
-            <input
-              type="file"
-              name="icon"
-              onChange={handleChange}
-              className="border p-1 mb-3 w-[100%]"
-            />
+        {/* Drawer Panel */}
+        <div
+          className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+            isDrawerOpen ? "translate-x-0" : "translate-x-full"
+          } w-[100%] md:w-[500px] overflow-y-scroll`}
+        >
+          <div className="p-4">
+            <div className="w-[100%] p-4 bg-white shadow h-[auto]">
+              <h3 className="font-semibold mb-2">{editingId ? "Edit" : "Add"} Category</h3>
 
+              <input
+                type="file"
+                name="icon"
+                onChange={handleChange}
+                className="border p-1 mb-3 w-[100%]"
+              />
 
-            <input
-              name="name"
-              placeholder="Category Name"
-              value={form.name}
-              onChange={handleChange}
-              className="border p-1 mb-3 w-[100%]"
-            />
+              <input
+                name="name"
+                placeholder="Category Name"
+                value={form.name}
+                onChange={handleChange}
+                className="border p-1 mb-3 w-[100%]"
+              />
 
-            <select
-              name="parentId"
-              value={form.parentId}
-              onChange={handleChange}
-              className="border p-1 mb-3 w-[100%]"
-            >
-              <option value="">-- Main Category --</option>
-              {parentCategories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              <select
+                name="parentId"
+                value={form.parentId}
+                onChange={(e) => {
+                  setForm({ ...form, parentId: e.target.value, subParentId: "" });
+                }}
+                className="border p-1 mb-3 w-[100%]"
+              >
+                <option value="">-- Main Category --</option>
+                {parentCategories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
 
-            <button
-              onClick={handleSave}
-              className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
-            >
-              {editingId ? "Update" : "Create"}
-            </button>
+              {form.parentId && (
+                <select
+                  name="subParentId"
+                  value={form.subParentId}
+                  onChange={handleChange}
+                  className="border p-1 mb-3 w-[100%]"
+                >
+                  <option value="">-- Optional Subcategory --</option>
+                  {subCategories(form.parentId).map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <button
+                onClick={handleSave}
+                className={editingId ? "bg-yellow-500 text-white px-3 py-1 w-[100%]" : "bg-blue-500 text-white px-3 py-1 w-[100%]"}
+              >
+                {editingId ? "Update" : "Create"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-        {/* Right Column - Add/Edit Form (30%) */}
-        
       </div>
     </div>
   );
