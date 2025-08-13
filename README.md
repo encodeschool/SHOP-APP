@@ -20,7 +20,7 @@ Supports user authentication (JWT), product management, brands, categories, dyna
 - Product detail page with:
   - Image gallery
   - Dynamic specifications
-  - Tabs for details, connection info, warehouse stock
+  - Tabs for details, connection info, warehouse stock.
 - Add to **Cart**
 - Add to **Favorites**
 - Related & bundled products
