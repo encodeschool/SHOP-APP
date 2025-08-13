@@ -27,13 +27,16 @@ jobs:
           cd shop-backend/ecommerce
           mvn clean package -DskipTests -Dmaven.test.skip=true
 
+      - name: List target folder
+        run: ls -la target
+
       - name: Deploy to VDS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VDS_HOST }}
           username: ${{ secrets.VDS_USER }}
           key: ${{ secrets.VDS_SSH_KEY }}
-          source: "target/*.jar"
+          source: "shop-backend/ecommerce/target/*.jar"
           target: "~/bazaar"
 
       - name: Restart Application
