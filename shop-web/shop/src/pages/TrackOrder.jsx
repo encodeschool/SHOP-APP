@@ -77,6 +77,7 @@ export default function TrackOrder() {
     try {
       const res = await axios.get(`/orders/${orderId}`);
       setOrder(res.data);
+      console.log(res.data);
     } catch (err) {
       console.error(err);
       setError("Order not found or an error occurred.");
@@ -120,7 +121,25 @@ export default function TrackOrder() {
               Status:{" "}
               <span className="font-medium">{order.status}</span>
             </p>
-            <p>Total: ${order.total}</p>
+            <table className="w-full my-4 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-white uppercase bg-indigo-400 dark:text-white">
+                <tr>
+                  <th className="p-2">Title</th>
+                  <th className="p-2">Quantity</th>
+                  <th className="p-2">Price per unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {order.items.map((item, index) => (
+                  <tr key={`${item.id || item.productTitle}-${index}`} className="border-b border-indigo-400">
+                    <td className="p-2">{item.productTitle}</td>
+                    <td className="p-2">{item.quantity}</td>
+                    <td className="p-2">{item.pricePerUnit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p>Total: ${order.totalPrice}</p>
             <p>Placed on: {new Date(order.createdAt).toLocaleString()}</p>
           </div>
         </>
