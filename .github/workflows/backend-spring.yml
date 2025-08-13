@@ -46,5 +46,4 @@ jobs:
           username: ${{ secrets.VDS_USER }}
           key: ${{ secrets.VDS_SSH_KEY }}
           script: |
-            pkill -f 'java -jar' || true
-            nohup java -jar ~/bazaar/bazaar.jar > ~/bazaar/log.txt 2>&1 &
+            sudo systemctl restart bazaarly
