@@ -19,8 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Build Jar
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -Dmaven.test.skip=true
 
       - name: Deploy to VDS
         uses: appleboy/scp-action@v0.1.4
@@ -29,7 +32,7 @@ jobs:
           username: ${{ secrets.VDS_USER }}
           key: ${{ secrets.VDS_SSH_KEY }}
           source: "target/*.jar"
-          target: "~/app"
+          target: "~/bazaar"
 
       - name: Restart Application
         uses: appleboy/ssh-action@v0.1.8
@@ -39,4 +42,4 @@ jobs:
           key: ${{ secrets.VDS_SSH_KEY }}
           script: |
             pkill -f 'java -jar' || true
-            nohup java -jar ~/app/yourapp.jar > ~/app/log.txt 2>&1 &
+            nohup java -jar ~/bazaar/bazaar.jar > ~/bazaar/log.txt 2>&1 &
