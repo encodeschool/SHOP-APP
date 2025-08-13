@@ -25,32 +25,30 @@ export default function Profile() {
     condition: 'NEW',
     categoryId: '',
     subcategoryId: '',
+    subsubcategoryId: '',
     userId: '',
     featured: false,
     images: [],
-    brandId: '', // 👈 New
+    brandId: '',
     attributes: []
   });
   const userId = localStorage.getItem('userId');
   const [productImage, setProductImage] = useState(null);
-
-  // New states for categories and brands, and selected category/brand
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
-
+  const [subsubcategories, setSubsubcategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [productImages, setProductImages] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
-  // fetch functions (similar to Products.jsx)
   useEffect(() => {
     fetchCategories();
     fetchBrands();
-    fetchUserProducts(); // your seller products
+    fetchUserProducts();
   }, []);
 
   const fetchUserProducts = async () => {
@@ -65,28 +63,61 @@ export default function Profile() {
     }
   };
 
-
   const fetchCategories = async () => {
-    const res = await axios.get('/categories');
-    setCategories(res.data);
+    try {
+      const res = await axios.get('/categories', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Failed to fetch categories:', err);
+    }
   };
-  const fetchSubcategories = async (categoryId) => {
-    const res = await axios.get(`/categories/${categoryId}/subcategories`);
-    setSubcategories(res.data);
+
+  const fetchSubcategories = (categoryId) => {
+    const selectedCat = categories.find(cat => cat.id === categoryId);
+    if (selectedCat && selectedCat.subcategories) {
+      setSubcategories(selectedCat.subcategories);
+    } else {
+      setSubcategories([]);
+      setSubsubcategories([]);
+    }
   };
+
+  const fetchSubsubcategories = () => {
+    if (selectedSubcategory) {
+      const selectedSub = subcategories.find(sub => sub.id === selectedSubcategory);
+      if (selectedSub && selectedSub.subcategories) {
+        setSubsubcategories(selectedSub.subcategories);
+      } else {
+        setSubsubcategories([]);
+      }
+    } else {
+      setSubsubcategories([]);
+    }
+  };
+
   const fetchAttributes = (categoryId) => {
-    axios.get(`products/attributes/category/${categoryId}`)
+    axios.get(`/products/attributes/category/${categoryId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then(res => {
-        setAttributes(res.data || [])
+        setAttributes(res.data || []);
       })
       .catch(console.error);
   };
+
   const fetchBrands = async () => {
-    const res = await axios.get('/products/brands');
-    setBrands(res.data);
+    try {
+      const res = await axios.get('/products/brands', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBrands(res.data);
+    } catch (err) {
+      console.error('Failed to fetch brands:', err);
+    }
   };
 
-  // Fetch categories and brands on mount
   useEffect(() => {
     if (token) {
       axios
@@ -106,9 +137,11 @@ export default function Profile() {
   }, [token]);
 
   useEffect(() => {
-    
+    fetchSubsubcategories();
+  }, [selectedSubcategory, subcategories]);
 
-  const fetchOrders = async () => {
+  useEffect(() => {
+    const fetchOrders = async () => {
       if (activeTab === 'orders' && userId && token) {
         try {
           const res = await axios.get(`/orders/user/${userId}`, {
@@ -120,7 +153,6 @@ export default function Profile() {
         }
       }
     };
-
     fetchOrders();
   }, [activeTab, token]);
 
@@ -131,16 +163,12 @@ export default function Profile() {
           const res = await axios.get(`/favorites/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-
           const favoriteItems = res.data;
-
-          // Fetch product details for each favorite
           const productPromises = favoriteItems.map((fav) =>
             axios.get(`/products/${fav.productId}`, {
               headers: { Authorization: `Bearer ${token}` },
             }).then(res => res.data)
           );
-
           const products = await Promise.all(productPromises);
           setFavorites(products);
         } catch (err) {
@@ -148,7 +176,6 @@ export default function Profile() {
         }
       }
     };
-
     fetchFavorites();
   }, [activeTab, token]);
 
@@ -186,10 +213,8 @@ export default function Profile() {
       username: user.username,
       phone: user.phone,
     };
-
     formData.append('data', JSON.stringify(data));
     if (profileImage) formData.append('profilePicture', profileImage);
-
     try {
       const res = await axios.put(`/users/update-profile`, formData, {
         headers: {
@@ -226,26 +251,34 @@ export default function Profile() {
     setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle category change
   const handleCategoryChange = (e) => {
     const categoryId = e.target.value;
     setSelectedCategory(categoryId);
-    setNewProduct(prev => ({ ...prev, categoryId })); // sync here
+    setNewProduct(prev => ({ ...prev, categoryId }));
     setSelectedSubcategory('');
-    setNewProduct(prev => ({ ...prev, subcategoryId: '' }));
+    setNewProduct(prev => ({ ...prev, subcategoryId: '', subsubcategoryId: '' }));
     setAttributes([]);
     if (categoryId) {
       fetchSubcategories(categoryId);
+    } else {
+      setSubcategories([]);
+      setSubsubcategories([]);
     }
   };
 
   const handleSubcategoryChange = (e) => {
     const subcategoryId = e.target.value;
     setSelectedSubcategory(subcategoryId);
-    setNewProduct(prev => ({ ...prev, subcategoryId }));
+    setNewProduct(prev => ({ ...prev, subcategoryId, subsubcategoryId: '' }));
+    setSubsubcategories([]);
     if (subcategoryId) {
       fetchAttributes(subcategoryId);
     }
+  };
+
+  const handleSubSubCategoryChange = (e) => {
+    const subsubcategoryId = e.target.value;
+    setNewProduct(prev => ({ ...prev, subsubcategoryId }));
   };
 
   const handleBrandChange = (e) => {
@@ -254,20 +287,17 @@ export default function Profile() {
     setNewProduct(prev => ({ ...prev, brandId }));
   };
 
-
-  // Handle dynamic attribute change
   const handleDynamicAttributesChange = (attributeMap) => {
-    const attrs = Object.entries(attributeMap).map(([attributeId, value]) => ({
-      attributeId,
-      value
+    // Ensure attributeMap is converted to an array of { attributeId, value } objects
+    const attrs = Object.entries(attributeMap || {}).map(([attributeId, value]) => ({
+      attributeId: attributeId,
+      value: value
     }));
     setNewProduct(prev => ({ ...prev, attributes: attrs }));
   };
 
-  // Create or update product
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append(
       'product',
@@ -279,10 +309,11 @@ export default function Profile() {
         condition: newProduct.condition,
         categoryId: selectedCategory,
         subcategoryId: selectedSubcategory,
+        subsubcategoryId: newProduct.subsubcategoryId || '',
         userId: userId,
         featured: newProduct.featured,
         brandId: selectedBrand,
-        attributes: newProduct.attributes || [],
+        attributes: newProduct.attributes || []
       })], { type: 'application/json' })
     );
     productImages.forEach((file) => {
@@ -292,11 +323,11 @@ export default function Profile() {
     try {
       if (editingId) {
         await axios.put(`/products/${editingId}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
         });
       } else {
         await axios.post('/products', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
         });
       }
       setNewProduct({
@@ -307,6 +338,7 @@ export default function Profile() {
         condition: 'NEW',
         categoryId: '',
         subcategoryId: '',
+        subsubcategoryId: '',
         userId: userId || '',
         featured: false,
         images: [],
@@ -319,22 +351,24 @@ export default function Profile() {
       setAttributes([]);
       setProductImages([]);
       setEditingId(null);
-    } catch (err) {
-      console.error('Error saving product', err);
-    }
-  };
-
-  // Delete product
-  const handleDeleteProduct = async (id) => {
-    try {
-      await axios.delete(`/products/${id}`);
       fetchUserProducts();
     } catch (err) {
-      console.error('Error deleting product', err);
+      console.error('Error saving product:', err);
+      setMessage('Failed to save product');
     }
   };
 
-  // Edit product (load data into form)
+  const handleDeleteProduct = async (id) => {
+    try {
+      await axios.delete(`/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUserProducts();
+    } catch (err) {
+      console.error('Error deleting product:', err);
+    }
+  };
+
   const handleEditProduct = async (product) => {
     setEditingId(product.id);
     setNewProduct({
@@ -345,26 +379,32 @@ export default function Profile() {
       condition: product.condition,
       categoryId: product.categoryId,
       subcategoryId: product.subcategoryId,
+      subsubcategoryId: product.subsubcategoryId || '',
       userId: product.userId,
       featured: product.featured,
       brandId: product.brandId,
-      // Convert attributes array to map for DynamicAttributeForm usage
-      attributes: product.attributes?.reduce((acc, attr) => {
-        acc[attr.attributeId] = attr.value;
-        return acc;
-      }, {}) || {},
+      attributes: product.attributes || []
     });
     setSelectedCategory(product.categoryId);
     try {
-      await fetchSubcategories(product.categoryId);
+      fetchSubcategories(product.categoryId);
       setSelectedSubcategory(product.subcategoryId);
-      // await fetchAttributes(product.subcategoryId);
+      if (product.subcategoryId) {
+        const selectedSub = subcategories.find(sub => sub.id === product.subcategoryId);
+        if (selectedSub && selectedSub.subcategories) {
+          setSubsubcategories(selectedSub.subcategories);
+        } else {
+          setSubsubcategories([]);
+        }
+      }
+      if (product.subcategoryId) {
+        await fetchAttributes(product.subcategoryId);
+      }
     } catch (err) {
-      console.error('Failed to load subcategories or attributes', err);
+      console.error('Failed to load subcategories or attributes:', err);
     }
     setSelectedBrand(product.brandId);
   };
-
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -374,9 +414,7 @@ export default function Profile() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded ${
-              activeTab === tab ? 'bg-black text-white' : 'bg-gray-100'
-            }`}
+            className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-black text-white' : 'bg-gray-100'}`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
@@ -463,7 +501,6 @@ export default function Profile() {
         </div>
       )}
 
-
       {activeTab === 'orders' && (
         <div className="space-y-4">
           {orders.length === 0 ? (
@@ -477,7 +514,6 @@ export default function Profile() {
                 <p>Shipping Method: {order.shippingMethod}</p>
                 <p>Shipping Cost: ${order.shippingCost}</p>
                 <p className="font-semibold">Total: ${order.totalPrice}</p>
-
                 <div className="mt-2">
                   <h4 className="font-medium">Items:</h4>
                   <ul className="list-disc ml-6">
@@ -496,7 +532,6 @@ export default function Profile() {
 
       {activeTab === 'Product' && (
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Product List */}
           <div className="w-full lg:w-4/5">
             {products.length === 0 ? (
               <p className="text-gray-600">You haven't added any products yet.</p>
@@ -534,7 +569,6 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Product Form */}
           <div className="w-full lg:w-1/5 border p-4 rounded">
             <h3 className="text-lg font-semibold mb-2">
               {editingId ? 'Edit Product' : 'Add Product'}
@@ -565,8 +599,27 @@ export default function Profile() {
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
               />
-
-              {/* Category */}
+              <select
+                name="condition"
+                value={newProduct.condition}
+                onChange={handleNewProductChange}
+                className="w-full border px-2 py-1 rounded"
+                required
+              >
+                <option value="NEW">New</option>
+                <option value="USED">Used</option>
+                <option value="REFURBISHED">Refurbished</option>
+              </select>
+              <input
+                type="number"
+                name="stock"
+                placeholder="Stock Quantity"
+                value={newProduct.stock}
+                onChange={handleNewProductChange}
+                className="w-full border px-2 py-1 rounded"
+                min="0"
+                required
+              />
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
@@ -580,8 +633,6 @@ export default function Profile() {
                   </option>
                 ))}
               </select>
-
-              {/* Subcategory */}
               {subcategories.length > 0 && (
                 <select
                   value={selectedSubcategory}
@@ -597,8 +648,20 @@ export default function Profile() {
                   ))}
                 </select>
               )}
-
-              {/* Brand */}
+              {subsubcategories.length > 0 && (
+                <select
+                  value={newProduct.subsubcategoryId}
+                  onChange={handleSubSubCategoryChange}
+                  className="w-full border px-2 py-1 rounded"
+                >
+                  <option value="">Select Sub-subcategory</option>
+                  {subsubcategories.map((subsub) => (
+                    <option key={subsub.id} value={subsub.id}>
+                      {subsub.name}
+                    </option>
+                  ))}
+                </select>
+              )}
               <select
                 value={selectedBrand}
                 onChange={handleBrandChange}
@@ -612,8 +675,6 @@ export default function Profile() {
                   </option>
                 ))}
               </select>
-
-              {/* Attributes */}
               {(selectedSubcategory || selectedCategory) && (
                 <DynamicAttributeForm
                   categoryId={newProduct.subcategoryId || newProduct.categoryId}
@@ -621,16 +682,13 @@ export default function Profile() {
                   onChange={handleDynamicAttributesChange}
                 />
               )}
-
-              {/* Images */}
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                className='w-full border px-2 py-1 rounded'
+                className="w-full border px-2 py-1 rounded"
                 onChange={(e) => setProductImages(Array.from(e.target.files))}
               />
-
               {productImages.length > 0 && (
                 <div className="flex gap-2 mt-2 overflow-x-auto">
                   {productImages.map((file, idx) => (
@@ -643,9 +701,6 @@ export default function Profile() {
                   ))}
                 </div>
               )}
-
-
-
               <button
                 type="submit"
                 className="bg-black text-white w-full py-1 rounded"
@@ -656,7 +711,6 @@ export default function Profile() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

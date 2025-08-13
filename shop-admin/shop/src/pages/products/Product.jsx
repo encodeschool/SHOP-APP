@@ -18,14 +18,18 @@ export default function Products() {
     price: '',
     stock: '',
     condition: 'NEW',
-    categoryId: '',
-    subcategoryId: '',
+    categoryId: '',       // top-level
+    subcategoryId: '',    // second-level
+    subsubcategoryId: '', // third-level
     userId: '',
     featured: false,
     images: [],
     brandId: '',
     attributes: []
   });
+
+  const [subsubcategories, setSubsubcategories] = useState([]); // children of subcategory
+
 
   const [editingId, setEditingId] = useState(null);
 
@@ -83,17 +87,39 @@ export default function Products() {
     }));
 
     if (name === 'categoryId') {
-      const updated = { ...newProduct, categoryId: value, subcategoryId: '', attributes: [] };
-      setNewProduct(updated);
-      setAttributes([]);
-      fetchSubcategories(value);
+      setNewProduct({
+        ...newProduct,
+        categoryId: value,
+        subcategoryId: '',
+        subsubcategoryId: '',
+        attributes: []
+      });
+
+      const selectedCat = categories.find(c => c.id === value);
+      setSubcategories(selectedCat?.subcategories || []);
+      setSubsubcategories([]);
       fetchAttributes(value);
     }
 
     if (name === 'subcategoryId') {
-      const effectiveCategoryId = value || newProduct.categoryId;
-      setNewProduct(prev => ({ ...prev, subcategoryId: value }));
-      fetchAttributes(effectiveCategoryId);
+      setNewProduct({
+        ...newProduct,
+        subcategoryId: value,
+        subsubcategoryId: '',
+        attributes: []
+      });
+
+      const selectedSubcat = subcategories.find(sc => sc.id === value);
+      setSubsubcategories(selectedSubcat?.subcategories || []);
+      fetchAttributes(value);
+    }
+
+    if (name === 'subsubcategoryId') {
+      setNewProduct({
+        ...newProduct,
+        subsubcategoryId: value
+      });
+      fetchAttributes(value);
     }
   };
 
@@ -118,7 +144,7 @@ export default function Products() {
       ...rest
     } = newProduct;
 
-    const finalCategoryId = subcategoryId || categoryId;
+    const finalCategoryId = newProduct.subsubcategoryId || newProduct.subcategoryId || newProduct.categoryId;
 
     const productPayload = {
       ...rest,
@@ -314,12 +340,19 @@ export default function Products() {
                 ))}
               </select>
 
-              <select name="subcategoryId" className="border p-1 mb-3 w-full" value={newProduct.subcategoryId} onChange={handleInputChange}>
-                <option value="">Select Subcategory</option>
-                {subcategories.map(sc => (
-                  <option key={sc.id} value={sc.id}>{sc.name}</option>
-                ))}
-              </select>
+              {newProduct.categoryId && (
+                <select name="subcategoryId" className="border p-1 mb-3 w-full" value={newProduct.subcategoryId} onChange={handleInputChange}>
+                  <option value="">Select Subcategory</option>
+                  {subcategories.map(sc => <option key={sc.id} value={sc.id}>{sc.name}</option>)}
+                </select>
+              )}
+
+              {newProduct.subcategoryId && (
+                <select name="subsubcategoryId" className="border p-1 mb-3 w-full" value={newProduct.subsubcategoryId} onChange={handleInputChange}>
+                  <option value="">Select Sub-subcategory</option>
+                  {subsubcategories.map(ssc => <option key={ssc.id} value={ssc.id}>{ssc.name}</option>)}
+                </select>
+              )}
 
               <select name="userId" className="border p-1 mb-3 w-full" value={newProduct.userId} onChange={handleInputChange}>
                 <option value="">Select User</option>
