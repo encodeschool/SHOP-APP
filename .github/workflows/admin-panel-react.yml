@@ -35,7 +35,7 @@ jobs:
         working-directory: shop-admin/shop
 
       - name: Upload build logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: react-admin-build-logs
           path: shop-admin/shop/build-logs.txt
