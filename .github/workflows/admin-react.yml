@@ -23,15 +23,15 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: shop-admin
+        working-directory: shop-admin/shop
 
       - name: Run tests
         run: npm test -- --watchAll=false
-        working-directory: shop-admin
+        working-directory: shop-admin/shop
 
       - name: Build project
         run: npm run build
-        working-directory: shop-admin
+        working-directory: shop-admin/shop
 
       - name: Deploy to VDS
         uses: appleboy/scp-action@v0.1.4
@@ -39,7 +39,7 @@ jobs:
           host: ${{ secrets.VDS_HOST }}
           username: ${{ secrets.VDS_USER }}
           key: ${{ secrets.VDS_SSH_KEY }}
-          source: "shop-admin/build/*"
+          source: "shop-admin/shop/build/*"
           target: "~/bazaarly/admin"
 
       - name: Restart Nginx (if needed)
