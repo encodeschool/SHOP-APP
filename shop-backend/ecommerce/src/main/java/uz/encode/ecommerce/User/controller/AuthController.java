@@ -1,25 +1,30 @@
 package uz.encode.ecommerce.User.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 import uz.encode.ecommerce.User.config.JwtUtil;
 import uz.encode.ecommerce.User.dto.UserCreateDTO;
 import uz.encode.ecommerce.User.dto.UserResponseDTO;
-import uz.encode.ecommerce.User.entity.User;
-import uz.encode.ecommerce.User.repository.UserRepository;
 import uz.encode.ecommerce.User.service.UserService;
-
-import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000/")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
