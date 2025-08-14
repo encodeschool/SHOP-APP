@@ -217,3 +217,25 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 ```
+
+!!! Note: If you get an error in Restart Application process like: "Sudo Password is required", you need to update sudoers file:
+
+- On your VDS, edit the sudoers file:
+
+```bash
+sudo visudo
+```
+
+- Add a line at the bottom (replace youruser with your SSH username):
+
+```psql
+youruser ALL=(ALL) NOPASSWD: /bin/systemctl restart bazaar
+```
+- Save and exit.
+
+Now youruser can run:
+
+```bash
+sudo systemctl restart bazaar
+```
+without being prompted for a password.
