@@ -73,7 +73,7 @@ const ProductDetail = () => {
           <img
             src={
               product.imageUrls?.[currentImageIndex]
-                ? `http://localhost:8085${product.imageUrls[currentImageIndex]}`
+                ? `https://shop.encode.uz${product.imageUrls[currentImageIndex]}`
                 : '/placeholder.jpg'
             }
             alt={`${product.title} image`}
@@ -83,7 +83,7 @@ const ProductDetail = () => {
             {product.imageUrls?.map((imgUrl, index) => (
               <img
                 key={index}
-                src={`http://localhost:8085${imgUrl}`}
+                src={`https://shop.encode.uz${imgUrl}`}
                 alt={`Thumbnail ${index + 1}`}
                 className={`w-16 h-16 object-contain cursor-pointer border-2 ${
                   index === currentImageIndex ? 'border-black' : 'border-transparent'
@@ -101,7 +101,7 @@ const ProductDetail = () => {
               <img
                 src={
                   brand?.icon
-                    ? `http://localhost:8085${brand.icon}`
+                    ? `https://shop.encode.uz${brand.icon}`
                     : '/placeholder.jpg'
                 }
                 alt={`${brand?.name} image`}

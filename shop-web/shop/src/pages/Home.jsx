@@ -150,7 +150,7 @@ const Home = () => {
               <img
                 src={
                   category.icon
-                    ? `http://localhost:8085${category.icon}`
+                    ? `https://shop.encode.uz${category.icon}`
                     : '/placeholder.jpg'
                 }
                 alt={category.name}

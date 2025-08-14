@@ -32,7 +32,7 @@ const CartView = () => {
             <tr key={item.id} className="hover:bg-gray-100">
               <td className="border border-gray-300 p-2 flex items-center gap-4">
                 <img
-                  src={item.imageUrls?.[0] ? `http://localhost:8085${item.imageUrls[0]}` : '/placeholder.jpg'}
+                  src={item.imageUrls?.[0] ? `https://shop.encode.uz${item.imageUrls[0]}` : '/placeholder.jpg'}
                   alt={item.title}
                   className="w-16 h-16 object-contain"
                 />

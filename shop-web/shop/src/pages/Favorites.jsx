@@ -37,7 +37,7 @@ export default function Favorites() {
     const handleRemoveFavorite = async (productId) => {
         const userId = localStorage.getItem('userId');
         try {
-        await axios.delete(`http://localhost:8085/api/favorites`, {
+        await axios.delete(`https://shop.encode.uz/api/favorites`, {
             params: { userId, productId },
             headers: { Authorization: `Bearer ${token}` },
         });
