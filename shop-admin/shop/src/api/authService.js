@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://shop.encode.uz/api/auth'; // Adjust if needed
+const API_URL = 'http://shop.encode.uz/api/auth'; 
 
 export const login = (credentials) => axios.post(`${API_URL}/login`, credentials);
 
