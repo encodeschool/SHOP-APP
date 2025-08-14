@@ -16,7 +16,7 @@ const isAuthenticated = () => !!localStorage.getItem('token');
 function PrivateRoute({ children }) {
   return isAuthenticated() ? children : <Navigate to="/login" replace />;
 }
-
+// Some comments
 function App() {
   return (
     <Router>
