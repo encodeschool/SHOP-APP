@@ -1,4 +1,4 @@
-name: Admin React CI
+name: Deploy React Admin to VDS
 
 on:
   push:
@@ -9,11 +9,12 @@ on:
       - 'shop-admin/**'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -31,3 +32,21 @@ jobs:
       - name: Build project
         run: npm run build
         working-directory: shop-admin
+
+      - name: Deploy to VDS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          source: "shop-admin/build/*"
+          target: "~/bazaarly/admin"
+
+      - name: Restart Nginx (if needed)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          script: |
+            sudo systemctl restart nginx
