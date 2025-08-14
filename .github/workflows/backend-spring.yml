@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.VDS_USER }}
           key: ${{ secrets.VDS_SSH_KEY }}
           source: "shop-backend/ecommerce/target/*.jar"
-          target: "~/bazaar"
+          target: "~/bazaarly"
 
       - name: Restart Application
         uses: appleboy/ssh-action@v0.1.8
