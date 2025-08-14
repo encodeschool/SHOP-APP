@@ -50,4 +50,3 @@ jobs:
           key: ${{ secrets.VDS_SSH_KEY }}
           script: |
             sudo systemctl restart nginx
-# updates
