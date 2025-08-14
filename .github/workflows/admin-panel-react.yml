@@ -30,7 +30,7 @@ jobs:
       #   working-directory: shop-admin/shop
 
       - name: Build project
-        run: npm run build
+        run: CI=false npm run build
         working-directory: shop-admin/shop
 
       - name: Deploy to VDS

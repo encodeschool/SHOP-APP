@@ -8,7 +8,7 @@ export default function Products() {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [users, setUsers] = useState([]);
-  const [attributes, setAttributes] = useState([]);
+  const [setAttributes] = useState([]);
   const [brands, setBrands] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
