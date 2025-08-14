@@ -28,7 +28,7 @@ jobs:
           mvn clean package -DskipTests -Dmaven.test.skip=true
 
       - name: List target folder
-        run: ls -la shop-backend/ecommerce/target
+        run: ls -la
 
       - name: Deploy to VDS
         uses: appleboy/scp-action@v0.1.4
