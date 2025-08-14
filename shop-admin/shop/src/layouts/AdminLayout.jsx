@@ -93,7 +93,7 @@ export default function AdminLayout() {
         <header className="h-16 bg-white border-b shadow flex items-center justify-end px-6">
           <div className="flex items-center space-x-4">
             <img
-              src={`http://localhost:8080${user.profilePictureUrl}`}
+              src={`http://shop.encode.uz${user.profilePictureUrl}`}
               alt="User"
               className="w-10 h-10 rounded-full object-cover"
             />

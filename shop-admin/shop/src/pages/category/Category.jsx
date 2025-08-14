@@ -165,7 +165,7 @@ export default function Categories() {
                     <td className="p-2">
                       {parent.icon ? (
                         <img
-                          src={`http://localhost:8080${parent.icon}`}
+                          src={`http://shop.encode.uz${parent.icon}`}
                           alt="Profile"
                           style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
                         />

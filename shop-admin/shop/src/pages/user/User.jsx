@@ -99,7 +99,7 @@ export default function Users() {
       // Add full URL if backend URL is relative
       const fullUrl = user.profilePictureUrl.startsWith("http")
         ? user.profilePictureUrl
-        : `http://localhost:8080${user.profilePictureUrl}`;
+        : `http://shop.encode.uz${user.profilePictureUrl}`;
       setProfilePicturePreview(fullUrl);
       setIsObjectUrl(false); // this is not an object URL
     } else {
@@ -219,7 +219,7 @@ export default function Users() {
                   <td className="p-2">
                     {u.profilePictureUrl ? (
                       <img
-                        src={`http://localhost:8080${u.profilePictureUrl}`}
+                        src={`http://shop.encode.uz${u.profilePictureUrl}`}
                         alt="Profile"
                         style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
                       />

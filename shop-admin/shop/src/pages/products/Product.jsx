@@ -288,7 +288,7 @@ export default function Products() {
               {products.map(p => (
                 <tr key={p.id}>
                   <td className="p-2">
-                    <img src={`http://localhost:8080${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
+                    <img src={`http://shop.encode.uz${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
                   </td>
                   <td className="p-2">{p.title}</td>
                   <td className="p-2">${p.price}</td>

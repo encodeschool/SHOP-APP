@@ -109,7 +109,7 @@ export default function Brand() {
                   <td className="p-2">
                     {brand.icon ? (
                       <img
-                        src={`http://localhost:8080${brand.icon}`}
+                        src={`http://shop.encode.uz${brand.icon}`}
                         alt="brand"
                         className="w-14 h-14 object-contain rounded"
                       />
