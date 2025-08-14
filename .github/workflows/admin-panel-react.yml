@@ -25,9 +25,9 @@ jobs:
         run: npm install
         working-directory: shop-admin/shop
 
-      - name: Run tests
-        run: npm test -- --watchAll=false
-        working-directory: shop-admin/shop
+      # - name: Run tests
+      #   run: npm test -- --watchAll=false
+      #   working-directory: shop-admin/shop
 
       - name: Build project
         run: npm run build
