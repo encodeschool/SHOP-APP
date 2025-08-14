@@ -130,7 +130,7 @@ export default function FilterPage() {
                 <img
                   src={
                     p.imageUrls?.[0]
-                      ? `http://localhost:8080${p.imageUrls[0]}`
+                      ? `http://localhost:8085${p.imageUrls[0]}`
                       : '/placeholder.jpg'
                   }
                   alt={p.title}

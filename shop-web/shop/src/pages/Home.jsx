@@ -150,7 +150,7 @@ const Home = () => {
               <img
                 src={
                   category.icon
-                    ? `http://localhost:8080${category.icon}`
+                    ? `http://localhost:8085${category.icon}`
                     : '/placeholder.jpg'
                 }
                 alt={category.name}
@@ -197,7 +197,7 @@ const Home = () => {
                   {selectedSubImage && (
                     <div className="ml-4">
                       <img
-                        src={`http://localhost:8080${selectedSubImage}`}
+                        src={`http://localhost:8085${selectedSubImage}`}
                         alt="Subcategory"
                         className="w-32 h-32 object-contain"
                       />
@@ -252,7 +252,7 @@ const Home = () => {
               <img
                 src={
                   product.imageUrls?.[0]
-                    ? `http://localhost:8080${product.imageUrls[0]}`
+                    ? `http://localhost:8085${product.imageUrls[0]}`
                     : '/placeholder.jpg'
                 }
                 alt={product.title}
@@ -330,7 +330,7 @@ const Home = () => {
                     className="bg-contain h-[100%] grayscale bg-no-repeat bg-center"
                     style={{
                       backgroundImage: `url(${
-                        brand.icon ? `http://localhost:8080${brand.icon}` : '/placeholder.jpg'
+                        brand.icon ? `http://localhost:8085${brand.icon}` : '/placeholder.jpg'
                       })`,
                     }}
                   ></div>
@@ -411,7 +411,7 @@ const Home = () => {
                     <img
                       src={
                         product.imageUrls?.[0]
-                          ? `http://localhost:8080${product.imageUrls[0]}`
+                          ? `http://localhost:8085${product.imageUrls[0]}`
                           : '/placeholder.jpg'
                       }
                       alt={product.title}

@@ -100,7 +100,7 @@ export default function SearchResults() {
                   <img
                     src={
                       product.imageUrls?.[0]
-                        ? `http://localhost:8080${product.imageUrls[0]}`
+                        ? `http://localhost:8085${product.imageUrls[0]}`
                         : '/placeholder.jpg'
                     }
                     alt={product.title}

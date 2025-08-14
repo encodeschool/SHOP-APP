@@ -34,7 +34,7 @@ export default function AppBar() {
       return;
     }
 
-    axios.get(`http://localhost:8080/api/users/${userId}`, {
+    axios.get(`http://localhost:8085/api/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

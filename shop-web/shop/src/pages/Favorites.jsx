@@ -37,7 +37,7 @@ export default function Favorites() {
     const handleRemoveFavorite = async (productId) => {
         const userId = localStorage.getItem('userId');
         try {
-        await axios.delete(`http://localhost:8080/api/favorites`, {
+        await axios.delete(`http://localhost:8085/api/favorites`, {
             params: { userId, productId },
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -64,7 +64,7 @@ export default function Favorites() {
                         <img
                         src={
                             product.imageUrls?.[0]
-                            ? `http://localhost:8080${product.imageUrls[0]}`
+                            ? `http://localhost:8085${product.imageUrls[0]}`
                             : '/placeholder.jpg'
                         }
                         alt={product.title}
