@@ -28,9 +28,16 @@ jobs:
       #   run: npm test -- --watchAll=false
       #   working-directory: shop-web/shop
 
-      - name: Build project
-        run: CI=false npm run build
+      - name: Build project (log output)
+        run: |
+          CI=false npm run build | tee build-logs.txt
         working-directory: shop-web/shop
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: react-web-build-logs
+          path: shop-web/shop/build-logs.txt
 
       - name: Deploy to VDS
         uses: appleboy/scp-action@v0.1.4
