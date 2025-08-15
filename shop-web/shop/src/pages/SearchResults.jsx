@@ -21,6 +21,7 @@ export default function SearchResults() {
   const [results, setResults] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function SearchResults() {
                   <img
                     src={
                       product.imageUrls?.[0]
-                        ? `https://shop.encode.uz${product.imageUrls[0]}`
+                        ? `${BASE_URL}${product.imageUrls[0]}`
                         : '/placeholder.jpg'
                     }
                     alt={product.title}

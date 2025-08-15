@@ -4,6 +4,7 @@ import axios from '../api/axios';
 export default function Favorites() {
     const [favorites, setFavorites] = useState([]);
     const token = localStorage.getItem('token');
+    const BASE_URL = process.env.REACT_APP_BASE_URL;
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -37,7 +38,7 @@ export default function Favorites() {
     const handleRemoveFavorite = async (productId) => {
         const userId = localStorage.getItem('userId');
         try {
-        await axios.delete(`https://shop.encode.uz/api/favorites`, {
+        await axios.delete(`${BASE_URL}/favorites`, {
             params: { userId, productId },
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -64,7 +65,7 @@ export default function Favorites() {
                         <img
                         src={
                             product.imageUrls?.[0]
-                            ? `http://localhost:8085${product.imageUrls[0]}`
+                            ? `${BASE_URL}${product.imageUrls[0]}`
                             : '/placeholder.jpg'
                         }
                         alt={product.title}

@@ -10,6 +10,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch('https://shop.encode.uz/api/auth/register', {
+      const res = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

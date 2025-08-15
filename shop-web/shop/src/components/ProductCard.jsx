@@ -6,6 +6,7 @@ import axios from '../api/axios';
 
 const ProductCard = ({ product }) => {
   const [favorites, setFavorites] = useState([]);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   useEffect(() => {
     const fetchFavorites = async () => {
       const userId = localStorage.getItem('userId');
@@ -38,7 +39,7 @@ const ProductCard = ({ product }) => {
         <img
           src={
             product.imageUrls?.[0]
-              ? `https://shop.encode.uz${product.imageUrls[0]}`
+              ? `${BASE_URL}${product.imageUrls[0]}`
               : '/placeholder.jpg'
           }
           alt={product.title}

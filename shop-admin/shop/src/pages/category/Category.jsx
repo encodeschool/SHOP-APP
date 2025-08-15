@@ -7,6 +7,7 @@ export default function Categories() {
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [form, setForm] = useState({
     name: "",
     parentId: "",
@@ -165,7 +166,7 @@ export default function Categories() {
                     <td className="p-2">
                       {parent.icon ? (
                         <img
-                          src={`https://shop.encode.uz${parent.icon}`}
+                          src={`${BASE_URL}${parent.icon}`}
                           alt="Profile"
                           style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
                         />

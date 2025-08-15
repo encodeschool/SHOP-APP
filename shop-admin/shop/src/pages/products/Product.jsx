@@ -11,6 +11,7 @@ export default function Products() {
   const [setAttributes] = useState([]);
   const [brands, setBrands] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -288,7 +289,7 @@ export default function Products() {
               {products.map(p => (
                 <tr key={p.id}>
                   <td className="p-2">
-                    <img src={`https://shop.encode.uz${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
+                    <img src={`${BASE_URL}${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
                   </td>
                   <td className="p-2">{p.title}</td>
                   <td className="p-2">${p.price}</td>

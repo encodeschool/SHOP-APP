@@ -7,6 +7,7 @@ export default function Brand() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", icon: null });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   const fetchBrands = () => {
     setLoading(true);
@@ -109,7 +110,7 @@ export default function Brand() {
                   <td className="p-2">
                     {brand.icon ? (
                       <img
-                        src={`https://shop.encode.uz${brand.icon}`}
+                        src={`${BASE_URL}${brand.icon}`}
                         alt="brand"
                         className="w-14 h-14 object-contain rounded"
                       />

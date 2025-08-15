@@ -6,6 +6,7 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [newUser, setNewUser] = useState({
     username: "",
     name: "",
@@ -99,7 +100,7 @@ export default function Users() {
       // Add full URL if backend URL is relative
       const fullUrl = user.profilePictureUrl.startsWith("https")
         ? user.profilePictureUrl
-        : `https://shop.encode.uz${user.profilePictureUrl}`;
+        : `${BASE_URL}${user.profilePictureUrl}`;
       setProfilePicturePreview(fullUrl);
       setIsObjectUrl(false); // this is not an object URL
     } else {
@@ -219,7 +220,7 @@ export default function Users() {
                   <td className="p-2">
                     {u.profilePictureUrl ? (
                       <img
-                        src={`https://shop.encode.uz${u.profilePictureUrl}`}
+                        src={`${BASE_URL}${u.profilePictureUrl}`}
                         alt="Profile"
                         style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }}
                       />

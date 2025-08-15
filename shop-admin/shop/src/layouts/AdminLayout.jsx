@@ -49,6 +49,8 @@ export default function AdminLayout() {
     navigate("/login");
   };
 
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -93,7 +95,7 @@ export default function AdminLayout() {
         <header className="h-16 bg-white border-b shadow flex items-center justify-end px-6">
           <div className="flex items-center space-x-4">
             <img
-              src={`https://shop.encode.uz${user.profilePictureUrl}`}
+              src={`${BASE_URL}${user.profilePictureUrl}`}
               alt="User"
               className="w-10 h-10 rounded-full object-cover"
             />

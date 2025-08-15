@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'https://shop.encode.uz/api/auth'; // Adjust if needed
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+const API_URL = `${BASE_URL}/auth`; 
+console.log(process.env.REACT_APP_BASE_URL);
 
 export const login = (credentials) => axios.post(`${API_URL}/login`, credentials);
 

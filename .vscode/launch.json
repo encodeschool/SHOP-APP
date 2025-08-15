@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "EcommerceApplication",
+            "request": "launch",
+            "mainClass": "uz.encode.ecommerce.EcommerceApplication",
+            "projectName": "ecommerce"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot Dev",
+            "request": "launch",
+            "mainClass": "uz.encode.ecommerce.EcommerceApplication",
+            "projectName": "backend",
+            "vmArgs": "-Dspring.profiles.active=dev"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot Prod",
+            "request": "launch",
+            "mainClass": "uz.encode.ecommerce.EcommerceApplication",
+            "projectName": "backend",
+            "vmArgs": "-Dspring.profiles.active=prod"
+        }
+    ]
+}

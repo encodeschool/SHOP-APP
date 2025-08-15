@@ -31,6 +31,7 @@ jobs:
 
       - name: Build project (log output)
         run: |
+          cp .env.production .env
           CI=false npm run build | tee build-logs.txt
         working-directory: shop-admin/shop
 

@@ -6,6 +6,7 @@ import { removeFromCart, increaseQuantity, decreaseQuantity } from '../redux/car
 const CartView = () => {
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   // Calculate total price
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -32,7 +33,7 @@ const CartView = () => {
             <tr key={item.id} className="hover:bg-gray-100">
               <td className="border border-gray-300 p-2 flex items-center gap-4">
                 <img
-                  src={item.imageUrls?.[0] ? `https://shop.encode.uz${item.imageUrls[0]}` : '/placeholder.jpg'}
+                  src={item.imageUrls?.[0] ? `${BASE_URL}${item.imageUrls[0]}` : '/placeholder.jpg'}
                   alt={item.title}
                   className="w-16 h-16 object-contain"
                 />

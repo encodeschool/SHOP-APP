@@ -12,12 +12,13 @@ export default function Login() {
 
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://shop.encode.uz/api/auth/login', {
+      const res = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

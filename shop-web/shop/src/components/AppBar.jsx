@@ -12,7 +12,7 @@ export default function AppBar() {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function AppBar() {
       return;
     }
 
-    axios.get(`https://shop.encode.uz/api/users/${userId}`, {
+    axios.get(`${BASE_URL}/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

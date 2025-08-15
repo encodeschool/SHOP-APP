@@ -1,8 +1,12 @@
 // src/services/axios.js
 import axios from 'axios';
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+const API_URL = `${BASE_URL}/auth`; 
+console.log(process.env.REACT_APP_BASE_URL);
+
 const instance = axios.create({
-  baseURL: 'https://shop.encode.uz/api',
+  baseURL: `${API_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },

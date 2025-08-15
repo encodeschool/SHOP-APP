@@ -7,6 +7,7 @@ import { Trash2 } from 'lucide-react';
 const Compare = () => {
   const dispatch = useDispatch();
   const items = useSelector(selectCompareItems);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   if (items.length === 0) {
     return (
@@ -60,7 +61,7 @@ const Compare = () => {
             <img
               src={
                 product.imageUrls?.[0]
-                  ? `https://shop.encode.uz${product.imageUrls[0]}`
+                  ? `${BASE_URL}${product.imageUrls[0]}`
                   : '/placeholder.jpg'
               }
               alt={product.title}

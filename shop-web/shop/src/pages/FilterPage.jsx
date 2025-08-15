@@ -17,6 +17,7 @@ export default function FilterPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -130,7 +131,7 @@ export default function FilterPage() {
                 <img
                   src={
                     p.imageUrls?.[0]
-                      ? `https://shop.encode.uz${p.imageUrls[0]}`
+                      ? `${BASE_URL}${p.imageUrls[0]}`
                       : '/placeholder.jpg'
                   }
                   alt={p.title}

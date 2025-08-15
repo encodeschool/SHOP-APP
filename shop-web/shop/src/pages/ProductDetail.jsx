@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
   const [activeTab, setActiveTab] = useState('specification');
   const [brand, setBrand] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   useEffect(() => {
     const fetchBrand = async (brandId) => {
@@ -73,7 +74,7 @@ const ProductDetail = () => {
           <img
             src={
               product.imageUrls?.[currentImageIndex]
-                ? `https://shop.encode.uz${product.imageUrls[currentImageIndex]}`
+                ? `${BASE_URL}${product.imageUrls[currentImageIndex]}`
                 : '/placeholder.jpg'
             }
             alt={`${product.title} image`}
@@ -83,7 +84,7 @@ const ProductDetail = () => {
             {product.imageUrls?.map((imgUrl, index) => (
               <img
                 key={index}
-                src={`https://shop.encode.uz${imgUrl}`}
+                src={`${BASE_URL}${imgUrl}`}
                 alt={`Thumbnail ${index + 1}`}
                 className={`w-16 h-16 object-contain cursor-pointer border-2 ${
                   index === currentImageIndex ? 'border-black' : 'border-transparent'
@@ -101,7 +102,7 @@ const ProductDetail = () => {
               <img
                 src={
                   brand?.icon
-                    ? `https://shop.encode.uz${brand.icon}`
+                    ? `${BASE_URL}${brand.icon}`
                     : '/placeholder.jpg'
                 }
                 alt={`${brand?.name} image`}
