@@ -34,7 +34,7 @@ export default function AppBar() {
       return;
     }
 
-    axios.get(`${BASE_URL}/users/${userId}`, {
+    axios.get(`${BASE_URL}/api/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
