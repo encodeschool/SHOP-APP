@@ -9,6 +9,7 @@ import Register from './pages/authorization/Registration';
 import Orders from "./pages/orders/Order";
 import AttributeManagement from './pages/products/AttributeManagement';
 import Brand from './pages/products/Brand';
+import Banner from "./pages/banner/Banner";
 
 // A simple helper to check if user is authenticated
 const isAuthenticated = () => !!localStorage.getItem('token');
@@ -41,6 +42,7 @@ function App() {
           <Route path="orders" element={<Orders />} />
           <Route path="product_attribute" element={<AttributeManagement />} />
           <Route path="brand" element={<Brand />} />
+          <Route path="banner" element={<Banner />} />
         </Route>
 
         {/* Redirect unknown routes to login */}
