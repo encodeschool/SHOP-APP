@@ -157,4 +157,5 @@ This project is licensed under the MIT License.
 If you want, I can **add installation screenshots & API documentation** to make it more professional. That would make the README look like a real open-source shop app.  
 
 Do you want me to extend it with that?
+Some updates are coming
 ```
