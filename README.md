@@ -3,6 +3,8 @@
 A **full-stack ecommerce application** built with **Spring Boot** (backend) and **React.js** (frontend).  
 Supports user authentication (JWT), product management, brands, categories, dynamic attributes, favorites, shopping cart, and admin dashboard with analytics.
 
+![Shop 0 Lesson-Обложка](https://github.com/user-attachments/assets/dd6cc152-9648-4c35-9e11-9f3bfc383843)
+
 ---
 
 ## 🚀 Features
