@@ -69,12 +69,12 @@ export default function AppBar() {
         <div className="hidden font-[200] md:flex items-center gap-4">
           <span className="flex items-center">
             <FaPhone className="mr-1" />
-            <span>+371 22164949</span>
+            <span>+371 26648735</span>
           </span>
           |
           <span className="flex items-center">
             <CiMail className="mr-1" />
-            <span>4games@4games.lv</span>
+            <span>bazaarly@gmail.com</span>
           </span>
           |
           <Link to="/track" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />Track Your Order</Link>

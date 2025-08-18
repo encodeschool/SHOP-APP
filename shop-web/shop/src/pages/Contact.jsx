@@ -46,15 +46,15 @@ export default function Contact() {
           </p>
           <div className="flex items-center gap-3">
             <FaMapMarkerAlt className="text-indigo-400 text-xl" />
-            <span>123 Main Street, Your City, Country</span>
+            <span>Raunas iela 44, Rīga, LV-1039</span>
           </div>
           <div className="flex items-center gap-3">
             <FaPhoneAlt className="text-indigo-400 text-xl" />
-            <span>+1 234 567 890</span>
+            <span>+371 26648735</span>
           </div>
           <div className="flex items-center gap-3">
             <FaEnvelope className="text-indigo-400 text-xl" />
-            <span>support@yourshop.com</span>
+            <span>bazaarly@gmail.com</span>
           </div>
         </div>
 
