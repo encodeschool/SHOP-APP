@@ -11,6 +11,9 @@ import AttributeManagement from './pages/products/AttributeManagement';
 import Brand from './pages/products/Brand';
 import Banner from "./pages/banner/Banner";
 import RoleRoute from './routes/RoleRoute';
+import NotFound from "./pages/Errors/NotFound";
+import Forbidden from "./pages/Errors/Forbidden";
+import ServerError from "./pages/Errors/ServerError";
 
 function App() {
   return (
@@ -39,11 +42,11 @@ function App() {
           <Route path="banner" element={<Banner />} />
         </Route>
 
-        {/* Unauthorized page */}
-        <Route path="/unauthorized" element={<div>403 – Access Denied</div>} />
+        <Route path="/unauthorized" element={<Forbidden />} />
+        <Route path="/server-error" element={<ServerError />} />
 
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Catch-all for unknown routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
