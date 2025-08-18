@@ -6,6 +6,8 @@ import { CiMail } from "react-icons/ci";
 import { FaPhone } from "react-icons/fa6";
 import { AuthContext } from '../contexts/AuthContext';
 import axios from 'axios';
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 
 export default function AppBar() {
@@ -16,6 +18,7 @@ export default function AppBar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
    const [user, setUser] = useState({
     fullName: "Admin",
@@ -59,7 +62,7 @@ export default function AppBar() {
       <div className="container mx-auto md:px-4 md:py-2 flex justify-between items-center">
         {/* Left Links - Desktop */}
         <div className="hidden md:flex gap-4">
-          <Link to="/terms" className="font-[200] hover:underline">Terms & Conditions</Link>
+          <Link to="/terms" className="font-[200] hover:underline">{t("Terms & Conditions")}</Link>
           <Link to="/delivery" className="font-[200] hover:underline">Delivery & Payment</Link>
           <Link to="/about" className="font-[200] hover:underline">About Us</Link>
           <Link to="/contacts" className="font-[200] hover:underline">Contacts</Link>
@@ -112,8 +115,9 @@ export default function AppBar() {
             </button>
             {languageOpen && (
               <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
-                <button className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
-                <button className="block px-4 py-2 hover:bg-gray-100">Русский</button>
+                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">English</button>
+                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
+                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">Русский</button>
               </div>
             )}
           </div>
