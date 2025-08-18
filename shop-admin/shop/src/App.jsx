@@ -10,13 +10,7 @@ import Orders from "./pages/orders/Order";
 import AttributeManagement from './pages/products/AttributeManagement';
 import Brand from './pages/products/Brand';
 import Banner from "./pages/banner/Banner";
-
-// A simple helper to check if user is authenticated
-const isAuthenticated = () => !!localStorage.getItem('token');
-
-function PrivateRoute({ children }) {
-  return isAuthenticated() ? children : <Navigate to="/login" replace />;
-}
+import RoleRoute from './routes/RoleRoute';
 
 function App() {
   return (
@@ -27,12 +21,12 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Protected admin routes */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            <PrivateRoute>
+            <RoleRoute roles={["ADMIN"]}>
               <AdminLayout />
-            </PrivateRoute>
+            </RoleRoute>
           }
         >
           <Route index element={<Dashboard />} />
@@ -45,7 +39,10 @@ function App() {
           <Route path="banner" element={<Banner />} />
         </Route>
 
-        {/* Redirect unknown routes to login */}
+        {/* Unauthorized page */}
+        <Route path="/unauthorized" element={<div>403 – Access Denied</div>} />
+
+        {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

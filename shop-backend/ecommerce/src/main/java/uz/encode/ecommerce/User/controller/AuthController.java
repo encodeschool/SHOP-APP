@@ -47,15 +47,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserResponseDTO dto) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserResponseDTO dto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
         );
         UserResponseDTO user = userService.getByEmail(dto.getEmail());
         String token = jwtUtil.generateJwtToken(dto.getEmail());
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         response.put("userId", user.getId().toString());
+        response.put("roles", user.getRoles());
         return ResponseEntity.ok(response);
     }
 }
