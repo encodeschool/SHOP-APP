@@ -3,6 +3,8 @@ import { FaHeart } from 'react-icons/fa';
 import axios from '../api/axios';
 import { toast } from 'react-toastify';
 import LoginPromptModal from './LoginPromptModal';
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const FavoriteButton = ({ productId, favorites, setFavorites }) => {
   const userId = localStorage.getItem('userId');
@@ -10,6 +12,7 @@ const FavoriteButton = ({ productId, favorites, setFavorites }) => {
   const isFavorite = favorites.includes(productId);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const { t } = useTranslation();
 
   const toggleFavorite = async (e) => {
     e.preventDefault();

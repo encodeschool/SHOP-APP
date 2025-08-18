@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import axios from '../api/axios'; // your centralized axios instance
 import { setBrands, setInStock, setPriceRange } from '../redux/filterSlice';
 import {useLoading} from '../contexts/LoadingContext';
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 export default function FilterSidebar() {
   const dispatch = useDispatch();
@@ -13,6 +15,7 @@ export default function FilterSidebar() {
 
   const [brands, setBrandsList] = useState([]);
   const { setLoading } = useLoading();
+  const { t } = useTranslation();
 
   // Fetch brands from backend
   useEffect(() => {
@@ -51,7 +54,7 @@ export default function FilterSidebar() {
               
               {/* Brands Filter */}
               <div>
-                <h2 className="font-bold">Brands</h2>
+                <h2 className="font-bold">{t("Brands")}</h2>
                 {brands.map((brand) => (
                   <label key={brand.id} className="block">
                     <input
@@ -67,7 +70,7 @@ export default function FilterSidebar() {
 
               {/* In Stock Filter */}
               <div>
-                <h2 className="font-bold">In stock</h2>
+                <h2 className="font-bold">{t("In stock")}</h2>
                 <label>
                   <input
                     type="checkbox"
@@ -75,13 +78,13 @@ export default function FilterSidebar() {
                     onChange={() => dispatch(setInStock(!inStock))}
                     className="mr-2"
                   />
-                  Show in stock only
+                  {t("Show in stock only")}
                 </label>
               </div>
 
               {/* Price Range Filter */}
               <div>
-                <h2 className="font-bold">Price range</h2>
+                <h2 className="font-bold">{t("Price range")}</h2>
                 <input
                   type="range"
                   min={0}
@@ -91,7 +94,7 @@ export default function FilterSidebar() {
                     dispatch(setPriceRange([0, parseInt(e.target.value)]))
                   }
                 />
-                <p>Price: €0 — €{priceRange[1]}</p>
+                <p>{t("Price")}: €0 — €{priceRange[1]}</p>
               </div>
             </div>
           </Disclosure.Panel>

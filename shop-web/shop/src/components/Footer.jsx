@@ -2,8 +2,11 @@ import React from 'react';
 import { MdSupportAgent } from "react-icons/md";
 import { FaFacebookF, FaTelegramPlane, FaWhatsapp, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className='bg-white'>
       <div className="container px-4 py-6 mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -18,9 +21,9 @@ export default function Footer() {
           </div>
           <div className="info text-sm mt-5 mb-10">
             <p className='mb-3 font-bold'>Raunas iela 44, Rīga, LV-1039</p>
-            <p>Mon-Fri: 11:00 – 19:00</p>
-            <p>Sat: 11:00 – 15:00</p>
-            <p>Sun: Holiday</p>
+            <p>{t("Mon-Fri")}: 11:00 – 19:00</p>
+            <p>{t("Sat")}: 11:00 – 15:00</p>
+            <p>{t("Sun")}: {t("Holiday")}</p>
           </div>
           {/* Social Media Icons */}
           <div className="flex space-x-3 mt-4">
@@ -47,31 +50,31 @@ export default function Footer() {
 
         {/* Shop */}
         <div>
-          <h2 className="font-bold mb-3">Shop</h2>
+          <h2 className="font-bold mb-3">{t("Shop")}</h2>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/filtered" className="text-gray-600 hover:text-black">Product Catalog</Link></li>
-            <li><Link to="/track" className="text-gray-600 hover:text-black">Track Your Order</Link></li>
-            <li><Link to="/profile" className="text-gray-600 hover:text-black">My Account</Link></li>
-            <li><Link to="/delivery-payment" className="text-gray-600 hover:text-black">Delivery & Payment</Link></li>
+            <li><Link to="/filtered" className="text-gray-600 hover:text-black">{t("Product Catalog")}</Link></li>
+            <li><Link to="/track" className="text-gray-600 hover:text-black">{t("Track Your Order")}</Link></li>
+            <li><Link to="/profile" className="text-gray-600 hover:text-black">{t("My Account")}</Link></li>
+            <li><Link to="/delivery-payment" className="text-gray-600 hover:text-black">{t("Delivery & Payment")}</Link></li>
           </ul>
         </div>
 
         {/* About Us */}
         <div>
-          <h2 className="font-bold mb-3">About Us</h2>
+          <h2 className="font-bold mb-3">{t("About Us")}</h2>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/about" className="text-gray-600 hover:text-black">About Us</Link></li>
-            <li><Link to="/contacts" className="text-gray-600 hover:text-black">Contacts</Link></li>
+            <li><Link to="/about" className="text-gray-600 hover:text-black">{t("About Us")}</Link></li>
+            <li><Link to="/contacts" className="text-gray-600 hover:text-black">{t("Contacts")}</Link></li>
           </ul>
         </div>
 
         {/* Regulations */}
         <div>
-          <h2 className="font-bold mb-3">Regulations</h2>
+          <h2 className="font-bold mb-3">{t("Regulations")}</h2>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/terms" className="text-gray-600 hover:text-black">Terms & Conditions</Link></li>
-            <li><Link to="/privacy" className="text-gray-600 hover:text-black">Privacy Policy</Link></li>
-            <li><Link to="/refund-policy" className="text-gray-600 hover:text-black">Refund and Returns Policy</Link></li>
+            <li><Link to="/terms" className="text-gray-600 hover:text-black">{t("Terms & Conditions")}</Link></li>
+            <li><Link to="/privacy" className="text-gray-600 hover:text-black">{t("Privacy Policy")}</Link></li>
+            <li><Link to="/refund-policy" className="text-gray-600 hover:text-black">{t("Refund and Returns Policy")}</Link></li>
           </ul>
         </div>
       </div>
@@ -79,7 +82,7 @@ export default function Footer() {
       {/* Footer Bottom */}
       <div className="bg-gray-100 text-center py-4 shadow-inner mt-auto">
         <p className="text-gray-600 text-sm">
-          © {new Date().getFullYear()} Shop. All rights reserved.
+          © {new Date().getFullYear()} {t("Shop. All rights reserved.")}
         </p>
       </div>
     </footer>

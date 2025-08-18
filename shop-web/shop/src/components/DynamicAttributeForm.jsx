@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 export default function DynamicAttributeForm({ categoryId, onChange, productId }) {
   const [attributes, setAttributes] = useState([]);
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadAttributesAndValues = async () => {
@@ -100,7 +103,7 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
               onChange={(e) => handleChange(attr.id, e.target.value)}
               className="w-full px-3 py-2 border rounded"
             >
-              <option value="">Select an option</option>
+              <option value="">{t("Select an option")}</option>
               {(attr.options || []).map((opt, idx) => (
                 <option key={idx} value={opt}>{opt}</option>
               ))}
@@ -115,7 +118,7 @@ export default function DynamicAttributeForm({ categoryId, onChange, productId }
                 onChange={(e) => handleChange(attr.id, e.target.checked)}
                 className="mr-2"
               />
-              Enable
+              {t("Enable")}
             </label>
           )}
 

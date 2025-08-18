@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "../api/axios"; // use your configured axios instance
 import { LiaTelegramPlane } from "react-icons/lia";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 export default function NewsletterFooter() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const { t } = useTranslation();
 
   const handleSubscribe = async () => {
     if (!email.trim()) {
@@ -36,11 +39,11 @@ export default function NewsletterFooter() {
         <div>
           <p className="flex items-center">
             <LiaTelegramPlane size={45} className="mr-2" />
-            Sign up to Newsletter
+            {t("Sign up to Newsletter")}
           </p>
         </div>
         <div>
-          <p>... and Be aware of all promotions and events!</p>
+          <p>{t("... and Be aware of all promotions and events!")}</p>
         </div>
         <div>
           <div className="hidden md:flex flex-1 max-w-3xl">
@@ -48,7 +51,7 @@ export default function NewsletterFooter() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Subscribe for more..."
+              placeholder={t("Subscribe for more...")}
               className="flex-1 px-4 py-2 rounded-l-full border border-indigo-500 focus:outline-none text-black"
               disabled={loading}
             />

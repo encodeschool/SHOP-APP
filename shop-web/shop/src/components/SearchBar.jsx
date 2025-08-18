@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import { useSelector } from 'react-redux';
 import { BsShop } from "react-icons/bs";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 
 export default function SearchAppBar() {
@@ -24,6 +26,7 @@ export default function SearchAppBar() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -93,50 +96,50 @@ export default function SearchAppBar() {
           <div className="flex flex-col gap-3 items-start text-gray-700">
             <div className="flex items-center gap-2">
               <FaSearch />
-              <button onClick={handleSearch}>Search</button>
+              <button onClick={handleSearch}>{t("Search")}</button>
             </div>
             <Link to="/favorites" className="flex items-center gap-2">
-              <FaHeart /> Favorites
+              <FaHeart /> {t("Favorites")}
             </Link>
             <Link to="/cart" className="flex items-center gap-2 relative">
               <FaShoppingBag />
-              <span>Cart</span>
+              <span>{t("Cart")}</span>
               <span className="absolute -top-2 -right-3 bg-indigo-400 text-white text-xs font-bold px-1.5 rounded-full">
                 0
               </span>
             </Link>
             <Link to="/compare">
               <div className="flex items-center gap-2">
-                <FaSyncAlt /> Sync
+                <FaSyncAlt /> {t("Sync")}
               </div>
             </Link>
           </div>
-          <Link to="/terms" className="block hover:underline">Terms & Conditions</Link>
-          <Link to="/delivery" className="block hover:underline">Delivery & Payment</Link>
-          <Link to="/about" className="block hover:underline">About Us</Link>
-          <Link to="/contacts" className="block hover:underline">Contacts</Link>
+          <Link to="/terms" className="block hover:underline">{t("Terms & Conditions")}</Link>
+          <Link to="/delivery" className="block hover:underline">{t("Delivery & Payment")}</Link>
+          <Link to="/about" className="block hover:underline">{t("About Us")}</Link>
+          <Link to="/contacts" className="block hover:underline">{t("Contacts")}</Link>
           
           <div className="flex items-center">
             <FaPhone className="mr-2" />
-            <u>+371 22164949</u>
+            <u>+371 26648735</u>
           </div>
           <div className="flex items-center">
             <FaMailBulk className="mr-2" />
-            <u>4games@4games.lv</u>
+            <u>bazaarly@gmail.com</u>
           </div>
           
-          <Link to="/track-order" className="block hover:underline">Track Your Order</Link>
+          <Link to="/track-order" className="block hover:underline">{t("Track Your Order")}</Link>
           
           {/* My Account Dropdown (Mobile) */}
             <div>
               <button onClick={() => setAccountOpen(!accountOpen)} className="hover:underline">
-                My Account
+                {t("My Account")}
               </button>
               {accountOpen && (
                 <div className="mt-1 bg-white shadow-md border rounded w-full">
-                  <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">Login</Link>
-                  <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">Register</Link>
-                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
+                  <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">{t("Login")}</Link>
+                  <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">{t("Register")}</Link>
+                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
                 </div>
               )}
             </div>
@@ -144,12 +147,12 @@ export default function SearchAppBar() {
           {/* Language Dropdown (Mobile) */}
             <div>
               <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
-                English
+                {t("English")}
               </button>
               {languageOpen && (
                 <div className="mt-1 bg-white shadow-md border rounded w-full">
-                  <button className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
-                  <button className="block px-4 py-2 hover:bg-gray-100">Русский</button>
+                  <button className="block px-4 py-2 hover:bg-gray-100">{t("Latvian")}</button>
+                  <button className="block px-4 py-2 hover:bg-gray-100">{t("Russian")}</button>
                 </div>
               )}
             </div>
