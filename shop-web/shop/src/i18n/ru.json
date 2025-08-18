@@ -1,8 +1,18 @@
 {
   "welcome": "Добро пожаловать",
-  "login": "Вход",
-  "register": "Регистрация",
+  "login": "Войти",
+  "register": "Зарегистрироваться",
   "cart": "Корзина",
   "favorites": "Избранное",
-  "Terms & Conditions": "Условия использования"
+  "Terms & Conditions": "Условия и положения",
+  "Delivery & Payment": "Доставка и оплата",
+  "About Us": "О нас",
+  "Contacts": "Контакты",
+  "Track Your Order": "Отследить заказ",
+  "My Account": "Мой аккаунт",
+  "Profile": "Профиль",
+  "Logout": "Выйти",
+  "English": "Английский",
+  "Latvian": "Латвийский",
+  "Russian": "Русский"
 }

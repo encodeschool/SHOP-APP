@@ -4,5 +4,17 @@
   "register": "Register",
   "cart": "Cart",
   "favorites": "Favorites",
-  "Terms & Conditions": "Terms & Conditions"
+  "Terms & Conditions": "Terms & Conditions",
+  "Delivery & Payment": "Delivery & Payment",
+  "About Us": "About Us",
+  "Contacts": "Contacts",
+  "Track Your Order": "Track Your Order",
+  "My Account": "My Account",
+  "Profile": "Profile",
+  "Logout": "Logout",
+  "English": "English",
+  "Latvian": "Latvian",
+  "Russian": "Russian",
+  "Login": "Login",
+  "Register": "Register"
 }

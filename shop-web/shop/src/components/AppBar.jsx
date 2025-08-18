@@ -63,9 +63,9 @@ export default function AppBar() {
         {/* Left Links - Desktop */}
         <div className="hidden md:flex gap-4">
           <Link to="/terms" className="font-[200] hover:underline">{t("Terms & Conditions")}</Link>
-          <Link to="/delivery" className="font-[200] hover:underline">Delivery & Payment</Link>
-          <Link to="/about" className="font-[200] hover:underline">About Us</Link>
-          <Link to="/contacts" className="font-[200] hover:underline">Contacts</Link>
+          <Link to="/delivery" className="font-[200] hover:underline">{t('Delivery & Payment')}</Link>
+          <Link to="/about" className="font-[200] hover:underline">{t('About Us')}</Link>
+          <Link to="/contacts" className="font-[200] hover:underline">{t('Contacts')}</Link>
         </div>
 
         {/* Right - Desktop */}
@@ -80,7 +80,7 @@ export default function AppBar() {
             <span>bazaarly@gmail.com</span>
           </span>
           |
-          <Link to="/track" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />Track Your Order</Link>
+          <Link to="/track" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />{t('Track Your Order')}</Link>
           |
           {/* My Account Dropdown */}
           <div className="relative">
@@ -91,15 +91,15 @@ export default function AppBar() {
                   {user.name}
                 </>
               ) : (
-                <p>My Account</p>
+                <p>{t('My Account')}</p>
               )}
             </button>
             {accountOpen && (
               <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
                 {isLoggedIn ? (
                   <>
-                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
-                    <button onClick={handleLogout} className="block px-4 py-2 hover:bg-gray-100">Logout</button>
+                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
+                    <button onClick={handleLogout} className="block px-4 py-2 hover:bg-gray-100">{t("Logout")}</button>
                   </>
                 ) : (
                   <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">{t('login')}</Link>
@@ -111,13 +111,14 @@ export default function AppBar() {
           {/* Language Dropdown */}
           <div className="relative">
             <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
-              English
+              {t("English")}
             </button>
             {languageOpen && (
               <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
-                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">English</button>
-                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
-                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">Русский</button>
+                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">{t("English")}</button>
+                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">{t("Latvian")}</button>
+                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">{t("Russian")}</button>
+                <button onClick={() => i18n.changeLanguage("uz")} className="block px-4 py-2 hover:bg-gray-100">{t("Uzbek")}</button>
               </div>
             )}
           </div>
@@ -127,10 +128,10 @@ export default function AppBar() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden px-4 pb-4 space-y-3">
-          <Link to="/terms" className="block hover:underline">Terms & Conditions</Link>
-          <Link to="/delivery" className="block hover:underline">Delivery & Payment</Link>
-          <Link to="/about" className="block hover:underline">About Us</Link>
-          <Link to="/contacts" className="block hover:underline">Contacts</Link>
+          <Link to="/terms" className="block hover:underline">{t("Terms & Conditions")}</Link>
+          <Link to="/delivery" className="block hover:underline">{t("Delivery & Payment")}</Link>
+          <Link to="/about" className="block hover:underline">{t("About Us")}</Link>
+          <Link to="/contacts" className="block hover:underline">{t("Contacts")}</Link>
 
           <div className="flex items-center">
             <FaPhone className="mr-2" />
@@ -141,18 +142,18 @@ export default function AppBar() {
             <u>4games@4games.lv</u>
           </div>
 
-          <Link to="/track-order" className="block hover:underline">Track Your Order</Link>
+          <Link to="/track-order" className="block hover:underline">{t("Track Your Order")}</Link>
 
           {/* My Account Dropdown (Mobile) */}
           <div>
             <button onClick={() => setAccountOpen(!accountOpen)} className="hover:underline">
-              My Account
+              {t("My Account")}
             </button>
             {accountOpen && (
               <div className="mt-1 bg-white shadow-md border rounded w-full">
-                <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">Login</Link>
-                <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">Register</Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
+                <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">{t("Login")}</Link>
+                <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">{t("Register")}</Link>
+                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
               </div>
             )}
           </div>
@@ -160,12 +161,14 @@ export default function AppBar() {
           {/* Language Dropdown (Mobile) */}
           <div>
             <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
-              English
+              {t("English")}
             </button>
             {languageOpen && (
               <div className="mt-1 bg-white shadow-md border rounded w-full">
-                <button className="block px-4 py-2 hover:bg-gray-100">Latviešu</button>
-                <button className="block px-4 py-2 hover:bg-gray-100">Русский</button>
+                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">{t("English")}</button>
+                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">{t("Latvian")}</button>
+                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">{t("Russian")}</button>
+                <button onClick={() => i18n.changeLanguage("uz")} className="block px-4 py-2 hover:bg-gray-100">{t("Uzbek")}</button>
               </div>
             )}
           </div>

@@ -1,8 +1,18 @@
 {
-  "welcome": "Добро пожаловать",
-  "login": "Вход",
-  "register": "Регистрация",
-  "cart": "Корзина",
-  "favorites": "Избранное",
-  "Terms & Conditions": "Условия использования"
+  "welcome": "Laipni lūdzam",
+  "login": "Pieslēgties",
+  "register": "Reģistrēties",
+  "cart": "Grozs",
+  "favorites": "Izlase",
+  "Terms & Conditions": "Noteikumi un nosacījumi",
+  "Delivery & Payment": "Piegāde un apmaksa",
+  "About Us": "Par mums",
+  "Contacts": "Kontakti",
+  "Track Your Order": "Izsekot pasūtījumu",
+  "My Account": "Mans konts",
+  "Profile": "Profils",
+  "Logout": "Izrakstīties",
+  "English": "Angļu",
+  "Latvian": "Latviešu",
+  "Russian": "Krievu"
 }

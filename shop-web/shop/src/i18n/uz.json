@@ -1,8 +1,19 @@
 {
-  "welcome": "Добро пожаловать",
-  "login": "Вход",
-  "register": "Регистрация",
-  "cart": "Корзина",
-  "favorites": "Избранное",
-  "Terms & Conditions": "Условия использования"
+  "welcome": "Xush kelibsiz",
+  "login": "Kirish",
+  "register": "Ro'yxatdan o'tish",
+  "cart": "Savat",
+  "favorites": "Sevimlilar",
+  "Terms & Conditions": "Foydalanish shartlari",
+  "Delivery & Payment": "Yetkazib berish va to'lov",
+  "About Us": "Biz haqimizda",
+  "Contacts": "Kontaktlar",
+  "Track Your Order": "Buyurtmangizni kuzatish",
+  "My Account": "Mening hisobim",
+  "Profile": "Profil",
+  "Logout": "Chiqish",
+  "English": "Inglizcha",
+  "Latvian": "Latviyacha",
+  "Russian": "Ruscha",
+  "Uzbek": "O'zbekcha"
 }
