@@ -75,6 +75,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductAttributeValue> attributes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductTranslation> translations = new ArrayList<>();
+
     // Optional helper
     public void addImage(ProductImage image) {
         this.images.add(image);
