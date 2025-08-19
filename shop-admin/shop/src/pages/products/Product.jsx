@@ -7,11 +7,14 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [subsubcategories, setSubsubcategories] = useState([]);
   const [users, setUsers] = useState([]);
-  const [setAttributes] = useState([]);
+  const [attributes, setAttributes] = useState([]); // Fixed typo: setAttributes was missing
   const [brands, setBrands] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL || ''; // Fallback for BASE_URL
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -19,58 +22,80 @@ export default function Products() {
     price: '',
     stock: '',
     condition: 'NEW',
-    categoryId: '',       // top-level
-    subcategoryId: '',    // second-level
-    subsubcategoryId: '', // third-level
+    categoryId: '',
+    subcategoryId: '',
+    subsubcategoryId: '',
     userId: '',
     featured: false,
     images: [],
     brandId: '',
-    attributes: []
+    attributes: [],
+    translations: [],
   });
-
-  const [subsubcategories, setSubsubcategories] = useState([]); // children of subcategory
-
 
   const [editingId, setEditingId] = useState(null);
 
   const fetchProducts = () => {
+    setIsLoading(true);
     axios.get('/products')
-      .then(res => setProducts(res.data))
-      .catch(console.error);
+      .then(res => {
+        setProducts(Array.isArray(res.data) ? res.data : []);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching products:', err);
+        setProducts([]);
+        setError('Failed to fetch products.');
+        setIsLoading(false);
+      });
   };
 
   const fetchBrands = () => {
     axios.get('/products/brands')
-      .then(res => setBrands(res.data))
-      .catch(console.error);
+      .then(res => setBrands(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching brands:', err);
+        setBrands([]);
+      });
   };
 
   const fetchCategories = () => {
     axios.get('/categories')
       .then(res => {
-        const rootCategories = res.data.filter(c => c.parentId === null);
+        const rootCategories = Array.isArray(res.data) ? res.data.filter(c => c.parentId === null) : [];
         setCategories(rootCategories);
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error('Error fetching categories:', err);
+        setCategories([]);
+      });
   };
 
   const fetchSubcategories = (categoryId) => {
     axios.get(`/categories/${categoryId}/subcategories`)
-      .then(res => setSubcategories(res.data || []))
-      .catch(console.error);
+      .then(res => setSubcategories(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching subcategories:', err);
+        setSubcategories([]);
+      });
   };
 
   const fetchAttributes = (categoryId) => {
     axios.get(`products/attributes/category/${categoryId}`)
-      .then(res => setAttributes(res.data || []))
-      .catch(console.error);
+      .then(res => setAttributes(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching attributes:', err);
+        setAttributes([]);
+      });
   };
 
   const fetchUsers = () => {
     axios.get('/users')
-      .then(res => setUsers(res.data))
-      .catch(console.error);
+      .then(res => setUsers(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching users:', err);
+        setUsers([]);
+      });
   };
 
   useEffect(() => {
@@ -88,14 +113,13 @@ export default function Products() {
     }));
 
     if (name === 'categoryId') {
-      setNewProduct({
-        ...newProduct,
+      setNewProduct(prev => ({
+        ...prev,
         categoryId: value,
         subcategoryId: '',
         subsubcategoryId: '',
         attributes: []
-      });
-
+      }));
       const selectedCat = categories.find(c => c.id === value);
       setSubcategories(selectedCat?.subcategories || []);
       setSubsubcategories([]);
@@ -103,25 +127,49 @@ export default function Products() {
     }
 
     if (name === 'subcategoryId') {
-      setNewProduct({
-        ...newProduct,
+      setNewProduct(prev => ({
+        ...prev,
         subcategoryId: value,
         subsubcategoryId: '',
         attributes: []
-      });
-
+      }));
       const selectedSubcat = subcategories.find(sc => sc.id === value);
       setSubsubcategories(selectedSubcat?.subcategories || []);
       fetchAttributes(value);
     }
 
     if (name === 'subsubcategoryId') {
-      setNewProduct({
-        ...newProduct,
+      setNewProduct(prev => ({
+        ...prev,
         subsubcategoryId: value
-      });
+      }));
       fetchAttributes(value);
     }
+  };
+
+  const handleTranslationChange = (index, field, value) => {
+    setNewProduct((prev) => {
+      const updatedTranslations = [...prev.translations];
+      updatedTranslations[index] = {
+        ...updatedTranslations[index],
+        [field]: value,
+      };
+      return { ...prev, translations: updatedTranslations };
+    });
+  };
+
+  const addTranslation = () => {
+    setNewProduct((prev) => ({
+      ...prev,
+      translations: [...prev.translations, { language: '', name: '', description: '' }],
+    }));
+  };
+
+  const removeTranslation = (index) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      translations: prev.translations.filter((_, i) => i !== index),
+    }));
   };
 
   const handleDynamicAttributesChange = (attributeMap) => {
@@ -138,12 +186,7 @@ export default function Products() {
 
   const handleCreateOrUpdate = async () => {
     const formData = new FormData();
-    const {
-      images,
-      subcategoryId,
-      categoryId,
-      ...rest
-    } = newProduct;
+    const { images, subcategoryId, categoryId, ...rest } = newProduct;
 
     const finalCategoryId = newProduct.subsubcategoryId || newProduct.subcategoryId || newProduct.categoryId;
 
@@ -155,6 +198,7 @@ export default function Products() {
       price: parseFloat(newProduct.price),
       attributes: newProduct.attributes,
       brandId: newProduct.brandId,
+      translations: newProduct.translations,
     };
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
@@ -189,15 +233,15 @@ export default function Products() {
         images: [],
         attributes: [],
         brandId: '',
+        translations: [],
       });
-
       setAttributes([]);
       setEditingId(null);
       setIsDrawerOpen(false);
       fetchProducts();
-
     } catch (err) {
       console.error('Error saving product', err);
+      setError('Failed to save product.');
     }
   };
 
@@ -205,8 +249,13 @@ export default function Products() {
     const confirmDelete = window.confirm("Are you sure you want to delete this product?");
     if (!confirmDelete) return;
 
-    await axios.delete(`/products/${id}`);
-    fetchProducts();
+    try {
+      await axios.delete(`/products/${id}`);
+      fetchProducts();
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      setError('Failed to delete product.');
+    }
   };
 
   const handleEdit = (product) => {
@@ -228,6 +277,7 @@ export default function Products() {
         value: attr.value ?? ''
       })),
       brandId: product.brand?.id || '',
+      translations: product.translations || [],
     });
 
     if (parentCategoryId) {
@@ -238,7 +288,7 @@ export default function Products() {
     fetchAttributes(effectiveCategoryId);
 
     setEditingId(product.id);
-    setIsDrawerOpen(true); // 👈 open drawer on edit
+    setIsDrawerOpen(true);
   };
 
   return (
@@ -264,6 +314,7 @@ export default function Products() {
                   images: [],
                   attributes: [],
                   brandId: '',
+                  translations: [],
                 });
                 setIsDrawerOpen(true);
               }}
@@ -273,40 +324,55 @@ export default function Products() {
             <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
             <Link to="/brand" className='bg-green-500 hover:bg-green-700 text-white font-bold ml-6 py-2 px-4 rounded'>Add brand</Link>
           </div>
-          <table className="w-full border bg-white shadow mt-6">
-            <thead>
-              <tr className="bg-gray-200 text-left">
-                <th className="p-2">Product Img</th>
-                <th className="p-2">Title</th>
-                <th className="p-2">Price</th>
-                <th className="p-2">Stock</th>
-                <th className="p-2">Condition</th>
-                <th className="p-2">Featured</th>
-                <th className="p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(p => (
-                <tr key={p.id}>
-                  <td className="p-2">
-                    <img src={`${BASE_URL}${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
-                  </td>
-                  <td className="p-2">{p.title}</td>
-                  <td className="p-2">${p.price}</td>
-                  <td className="p-2">{p.stock}</td>
-                  <td className="p-2">{p.condition}</td>
-                  <td className="p-2">{p.featured ? 'Yes' : 'No'}</td>
-                  <td className="p-2">
-                    <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
-                    <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
-                  </td>
+          {isLoading ? (
+            <p>Loading products...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : products.length === 0 ? (
+            <p>No products available.</p>
+          ) : (
+            <table className="w-full border bg-white shadow mt-6">
+              <thead>
+                <tr className="bg-gray-200 text-left">
+                  <th className="p-2">Product Img</th>
+                  <th className="p-2">Title</th>
+                  <th className="p-2">English Name</th> {/* New column */}
+                  <th className="p-2">Price</th>
+                  <th className="p-2">Stock</th>
+                  <th className="p-2">Condition</th>
+                  <th className="p-2">Featured</th>
+                  <th className="p-2">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id}>
+                    <td className="p-2">
+                      {p.imageUrls && p.imageUrls[0] ? (
+                        <img src={`${BASE_URL}${p.imageUrls[0]}`} alt={p.title} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 50 }} />
+                      ) : (
+                        <span>No image</span>
+                      )}
+                    </td>
+                    <td className="p-2">{p.title}</td>
+                    <td className="p-2">
+                      {p.translations?.find((t) => t.language === 'en')?.name || 'N/A'}
+                    </td>
+                    <td className="p-2">${p.price}</td>
+                    <td className="p-2">{p.stock}</td>
+                    <td className="p-2">{p.condition}</td>
+                    <td className="p-2">{p.featured ? 'Yes' : 'No'}</td>
+                    <td className="p-2">
+                      <button onClick={() => handleEdit(p)} className="bg-yellow-500 text-white px-2 py-1 text-sm mr-1">Edit</button>
+                      <button onClick={() => handleDelete(p.id)} className="bg-red-500 text-white px-2 py-1 text-sm">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        {/* Drawer Overlay */}
         <div
           className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
             isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -314,7 +380,6 @@ export default function Products() {
           onClick={() => setIsDrawerOpen(false)}
         ></div>
 
-        {/* Drawer Panel */}
         <div
           className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
             isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
@@ -326,6 +391,50 @@ export default function Products() {
 
               <input name="title" placeholder="Title" className="border p-1 mb-3 w-full" value={newProduct.title || ''} onChange={handleInputChange} />
               <input name="description" placeholder="Description" className="border p-1 mb-3 w-full" value={newProduct.description} onChange={handleInputChange} />
+              <div className="mb-3">
+                <h4 className="font-semibold mb-2">Translations</h4>
+                {newProduct.translations.map((translation, index) => (
+                  <div key={index} className="border p-2 mb-2 rounded">
+                    <select
+                      className="border p-1 mb-2 w-full"
+                      value={translation.language}
+                      onChange={(e) => handleTranslationChange(index, 'language', e.target.value)}
+                    >
+                      <option value="">Select Language</option>
+                      <option value="en">English</option>
+                      <option value="ru">Russian</option>
+                      <option value="uz">Uzbek</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Translated Name"
+                      className="border p-1 mb-2 w-full"
+                      value={translation.name}
+                      onChange={(e) => handleTranslationChange(index, 'name', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Translated Description"
+                      className="border p-1 mb-2 w-full"
+                      value={translation.description}
+                      onChange={(e) => handleTranslationChange(index, 'description', e.target.value)}
+                    />
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 text-sm"
+                      onClick={() => removeTranslation(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <button
+                  className="bg-blue-500 text-white px-3 py-1"
+                  onClick={addTranslation}
+                >
+                  Add Translation
+                </button>
+              </div>
+
               <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-full" value={newProduct.price} onChange={handleInputChange} />
               <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-full" value={newProduct.stock} onChange={handleInputChange} />
 
@@ -371,7 +480,7 @@ export default function Products() {
 
               {(editingId || newProduct.categoryId) && (
                 <DynamicAttributeForm
-                  categoryId={newProduct.subcategoryId || newProduct.categoryId}
+                  categoryId={newProduct.subsubcategoryId || newProduct.subcategoryId || newProduct.categoryId}
                   productId={editingId}
                   onChange={handleDynamicAttributesChange}
                 />

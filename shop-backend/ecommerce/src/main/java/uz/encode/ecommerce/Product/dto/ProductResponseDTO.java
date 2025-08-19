@@ -2,14 +2,19 @@ package uz.encode.ecommerce.Product.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
 import uz.encode.ecommerce.User.entity.User;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductResponseDTO {
     private UUID id;
     private String title;
@@ -29,5 +34,6 @@ public class ProductResponseDTO {
 
     private String brandName; // ✅ new
     private UUID brandId;     // optional
+    private List<ProductTranslationDTO> translations = new ArrayList<>();
 
 }

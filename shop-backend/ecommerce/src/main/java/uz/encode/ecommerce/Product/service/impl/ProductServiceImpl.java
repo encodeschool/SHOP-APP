@@ -15,22 +15,24 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.dto.ProductTranslationDTO;
 import uz.encode.ecommerce.Product.entity.Brand;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
+import uz.encode.ecommerce.Product.entity.ProductTranslation;
 import uz.encode.ecommerce.Product.repository.BrandRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeValueRepository;
@@ -41,19 +43,25 @@ import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
 @Service
-@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     @Value("${upload.path}")
     private String uploadFolderPath;
 
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
-    private final ProductAttributeRepository productAttributeRepository;
-    private final ProductAttributeValueRepository productAttributeValueRepository;
-    private final BrandRepository brandRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private ProductAttributeRepository productAttributeRepository;
+    @Autowired
+    private ProductAttributeValueRepository productAttributeValueRepository;
+    @Autowired
+    private BrandRepository brandRepository;
 
+    @Override
     public ProductResponseDTO create(ProductCreateDTO dto, List<MultipartFile> images) throws IOException {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -93,6 +101,20 @@ public class ProductServiceImpl implements ProductService {
 
                 savedProduct.getAttributes().add(pav);
             }
+        }
+
+        if (dto.getTranslations() != null) {
+            List<ProductTranslation> translations = dto.getTranslations().stream().map(translationDto -> {
+                ProductTranslation translation = new ProductTranslation();
+                translation.setLanguage(translationDto.getLanguage());
+                translation.setName(translationDto.getName());
+                translation.setDescription(translationDto.getDescription());
+                translation.setProduct(product);
+                return translation;
+            }).collect(Collectors.toList());
+            product.setTranslations(translations);
+        } else {
+            product.setTranslations(new ArrayList<>());
         }
 
         if (images != null && !images.isEmpty()) {
@@ -201,6 +223,24 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
+        // Handle translations
+        if (dto.getTranslations() != null) {
+            // Clear the existing translations (Hibernate will handle orphan removal)
+            product.getTranslations().clear();
+            // Add new translations to the existing collection
+            for (ProductTranslationDTO translationDto : dto.getTranslations()) {
+                ProductTranslation translation = new ProductTranslation();
+                translation.setLanguage(translationDto.getLanguage());
+                translation.setName(translationDto.getName());
+                translation.setDescription(translationDto.getDescription());
+                translation.setProduct(product);
+                product.getTranslations().add(translation);
+            }
+        } else {
+            // Clear translations if none provided
+            product.getTranslations().clear();
+        }
+
         Product savedProduct = productRepository.save(product);
 
         return mapToDto(savedProduct);
@@ -236,6 +276,16 @@ public class ProductServiceImpl implements ProductService {
                             attrDto.setValue(attr.getValue());
                             return attrDto;
                         }).collect(Collectors.toList()));
+        // Add translations
+        dto.setTranslations(
+            product.getTranslations().stream()
+                .map(t -> {
+                    ProductTranslationDTO tDto = new ProductTranslationDTO();
+                    tDto.setLanguage(t.getLanguage());
+                    tDto.setName(t.getName());
+                    tDto.setDescription(t.getDescription());
+                    return tDto;
+                }).collect(Collectors.toList()));
         // Add brand info
         if (product.getBrand() != null) {
             dto.setBrandName(product.getBrand().getName());

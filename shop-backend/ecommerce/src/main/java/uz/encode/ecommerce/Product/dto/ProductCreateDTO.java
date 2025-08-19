@@ -1,6 +1,7 @@
 package uz.encode.ecommerce.Product.dto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,10 +9,14 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductCreateDTO {
     @NotBlank
     private String title;
@@ -43,4 +48,5 @@ public class ProductCreateDTO {
 
     private UUID brandId; // ✅ new
 
+    private List<ProductTranslationDTO> translations = new ArrayList<>();
 }
