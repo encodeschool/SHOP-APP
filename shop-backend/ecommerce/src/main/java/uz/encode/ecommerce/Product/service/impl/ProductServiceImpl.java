@@ -448,4 +448,9 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
+    @Override
+    public List<ProductResponseDTO> getAll(String lang) {
+        return productRepository.findAll().stream().map(product -> new ProductResponseDTO(product, lang)).collect(Collectors.toList());
+    }
+
 }

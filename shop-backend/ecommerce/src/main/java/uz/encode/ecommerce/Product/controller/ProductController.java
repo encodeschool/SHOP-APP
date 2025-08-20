@@ -55,6 +55,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAll());
     }
 
+    @Operation(summary = "Get All Products By Lang")
+    @GetMapping(value = "/lang")
+    public ResponseEntity<List<ProductResponseDTO>> getAll(@RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(productService.getAll(lang));
+    }
+
     @Operation(summary = "Get Product By ID")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getById(@PathVariable UUID id) {

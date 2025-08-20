@@ -14,16 +14,17 @@ import CompareButton from '../components/CompareButton';
 import { useLoading } from '../contexts/LoadingContext';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [hoveredSubcategory, setHoveredSubcategory] = useState(null); // 🔹 NEW: Track hovered subcategory
+  const [hoveredSubcategory, setHoveredSubcategory] = useState(null);
   const [selectedSubImage, setSelectedSubImage] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [brands, setBrands] = useState([]);
-
+  const { t, i18n } = useTranslation(); // 🔹 Add useTranslation hook
   const brandPrevRef = useRef(null);
   const brandNextRef = useRef(null);
   const featuredPrevRef = useRef(null);
@@ -32,20 +33,21 @@ const Home = () => {
   const dispatch = useDispatch();
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+  // Fetch products with language parameter
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('/products');
+        const res = await axios.get(`/products/lang?lang=${i18n.language}`);
         setProducts(res.data);
       } catch (error) {
-        console.log(error);
+        console.error('Failed to fetch products:', error);
       } finally {
         setLoading(false);
       }
     };
     fetchProducts();
-  }, []);
+  }, [i18n.language, setLoading]); // 🔹 Add i18n.language to dependencies
 
   useEffect(() => {
     setLoading(true);
@@ -54,32 +56,31 @@ const Home = () => {
         const res = await axios.get('/products/brands');
         setBrands(res.data);
       } catch (error) {
-        console.log(error);
+        console.error('Failed to fetch brands:', error);
       } finally {
         setLoading(false);
       }
     };
     fetchBrands();
-  }, []);
+  }, [setLoading]);
 
   useEffect(() => {
     setLoading(true);
     const fetchCategories = async () => {
       try {
         const res = await axios.get('/categories');
-        // 🔹 CHANGE: Filter only root categories (parentId: null) with subcategories
         const rootCategories = res.data.filter(
           (cat) => cat.parentId === null && cat.subcategories && cat.subcategories.length > 0
         );
         setCategories(rootCategories);
       } catch (error) {
-        console.log(error);
+        console.error('Failed to fetch categories:', error);
       } finally {
         setLoading(false);
       }
     };
     fetchCategories();
-  }, []);
+  }, [setLoading]);
 
   useEffect(() => {
     setLoading(true);
@@ -101,13 +102,13 @@ const Home = () => {
       }
     };
     fetchFavorites();
-  }, []);
+  }, [setLoading]);
 
   const handleFavoriteToggle = async (productId) => {
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     if (!userId || !token) {
-      alert('Please log in to add favorites.');
+      alert(t('Please log in to add favorites.'));
       return;
     }
     try {
@@ -144,7 +145,7 @@ const Home = () => {
               onMouseEnter={() => setHoveredCategory(category)}
               onMouseLeave={() => {
                 setHoveredCategory(null);
-                setHoveredSubcategory(null); // 🔹 Reset hovered subcategory
+                setHoveredSubcategory(null);
                 setSelectedSubImage(null);
               }}
             >
@@ -167,8 +168,8 @@ const Home = () => {
                       <div
                         key={sub.id}
                         className="relative"
-                        onMouseEnter={() => setHoveredSubcategory(sub)} // 🔹 Set hovered subcategory
-                        onMouseLeave={() => setHoveredSubcategory(null)} // 🔹 Reset on leave
+                        onMouseEnter={() => setHoveredSubcategory(sub)}
+                        onMouseLeave={() => setHoveredSubcategory(null)}
                       >
                         <Link
                           to={`/category/${sub.id}`}
@@ -177,7 +178,6 @@ const Home = () => {
                         >
                           {sub.name}
                         </Link>
-                        {/* 🔹 NEW: Sub-subcategory dropdown */}
                         {hoveredSubcategory?.id === sub.id && sub.subcategories?.length > 0 && (
                           <div className="absolute left-full top-0 bg-white text-black shadow-lg p-4 rounded ml-2 w-fit">
                             {sub.subcategories.map((subsub) => (
@@ -194,7 +194,6 @@ const Home = () => {
                       </div>
                     ))}
                   </div>
-                  {/* Optional: Display selected subcategory image */}
                   {selectedSubImage && (
                     <div className="ml-4">
                       <img
@@ -216,7 +215,7 @@ const Home = () => {
       <FeatureStrip />
 
       <div className="container mx-auto px-4 py-6">
-        <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl">All Products</h1>
+        <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl">{t('All Products')}</h1>
         <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product) => (
             <Link
@@ -230,12 +229,12 @@ const Home = () => {
                 {product.condition === 'NEW' ? (
                   <>
                     <FaStar className="inline mr-1" />
-                    NEW
+                    {t('NEW')}
                   </>
                 ) : (
                   <>
                     <FaRecycle className="inline mr-1" />
-                    USED
+                    {t('USED')}
                   </>
                 )}
               </p>
@@ -287,7 +286,7 @@ const Home = () => {
 
       <div className="container mx-auto px-4 py-6 relative">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="border-b-[4px] border-indigo-400 text-xl">Our Brands</h1>
+          <h1 className="border-b-[4px] border-indigo-400 text-xl">{t('Our Brands')}</h1>
           <div className="flex gap-2">
             <button
               ref={brandPrevRef}
@@ -344,7 +343,7 @@ const Home = () => {
 
       <div className="container mx-auto px-4 py-6 relative">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="border-b-[4px] border-indigo-400 text-xl">Featured Products</h1>
+          <h1 className="border-b-[4px] border-indigo-400 text-xl">{t('Featured Products')}</h1>
           <div className="flex gap-2">
             <button
               ref={featuredPrevRef}
@@ -395,12 +394,12 @@ const Home = () => {
                       {product.condition === 'NEW' ? (
                         <>
                           <FaStar className="inline mr-1" />
-                          NEW
+                          {t('NEW')}
                         </>
                       ) : (
                         <>
                           <FaRecycle className="inline mr-1" />
-                          USED
+                          {t('USED')}
                         </>
                       )}
                     </p>
@@ -439,7 +438,7 @@ const Home = () => {
               ))
           ) : (
             <SwiperSlide>
-              <p className="text-center w-full">There are no featured products.</p>
+              <p className="text-center w-full">{t('There are no featured products.')}</p>
             </SwiperSlide>
           )}
         </Swiper>

@@ -55,4 +55,6 @@ public interface ProductService {
     void deleteBrand(UUID id);
 
     List<ProductResponseDTO> search(String query);
+
+    List<ProductResponseDTO> getAll(String lang);
 }
