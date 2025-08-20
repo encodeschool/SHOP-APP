@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -23,14 +22,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
+import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
+import uz.encode.ecommerce.Product.dto.ProductAttributeDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductTranslationDTO;
+import uz.encode.ecommerce.Product.entity.AttributeType;
 import uz.encode.ecommerce.Product.entity.Brand;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.entity.ProductAttribute;
+import uz.encode.ecommerce.Product.entity.ProductAttributeTranslation;
 import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
 import uz.encode.ecommerce.Product.entity.ProductTranslation;
 import uz.encode.ecommerce.Product.repository.BrandRepository;
@@ -99,6 +102,18 @@ public class ProductServiceImpl implements ProductService {
                 pav.setAttribute(attribute);
                 pav.setValue(attrDto.getValue());
                 pav.setProduct(savedProduct);
+
+                // UPDATED: Add translations for attribute value
+                if (attrDto.getTranslations() != null) {
+                    for (AttributeTranslationDTO tDto : attrDto.getTranslations()) {
+                        ProductAttributeTranslation t = new ProductAttributeTranslation();
+                        t.setLanguage(tDto.getLanguage());
+                        t.setName(tDto.getName());
+                        t.setAttributeValue(pav); // Link to attribute value
+                        t.setAttribute(null); // Not for attribute name
+                        pav.getTranslations().add(t);
+                    }
+                }
 
                 savedProduct.getAttributes().add(pav);
             }
@@ -198,11 +213,23 @@ public class ProductServiceImpl implements ProductService {
                 pav.setAttribute(attribute);
                 pav.setProduct(product);
                 pav.setValue(av.getValue());
+
+                // UPDATED: Add translations for attribute value
+                if (av.getTranslations() != null) {
+                    for (AttributeTranslationDTO tDto : av.getTranslations()) {
+                        ProductAttributeTranslation t = new ProductAttributeTranslation();
+                        t.setLanguage(tDto.getLanguage());
+                        t.setName(tDto.getName());
+                        t.setAttributeValue(pav); // Link to attribute value
+                        t.setAttribute(null); // Not for attribute name
+                        pav.getTranslations().add(t);
+                    }
+                }
+
                 product.getAttributes().add(pav);
             }
         }
 
-        // Handle images upload if any
         if (images != null && !images.isEmpty()) {
             Path uploadPath = Paths.get(uploadFolderPath);
             Files.createDirectories(uploadPath); // Ensure folder exists
@@ -318,7 +345,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if ("price-asc".equals(sort)) {
-            stream = stream.sorted(Comparator.comparing(p -> p.getPrice().doubleValue()));
+            stream = stream.sorted(Comparator.comparing( p -> p.getPrice().doubleValue()));
         } else if ("price-desc".equals(sort)) {
             stream = stream.sorted(Comparator.comparing((Product p) -> p.getPrice().doubleValue()).reversed());
         }
@@ -327,16 +354,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductAttribute> findByCategoryId(UUID categoryId) {
+    public List<ProductAttributeDTO> findByCategoryId(UUID categoryId) {
         Set<ProductAttribute> attributes = new HashSet<>();
         Category category = categoryRepository.findById(categoryId).orElseThrow();
 
         while (category != null) {
             attributes.addAll(productAttributeRepository.findAllByCategoryId(category.getId()));
-            category = category.getParent(); // Assume you have getParent()
+            category = category.getParent();
         }
 
-        return new ArrayList<>(attributes);
+        return attributes.stream().map(attr -> {
+            ProductAttributeDTO dto = new ProductAttributeDTO();
+            dto.setId(attr.getId());
+            dto.setName(attr.getName());
+            dto.setType(attr.getType().name());
+            dto.setRequired(attr.isRequired());
+            dto.setCategoryId(attr.getCategory().getId());
+            dto.setOptions(attr.getOptions());
+            dto.setTranslations(attr.getTranslations().stream()
+                    .map(t -> new AttributeTranslationDTO(t.getLanguage(), t.getName()))
+                    .collect(Collectors.toList()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -347,11 +386,25 @@ public class ProductServiceImpl implements ProductService {
         List<ProductAttributeValue> attributeValues = values.stream().map(dto -> {
             ProductAttribute attribute = productAttributeRepository.findById(dto.getAttributeId())
                     .orElseThrow(() -> new RuntimeException("Attribute not found"));
-            return ProductAttributeValue.builder()
+            ProductAttributeValue pav = ProductAttributeValue.builder()
                     .product(product)
                     .attribute(attribute)
                     .value(dto.getValue())
                     .build();
+
+            // UPDATED: Add translations for attribute value in saveAttributeValues
+            if (dto.getTranslations() != null) {
+                for (AttributeTranslationDTO tDto : dto.getTranslations()) {
+                    ProductAttributeTranslation t = new ProductAttributeTranslation();
+                    t.setLanguage(tDto.getLanguage());
+                    t.setName(tDto.getName());
+                    t.setAttributeValue(pav);
+                    t.setAttribute(null);
+                    pav.getTranslations().add(t);
+                }
+            }
+
+            return pav;
         }).toList();
 
         productAttributeValueRepository.saveAll(attributeValues);
@@ -361,19 +414,83 @@ public class ProductServiceImpl implements ProductService {
     public List<AttributeValueDTO> getAttributeValuesByProduct(UUID productId) {
         return productAttributeValueRepository.findByProductId(productId)
                 .stream()
-                .map(value -> new AttributeValueDTO(value.getAttribute().getId(), value.getValue()))
+                .map(value -> {
+                    AttributeValueDTO dto = new AttributeValueDTO(value.getAttribute().getId(), value.getValue());
+
+                    // UPDATED: Include translations in getAttributeValuesByProduct
+                    List<AttributeTranslationDTO> translations = value.getTranslations().stream()
+                            .map(t -> new AttributeTranslationDTO(t.getLanguage(), t.getName()))
+                            .collect(Collectors.toList());
+                    dto.setTranslations(translations);
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ProductAttribute createAttribute(ProductAttribute productAttribute) {
-        if (productAttribute.getCategory() == null || productAttribute.getCategory().getId() == null) {
+    public ProductAttributeDTO createAttribute(ProductAttributeDTO productAttributeDTO) {
+        if (productAttributeDTO.getCategoryId() == null) {
             throw new IllegalArgumentException("Category ID is required");
         }
-        Category category = categoryRepository.findById(productAttribute.getCategory().getId())
+        Category category = categoryRepository.findById(productAttributeDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category ID not Found"));
+
+        ProductAttribute productAttribute = new ProductAttribute();
+        productAttribute.setName(productAttributeDTO.getName());
+        productAttribute.setType(AttributeType.valueOf(productAttributeDTO.getType()));
+        productAttribute.setRequired(productAttributeDTO.isRequired());
         productAttribute.setCategory(category);
-        return productAttributeRepository.save(productAttribute);
+        productAttribute.setOptions(productAttributeDTO.getOptions());
+
+        // Handle translations
+        if (productAttributeDTO.getTranslations() != null) {
+            productAttribute.setTranslations(productAttributeDTO.getTranslations().stream()
+                    .map(t -> {
+                        ProductAttributeTranslation translation = new ProductAttributeTranslation();
+                        translation.setLanguage(t.getLanguage());
+                        translation.setName(t.getName());
+                        translation.setAttribute(productAttribute);
+                        translation.setAttributeValue(null);
+                        return translation;
+                    })
+                    .collect(Collectors.toList()));
+        }
+
+        ProductAttribute savedAttribute = productAttributeRepository.save(productAttribute);
+
+        ProductAttributeDTO result = new ProductAttributeDTO();
+        result.setId(savedAttribute.getId());
+        result.setName(savedAttribute.getName());
+        result.setType(savedAttribute.getType().name());
+        result.setRequired(savedAttribute.isRequired());
+        result.setCategoryId(savedAttribute.getCategory().getId());
+        result.setOptions(savedAttribute.getOptions());
+        result.setTranslations(savedAttribute.getTranslations().stream()
+                .map(t -> new AttributeTranslationDTO(t.getLanguage(), t.getName()))
+                .collect(Collectors.toList()));
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public void saveAttributeTranslations(UUID attributeId, List<AttributeTranslationDTO> translations) {
+        ProductAttribute attribute = productAttributeRepository.findById(attributeId)
+                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+        attribute.getTranslations().clear();
+
+        for (AttributeTranslationDTO tDto : translations) {
+            ProductAttributeTranslation t = new ProductAttributeTranslation();
+            t.setLanguage(tDto.getLanguage());
+            t.setName(tDto.getName());
+            t.setAttribute(attribute);
+            t.setAttributeValue(null);
+            attribute.getTranslations().add(t);
+        }
+
+        productAttributeRepository.save(attribute);
     }
 
     @Override

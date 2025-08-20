@@ -8,17 +8,20 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
+import uz.encode.ecommerce.Product.dto.ProductAttributeDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 import uz.encode.ecommerce.Product.entity.Brand;
-import uz.encode.ecommerce.Product.entity.ProductAttribute;
 
 @Service
 public interface ProductService {
     ProductResponseDTO create(ProductCreateDTO dto, List<MultipartFile> images) throws IOException;
-
+    
     List<ProductResponseDTO> getAll();
+
+    List<ProductResponseDTO> getAll(String lang);
 
     ProductResponseDTO getById(UUID id);
 
@@ -28,21 +31,23 @@ public interface ProductService {
 
     List<ProductResponseDTO> getByCategory(UUID categoryId);
 
-    ProductResponseDTO update(UUID id, ProductCreateDTO dto, List<MultipartFile> multipartFiles) throws IOException;
+    ProductResponseDTO update(UUID id, ProductCreateDTO dto, List<MultipartFile> images) throws IOException;
 
     void delete(UUID id);
 
-    List<ProductResponseDTO> getFeatured(); // Add this
+    List<ProductResponseDTO> getFeatured();
 
     List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort);
 
-    List<ProductAttribute> findByCategoryId(UUID categoryId);
+    List<ProductAttributeDTO> findByCategoryId(UUID categoryId); // UPDATED: Use DTO
 
     void saveAttributeValues(UUID productId, List<AttributeValueDTO> values);
 
     List<AttributeValueDTO> getAttributeValuesByProduct(UUID productId);
 
-    ProductAttribute createAttribute(ProductAttribute productAttribute);
+    ProductAttributeDTO createAttribute(ProductAttributeDTO productAttribute); // UPDATED: Use DTO
+
+    void saveAttributeTranslations(UUID attributeId, List<AttributeTranslationDTO> translations);
 
     List<Brand> getAllBrands();
 
@@ -58,5 +63,4 @@ public interface ProductService {
 
     List<ProductResponseDTO> search(String query);
 
-    List<ProductResponseDTO> getAll(String lang);
 }

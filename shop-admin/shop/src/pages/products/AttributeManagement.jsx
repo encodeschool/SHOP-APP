@@ -8,6 +8,10 @@ const AttributeManagement = () => {
   const [newAttrName, setNewAttrName] = useState('');
   const [newAttrType, setNewAttrType] = useState('STRING');
   const [newAttrOptions, setNewAttrOptions] = useState('');
+  const [newAttrTranslations, setNewAttrTranslations] = useState([]);
+  const [selectedAttrIndex, setSelectedAttrIndex] = useState(null);
+  const [translationLanguage, setTranslationLanguage] = useState('');
+  const [translationName, setTranslationName] = useState('');
 
   useEffect(() => {
     axios.get('/categories')
@@ -35,29 +39,39 @@ const AttributeManagement = () => {
       id: null,
       name: newAttrName,
       type: newAttrType,
+      isRequired: false, // NEW: Added default value
       categoryId,
       options: newAttrType === 'DROPDOWN'
         ? newAttrOptions.split(',').map(o => o.trim()).filter(o => o)
-        : []
+        : [],
+      translations: newAttrTranslations
     };
 
     setAttributes([...attributes, attr]);
     setNewAttrName('');
     setNewAttrType('STRING');
     setNewAttrOptions('');
+    setNewAttrTranslations([]);
   };
 
   const saveAttributes = async () => {
     if (!categoryId) return alert('Please select a category before saving attributes.');
     try {
+      const savedAttributes = [];
       for (let attr of attributes) {
+        if (attr.id) continue; // Skip already saved attributes
         const payload = {
-          ...attr,
-          category: { id: categoryId }
+          name: attr.name,
+          type: attr.type,
+          isRequired: attr.isRequired,
+          categoryId: categoryId,
+          options: attr.options,
+          translations: attr.translations
         };
-        await axios.post('/products/create/attributes', payload);
+        const response = await axios.post('/products/create/attributes', payload);
+        savedAttributes.push({ ...attr, id: response.data.id });
       }
-
+      setAttributes(savedAttributes.length > 0 ? [...attributes.filter(a => a.id), ...savedAttributes] : attributes);
       alert('Attributes saved successfully');
       fetchAttributes();
     } catch (err) {
@@ -70,6 +84,56 @@ const AttributeManagement = () => {
     const updated = [...attributes];
     updated.splice(index, 1);
     setAttributes(updated);
+  };
+
+  const addTranslation = () => {
+    if (!translationLanguage.trim() || !translationName.trim()) {
+      return alert('Language and translation name are required');
+    }
+    setNewAttrTranslations([
+      ...newAttrTranslations,
+      { language: translationLanguage, name: translationName }
+    ]);
+    setTranslationLanguage('');
+    setTranslationName('');
+  };
+
+  const updateAttributeTranslations = async (index) => {
+    if (!translationLanguage.trim() || !translationName.trim()) {
+      return alert('Language and translation name are required');
+    }
+    const updatedAttributes = [...attributes];
+    const attr = updatedAttributes[index];
+    const newTranslation = { language: translationLanguage, name: translationName };
+    
+    if (attr.id) {
+      try {
+        await axios.post(`/products/attributes/translations?attributeId=${attr.id}`, [
+          ...attr.translations.filter(t => t.language !== translationLanguage),
+          newTranslation
+        ]);
+        alert('Translation updated successfully');
+        fetchAttributes(); // Refresh attributes to get updated translations
+      } catch (err) {
+        console.error('Failed to update translations', err);
+        alert('Failed to update translations');
+      }
+    } else {
+      attr.translations = [
+        ...attr.translations.filter(t => t.language !== translationLanguage),
+        newTranslation
+      ];
+      setAttributes(updatedAttributes);
+    }
+    setTranslationLanguage('');
+    setTranslationName('');
+    setSelectedAttrIndex(null);
+  };
+
+  const deleteTranslation = (attrIndex, transIndex) => {
+    const updatedAttributes = [...attributes];
+    updatedAttributes[attrIndex].translations.splice(transIndex, 1);
+    setAttributes(updatedAttributes);
   };
 
   return (
@@ -138,17 +202,73 @@ const AttributeManagement = () => {
                 )}
 
                 <button
+                  onClick={() => setSelectedAttrIndex(i)}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                  title="Manage Translations"
+                >
+                  🌐
+                </button>
+
+                <button
                   onClick={() => deleteAttribute(i)}
                   className="text-red-500 hover:text-red-700 text-lg ml-2"
                   title="Delete"
                 >
                   ❌
                 </button>
+
+                {attr.translations && attr.translations.length > 0 && (
+                  <div className="ml-4 mt-2">
+                    <h4 className="text-sm font-medium">Translations:</h4>
+                    <ul className="space-y-1">
+                      {attr.translations.map((trans, j) => (
+                        <li key={j} className="flex items-center gap-2">
+                          <span>{trans.language}: {trans.name}</span>
+                          <button
+                            onClick={() => deleteTranslation(i, j)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            ❌
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
 
-          {/* Add New Attribute */}
+          {selectedAttrIndex !== null && (
+            <div className="mb-6 p-4 bg-gray-100 rounded">
+              <h4 className="text-md font-medium text-gray-700 mb-2">
+                Edit Translations for {attributes[selectedAttrIndex].name}
+              </h4>
+              <div className="flex flex-col gap-2 md:flex-row">
+                <input
+                  type="text"
+                  value={translationLanguage}
+                  onChange={e => setTranslationLanguage(e.target.value)}
+                  placeholder="Language (e.g., en, ru, uz)"
+                  className="border px-3 py-2 rounded w-full"
+                />
+                <input
+                  type="text"
+                  value={translationName}
+                  onChange={e => setTranslationName(e.target.value)}
+                  placeholder="Translated name"
+                  className="border px-3 py-2 rounded w-full"
+                />
+                <button
+                  onClick={() => updateAttributeTranslations(selectedAttrIndex)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  Add/Update Translation
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4 mb-6">
             <h4 className="text-md font-medium text-gray-700">Add New Attribute</h4>
             <input
@@ -175,6 +295,48 @@ const AttributeManagement = () => {
                 placeholder="Options (comma separated)"
                 className="w-full border px-3 py-2 rounded"
               />
+            )}
+            <div className="flex flex-col gap-2 md:flex-row">
+              <input
+                type="text"
+                value={translationLanguage}
+                onChange={e => setTranslationLanguage(e.target.value)}
+                placeholder="Language (e.g., en, ru, uz)"
+                className="border px-3 py-2 rounded w-full"
+              />
+              <input
+                type="text"
+                value={translationName}
+                onChange={e => setTranslationName(e.target.value)}
+                placeholder="Translated name"
+                className="border px-3 py-2 rounded w-full"
+              />
+              <button
+                onClick={addTranslation}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                Add Translation
+              </button>
+            </div>
+            {newAttrTranslations.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium">Translations:</h4>
+                <ul className="space-y-1">
+                  {newAttrTranslations.map((trans, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <span>{trans.language}: {trans.name}</span>
+                      <button
+                        onClick={() => {
+                          setNewAttrTranslations(newAttrTranslations.filter((_, j) => j !== i));
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        ❌
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <button
               onClick={addAttribute}

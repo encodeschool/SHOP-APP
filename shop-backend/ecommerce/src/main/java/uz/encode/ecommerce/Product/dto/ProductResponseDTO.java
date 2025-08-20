@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uz.encode.ecommerce.Product.entity.Product;
+import uz.encode.ecommerce.Product.entity.ProductAttributeTranslation;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
 import uz.encode.ecommerce.Product.entity.ProductTranslation;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
@@ -52,27 +53,43 @@ public class ProductResponseDTO {
         
         this.title = translation != null ? translation.getName() : product.getTitle();
         this.description = translation != null ? translation.getDescription() : product.getDescription();
-        this.lang = language; // Set to null in JSON, but keeping language for clarity
+        this.lang = language;
         
         this.price = product.getPrice();
         this.quantity = product.getQuantity();
         this.available = product.isAvailable();
+        this.featured = product.isFeatured();
         this.stock = product.getStock();
         this.condition = product.getCondition() != null ? product.getCondition() : null;
         this.createdAt = product.getCreatedAt();
         this.user = product.getUser() != null ? product.getUser() : null;
         this.categoryId = product.getCategory() != null ? product.getCategory().getId() : null;
-        this.featured = product.isFeatured();
         this.imageUrls = product.getImages().stream()
                 .map(ProductImage::getUrl)
                 .collect(Collectors.toList());
-        this.brandName = product.getBrand() != null ? product.getBrand().getName() : null;
         this.brandId = product.getBrand() != null ? product.getBrand().getId() : null;
+        this.brandName = product.getBrand() != null ? product.getBrand().getName() : null;
         this.attributes = product.getAttributes().stream()
-                .map(attr -> new AttributeValueResponseDTO(attr.getAttribute().getName(), attr.getValue()))
+                .map(attr -> {
+                    // Get translated attribute name from ProductAttribute
+                    ProductAttributeTranslation attrTranslation = attr.getAttribute().getTranslations().stream()
+                            .filter(t -> t.getLanguage().equalsIgnoreCase(language))
+                            .findFirst()
+                            .orElse(null);
+                    String attrName = attrTranslation != null ? attrTranslation.getName() : attr.getAttribute().getName();
+
+                    // Get translated attribute value from ProductAttributeValue
+                    ProductAttributeTranslation valueTranslation = attr.getTranslations().stream()
+                            .filter(t -> t.getLanguage().equalsIgnoreCase(language))
+                            .findFirst()
+                            .orElse(null);
+                    String attrValue = valueTranslation != null ? valueTranslation.getName() : attr.getValue();
+
+                    return new AttributeValueResponseDTO(attrName, attrValue);
+                })
                 .collect(Collectors.toList());
         this.translations = product.getTranslations().stream()
-                .map(ProductTranslationDTO::new)
+                .map(t -> new ProductTranslationDTO(t.getLanguage(), t.getName(), t.getDescription()))
                 .collect(Collectors.toList());
     }
 

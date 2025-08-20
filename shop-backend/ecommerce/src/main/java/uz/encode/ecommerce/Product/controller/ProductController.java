@@ -25,11 +25,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
+import uz.encode.ecommerce.Product.dto.ProductAttributeDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 import uz.encode.ecommerce.Product.entity.Brand;
-import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.service.ProductService;
 
 @RestController
@@ -91,7 +92,6 @@ public class ProductController {
             @PathVariable UUID id,
             @Valid @RequestPart("product") ProductCreateDTO dto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
-
         return ResponseEntity.ok(productService.update(id, dto, images));
     }
 
@@ -118,7 +118,7 @@ public class ProductController {
     }
 
     @GetMapping("/attributes/category/{categoryId}")
-    public ResponseEntity<List<ProductAttribute>> getAttributesByCategory(@PathVariable UUID categoryId) {
+    public ResponseEntity<List<ProductAttributeDTO>> getAttributesByCategory(@PathVariable UUID categoryId) {
         return ResponseEntity.ok(productService.findByCategoryId(categoryId));
     }
 
@@ -136,9 +136,19 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAttributeValuesByProduct(productId));
     }
 
+    @Operation(summary = "Create Product Attribute")
     @PostMapping("/create/attributes")
-    public ResponseEntity<ProductAttribute> createAttribute(@RequestBody ProductAttribute productAttribute) {
+    public ResponseEntity<ProductAttributeDTO> createAttribute(@RequestBody ProductAttributeDTO productAttribute) {
         return ResponseEntity.ok(productService.createAttribute(productAttribute));
+    }
+
+    @Operation(summary = "Save Translations for Product Attribute")
+    @PostMapping("/attributes/translations")
+    public ResponseEntity<Void> saveAttributeTranslations(
+            @RequestParam UUID attributeId,
+            @RequestBody List<AttributeTranslationDTO> translations) {
+        productService.saveAttributeTranslations(attributeId, translations);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/brands")
@@ -170,8 +180,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponseDTO> searchProducts(@RequestParam("q") String query) {
-        return productService.search(query);
+    public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam("q") String query) {
+        return ResponseEntity.ok(productService.search(query));
     }
-
 }
