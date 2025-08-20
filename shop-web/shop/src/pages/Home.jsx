@@ -24,7 +24,7 @@ const Home = () => {
   const [selectedSubImage, setSelectedSubImage] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [brands, setBrands] = useState([]);
-  const { t, i18n } = useTranslation(); // 🔹 Add useTranslation hook
+  const { t, i18n } = useTranslation();
   const brandPrevRef = useRef(null);
   const brandNextRef = useRef(null);
   const featuredPrevRef = useRef(null);
@@ -33,12 +33,12 @@ const Home = () => {
   const dispatch = useDispatch();
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-  // Fetch products with language parameter
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`/products/lang?lang=${i18n.language}`);
+        const lang = i18n.language === 'lv' ? 'en' : i18n.language; // Fallback for Latvian
+        const res = await axios.get(`/products/lang?lang=${lang}`);
         setProducts(res.data);
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -47,7 +47,7 @@ const Home = () => {
       }
     };
     fetchProducts();
-  }, [i18n.language, setLoading]); // 🔹 Add i18n.language to dependencies
+  }, [i18n.language, setLoading]);
 
   useEffect(() => {
     setLoading(true);
@@ -68,7 +68,8 @@ const Home = () => {
     setLoading(true);
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('/categories');
+        const lang = i18n.language === 'lv' ? 'en' : i18n.language; // Fallback for Latvian
+        const res = await axios.get(`/categories?lang=${lang}`);
         const rootCategories = res.data.filter(
           (cat) => cat.parentId === null && cat.subcategories && cat.subcategories.length > 0
         );
@@ -80,7 +81,7 @@ const Home = () => {
       }
     };
     fetchCategories();
-  }, [setLoading]);
+  }, [i18n.language, setLoading]);
 
   useEffect(() => {
     setLoading(true);
