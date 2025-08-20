@@ -31,17 +31,27 @@ const Home = () => {
   const featuredNextRef = useRef(null);
   const { setLoading } = useLoading();
   const dispatch = useDispatch();
-  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
+  // Get localized name from translations or fallback to default name
+  const getLocalizedName = (item) => {
+    if (!item) return '';
+    const lang = i18n.language === 'lv' ? 'en' : i18n.language;
+    const translation = item.translations?.find(t => t.language === lang);
+    return translation?.name || item.name || 'Unnamed';
+  };
 
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
       try {
-        const lang = i18n.language === 'lv' ? 'en' : i18n.language; // Fallback for Latvian
+        const lang = i18n.language === 'lv' ? 'en' : i18n.language;
         const res = await axios.get(`/products/lang?lang=${lang}`);
+        console.log('Products API Response:', JSON.stringify(res.data, null, 2));
         setProducts(res.data);
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -54,9 +64,11 @@ const Home = () => {
     const fetchBrands = async () => {
       try {
         const res = await axios.get('/products/brands');
+        console.log('Brands API Response:', JSON.stringify(res.data, null, 2));
         setBrands(res.data);
       } catch (error) {
         console.error('Failed to fetch brands:', error);
+        setBrands([]);
       } finally {
         setLoading(false);
       }
@@ -68,14 +80,47 @@ const Home = () => {
     setLoading(true);
     const fetchCategories = async () => {
       try {
-        const lang = i18n.language === 'lv' ? 'en' : i18n.language; // Fallback for Latvian
+        const lang = i18n.language === 'lv' ? 'en' : i18n.language;
         const res = await axios.get(`/categories?lang=${lang}`);
-        const rootCategories = res.data.filter(
+        console.log('Categories API Response:', JSON.stringify(res.data, null, 2));
+        
+        // Deduplicate categories by ID
+        const uniqueCategories = [];
+        const seenIds = new Set();
+        res.data.forEach((cat) => {
+          if (!seenIds.has(cat.id)) {
+            seenIds.add(cat.id);
+            uniqueCategories.push(cat);
+          } else {
+            console.warn(`Duplicate category ID detected: ${cat.id}, Name=${cat.name}`);
+          }
+        });
+
+        // Filter root categories with subcategories
+        const rootCategories = uniqueCategories.filter(
           (cat) => cat.parentId === null && cat.subcategories && cat.subcategories.length > 0
         );
+
+        // Deduplicate subcategories
+        rootCategories.forEach((cat) => {
+          const uniqueSubcategories = [];
+          const subSeenIds = new Set();
+          cat.subcategories.forEach((sub) => {
+            if (!subSeenIds.has(sub.id)) {
+              subSeenIds.add(sub.id);
+              uniqueSubcategories.push(sub);
+            } else {
+              console.warn(`Duplicate subcategory ID detected: ${sub.id}, Name=${sub.name}, ParentID=${cat.id}`);
+            }
+          });
+          cat.subcategories = uniqueSubcategories;
+        });
+
+        console.log('Deduplicated Categories:', JSON.stringify(rootCategories, null, 2));
         setCategories(rootCategories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -97,6 +142,7 @@ const Home = () => {
           setFavorites(productIds);
         } catch (error) {
           console.error('Failed to fetch favorites:', error);
+          setFavorites([]);
         } finally {
           setLoading(false);
         }
@@ -139,9 +185,9 @@ const Home = () => {
     <div>
       <div className="w-full bg-indigo-400 relative">
         <div className="container mx-auto flex gap-6 px-4 py-3 text-white text-base font-medium">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <div
-              key={category.id}
+              key={`${category.id}-${index}`}
               className="flex relative"
               onMouseEnter={() => setHoveredCategory(category)}
               onMouseLeave={() => {
@@ -156,18 +202,18 @@ const Home = () => {
                     ? `${BASE_URL}${category.icon}`
                     : '/placeholder.jpg'
                 }
-                alt={category.name}
+                alt={getLocalizedName(category)}
                 className="w-[20px] invert-[100%] mr-2 object-contain"
               />
-              <button className="hover:underline">{category.name}</button>
+              <button className="hover:underline">{getLocalizedName(category)}</button>
 
               {/* Mega Menu Dropdown */}
               {hoveredCategory?.id === category.id && (
                 <div className="absolute top-full left-0 bg-white text-black shadow-lg z-50 flex p-6 mt-1 rounded w-auto">
                   <div className="grid gap-4 w-auto flex-1">
-                    {category.subcategories?.map((sub) => (
+                    {category.subcategories?.map((sub, subIndex) => (
                       <div
-                        key={sub.id}
+                        key={`${sub.id}-${subIndex}`}
                         className="relative"
                         onMouseEnter={() => setHoveredSubcategory(sub)}
                         onMouseLeave={() => setHoveredSubcategory(null)}
@@ -177,17 +223,17 @@ const Home = () => {
                           className="hover:underline"
                           onMouseEnter={() => setSelectedSubImage(sub.imageUrl)}
                         >
-                          {sub.name}
+                          {getLocalizedName(sub)}
                         </Link>
                         {hoveredSubcategory?.id === sub.id && sub.subcategories?.length > 0 && (
                           <div className="absolute left-full top-0 bg-white text-black shadow-lg p-4 rounded ml-2 w-fit">
-                            {sub.subcategories.map((subsub) => (
+                            {sub.subcategories.map((subsub, subsubIndex) => (
                               <Link
-                                key={subsub.id}
+                                key={`${subsub.id}-${subsubIndex}`}
                                 to={`/category/${subsub.id}`}
                                 className="block hover:underline py-1"
                               >
-                                {subsub.name}
+                                {getLocalizedName(subsub)}
                               </Link>
                             ))}
                           </div>
@@ -218,10 +264,10 @@ const Home = () => {
       <div className="container mx-auto px-4 py-6">
         <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl">{t('All Products')}</h1>
         <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <Link
               to={`/product/${product.id}`}
-              key={product.id}
+              key={`${product.id}-${index}`}
               className="relative border p-4 rounded-xl hover:shadow group"
             >
               <p
@@ -323,8 +369,8 @@ const Home = () => {
             1024: { slidesPerView: 6 },
           }}
         >
-          {brands.map((brand) => (
-            <SwiperSlide key={brand.id}>
+          {brands.map((brand, index) => (
+            <SwiperSlide key={`${brand.id}-${index}`}>
               <Link to="/filtered">
                 <div className="p-[50px] w-full h-[150px] border-[3px] border-indigo-400 rounded-xl hover:shadow">
                   <div
@@ -383,8 +429,8 @@ const Home = () => {
           {products.filter((p) => p.featured).length > 0 ? (
             products
               .filter((p) => p.featured)
-              .map((product) => (
-                <SwiperSlide key={product.id}>
+              .map((product, index) => (
+                <SwiperSlide key={`${product.id}-${index}`}>
                   <Link
                     to={`/product/${product.id}`}
                     className="relative border p-4 rounded-xl hover:shadow group h-full block"
