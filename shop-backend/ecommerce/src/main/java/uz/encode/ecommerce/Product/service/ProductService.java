@@ -22,6 +22,8 @@ public interface ProductService {
 
     ProductResponseDTO getById(UUID id);
 
+    ProductResponseDTO getById(UUID id, String lang);
+
     List<ProductResponseDTO> getByUser(UUID userId);
 
     List<ProductResponseDTO> getByCategory(UUID categoryId);

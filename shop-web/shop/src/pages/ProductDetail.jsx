@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { addToCart } from '../redux/cartSlice';
@@ -6,10 +6,12 @@ import { useDispatch } from 'react-redux';
 import { FaCartPlus } from 'react-icons/fa';
 import Breadcrumb from '../components/Breadcrumb';
 import CompareButton from '../components/CompareButton';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const { language } = useContext(LanguageContext);
   const dispatch = useDispatch();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
@@ -19,9 +21,13 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchBrand = async (brandId) => {
-      const res = await axios.get(`/products/brands/${brandId}`)
-      setBrand(res.data);
-    }
+      try {
+        const res = await axios.get(`/products/brands/${brandId}`);
+        setBrand(res.data);
+      } catch (err) {
+        console.error('Error fetching brand:', err);
+      }
+    };
     if (product?.brandId) {
       fetchBrand(product.brandId);
     }
@@ -29,11 +35,17 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const res = await axios.get(`/products/${id}`);
-      setProduct(res.data);
+      try {
+        // Fallback to 'en' if language is 'lv' (not supported by backend)
+        const apiLang = language === 'lv' ? 'en' : language;
+        const res = await axios.get(`/products/lang/${id}?lang=${apiLang}`);
+        setProduct(res.data);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+      }
     };
     fetchProduct();
-  }, [id]);
+  }, [id, language]);
 
   useEffect(() => {
     const buildBreadcrumbPath = async (categoryId) => {

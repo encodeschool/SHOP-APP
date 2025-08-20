@@ -27,55 +27,58 @@ import SearchResults from './pages/SearchResults';
 import { LoadingProvider } from './contexts/LoadingContext';
 import TrackOrder from './pages/TrackOrder';
 import Contact from './pages/Contact';
+import { LanguageProvider } from './contexts/LanguageContext';
 // 
 function App() {
   return (
     <LoadingProvider>
-      <div className="flex flex-col min-h-screen">
-        <AppBar />
-        {/* <Navbar /> */}
-        <SearchBar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path='/cart' element={< CartView />} />
-            <Route
-              path="/checkout"
-              element={
-                <ProtectedRoute>
-                  <Checkout />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/category/:categoryId" element={<CategoryPage />} />
-            <Route path='/about' element={<About />} />
-            <Route path='/terms' element={<TermCondition />} />
-            <Route path='/order-confirmation' element={< OrderConfirmation />} />
-            <Route path="/filtered" element={<FilterPage />} />
-            <Route path='/login' element={< Login />} />
-            <Route path='/register' element={< Register />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route path='/favorites' element={< Favorites />} />
-            <Route path='/track' element={<TrackOrder />} />
-            <Route path='/contacts' element={<Contact />} />
-            {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
-            {/* Add other routes like /cart, /favorites, /login, etc. */}
-          </Routes>
-        </main>
-        <NewsletterFooter />
-        <Footer />
-        <ToastContainer position="top-right" autoClose={2000} />
-      </div>
+      <LanguageProvider>
+        <div className="flex flex-col min-h-screen">
+          <AppBar />
+          {/* <Navbar /> */}
+          <SearchBar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path='/cart' element={< CartView />} />
+              <Route
+                path="/checkout"
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/category/:categoryId" element={<CategoryPage />} />
+              <Route path='/about' element={<About />} />
+              <Route path='/terms' element={<TermCondition />} />
+              <Route path='/order-confirmation' element={< OrderConfirmation />} />
+              <Route path="/filtered" element={<FilterPage />} />
+              <Route path='/login' element={< Login />} />
+              <Route path='/register' element={< Register />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
+              <Route path='/favorites' element={< Favorites />} />
+              <Route path='/track' element={<TrackOrder />} />
+              <Route path='/contacts' element={<Contact />} />
+              {/* <Route path="/category/:id" element={<CategoryPage />} /> */}
+              {/* Add other routes like /cart, /favorites, /login, etc. */}
+            </Routes>
+          </main>
+          <NewsletterFooter />
+          <Footer />
+          <ToastContainer position="top-right" autoClose={2000} />
+        </div>
+      </LanguageProvider>
     </LoadingProvider>
   );
 }

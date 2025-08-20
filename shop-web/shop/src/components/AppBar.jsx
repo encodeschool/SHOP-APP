@@ -5,22 +5,21 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { CiMail } from "react-icons/ci";
 import { FaPhone } from "react-icons/fa6";
 import { AuthContext } from '../contexts/AuthContext';
+import { LanguageContext } from '../contexts/LanguageContext';
 import axios from 'axios';
 import { useTranslation } from "react-i18next";
-import i18n from "../i18n";
-
 
 export default function AppBar() {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
-  const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn, logout } = useContext(AuthContext);
+  const { language, setLanguage } = useContext(LanguageContext);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-   const [user, setUser] = useState({
+  const [user, setUser] = useState({
     fullName: "Admin",
     profileImage: "https://via.placeholder.com/40",
   });
@@ -37,24 +36,29 @@ export default function AppBar() {
       return;
     }
 
-    axios.get(`${BASE_URL}/api/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res) => {
+    axios
+      .get(`${BASE_URL}/api/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
         setUser(res.data);
         localStorage.setItem("user", JSON.stringify(res.data));
-    })
-    .catch((err) => {
+      })
+      .catch((err) => {
         console.error("Failed to fetch user", err);
-    });
-  }, [isLoggedIn]); // Add isLoggedIn here
-
+      });
+  }, [isLoggedIn]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    setLanguageOpen(false);
   };
 
   return (
@@ -80,12 +84,14 @@ export default function AppBar() {
             <span>bazaarly@gmail.com</span>
           </span>
           |
-          <Link to="/track" className="hover:underline flex items-center "><TbTruckDelivery className="mr-1" />{t('Track Your Order')}</Link>
+          <Link to="/track" className="hover:underline flex items-center">
+            <TbTruckDelivery className="mr-1" />{t('Track Your Order')}
+          </Link>
           |
           {/* My Account Dropdown */}
           <div className="relative">
             <button onClick={() => setAccountOpen(!accountOpen)} className="flex items-center hover:underline">
-              < FaRegUserCircle className="mr-1" />
+              <FaRegUserCircle className="mr-1" />
               {isLoggedIn ? (
                 <>
                   {user.name}
@@ -111,17 +117,24 @@ export default function AppBar() {
           {/* Language Dropdown */}
           <div className="relative">
             <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
-              {t("English")}
+              {language === 'en' ? 'English' : language === 'ru' ? 'Russian' : language === 'uz' ? 'Uzbek' : 'Latvian'}
             </button>
             {languageOpen && (
               <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
-                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">{t("English")}</button>
-                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">{t("Latvian")}</button>
-                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">{t("Russian")}</button>
-                <button onClick={() => i18n.changeLanguage("uz")} className="block px-4 py-2 hover:bg-gray-100">{t("Uzbek")}</button>
+                <button onClick={() => handleLanguageChange('en')} className="block px-4 py-2 hover:bg-gray-100">English</button>
+                <button onClick={() => handleLanguageChange('lv')} className="block px-4 py-2 hover:bg-gray-100">Latvian</button>
+                <button onClick={() => handleLanguageChange('ru')} className="block px-4 py-2 hover:bg-gray-100">Russian</button>
+                <button onClick={() => handleLanguageChange('uz')} className="block px-4 py-2 hover:bg-gray-100">Uzbek</button>
               </div>
             )}
           </div>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden flex items-center">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
       </div>
 
@@ -151,9 +164,17 @@ export default function AppBar() {
             </button>
             {accountOpen && (
               <div className="mt-1 bg-white shadow-md border rounded w-full">
-                <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">{t("Login")}</Link>
-                <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">{t("Register")}</Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
+                    <button onClick={handleLogout} className="block px-4 py-2 hover:bg-gray-100">{t("Logout")}</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="block px-4 py-2 hover:bg-gray-100">{t("Login")}</Link>
+                    <Link to="/register" className="block px-4 py-2 hover:bg-gray-100">{t("Register")}</Link>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -161,14 +182,14 @@ export default function AppBar() {
           {/* Language Dropdown (Mobile) */}
           <div>
             <button onClick={() => setLanguageOpen(!languageOpen)} className="hover:underline">
-              {t("English")}
+              {language === 'en' ? 'English' : language === 'ru' ? 'Russian' : language === 'uz' ? 'Uzbek' : 'Latvian'}
             </button>
             {languageOpen && (
               <div className="mt-1 bg-white shadow-md border rounded w-full">
-                <button onClick={() => i18n.changeLanguage("en")} className="block px-4 py-2 hover:bg-gray-100">{t("English")}</button>
-                <button onClick={() => i18n.changeLanguage("lv")} className="block px-4 py-2 hover:bg-gray-100">{t("Latvian")}</button>
-                <button onClick={() => i18n.changeLanguage("ru")} className="block px-4 py-2 hover:bg-gray-100">{t("Russian")}</button>
-                <button onClick={() => i18n.changeLanguage("uz")} className="block px-4 py-2 hover:bg-gray-100">{t("Uzbek")}</button>
+                <button onClick={() => handleLanguageChange('en')} className="block px-4 py-2 hover:bg-gray-100">English</button>
+                <button onClick={() => handleLanguageChange('lv')} className="block px-4 py-2 hover:bg-gray-100">Latvian</button>
+                <button onClick={() => handleLanguageChange('ru')} className="block px-4 py-2 hover:bg-gray-100">Russian</button>
+                <button onClick={() => handleLanguageChange('uz')} className="block px-4 py-2 hover:bg-gray-100">Uzbek</button>
               </div>
             )}
           </div>

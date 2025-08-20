@@ -453,4 +453,10 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream().map(product -> new ProductResponseDTO(product, lang)).collect(Collectors.toList());
     }
 
+    @Override
+    public ProductResponseDTO getById(UUID id, String lang) {
+        Product product = productRepository.findById(id).orElseThrow();
+        return new ProductResponseDTO(product, lang);
+    }
+
 }
