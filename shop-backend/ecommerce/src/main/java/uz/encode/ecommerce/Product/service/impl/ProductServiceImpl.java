@@ -62,6 +62,7 @@ public class ProductServiceImpl implements ProductService {
     private BrandRepository brandRepository;
 
     @Override
+    @Transactional
     public ProductResponseDTO create(ProductCreateDTO dto, List<MultipartFile> images) throws IOException {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,17 +105,14 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (dto.getTranslations() != null) {
-            List<ProductTranslation> translations = dto.getTranslations().stream().map(translationDto -> {
+            for (ProductTranslationDTO translationDto : dto.getTranslations()) {
                 ProductTranslation translation = new ProductTranslation();
                 translation.setLanguage(translationDto.getLanguage());
                 translation.setName(translationDto.getName());
                 translation.setDescription(translationDto.getDescription());
                 translation.setProduct(product);
-                return translation;
-            }).collect(Collectors.toList());
-            product.setTranslations(translations);
-        } else {
-            product.setTranslations(new ArrayList<>());
+                product.getTranslations().add(translation); // Add to existing collection
+            }
         }
 
         if (images != null && !images.isEmpty()) {
@@ -225,7 +223,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Handle translations
         if (dto.getTranslations() != null) {
-            // Clear the existing translations (Hibernate will handle orphan removal)
+            // Clear the existing translations (Hibernate will handle orphan removal)s
             product.getTranslations().clear();
             // Add new translations to the existing collection
             for (ProductTranslationDTO translationDto : dto.getTranslations()) {

@@ -336,7 +336,7 @@ export default function Products() {
                 <tr className="bg-gray-200 text-left">
                   <th className="p-2">Product Img</th>
                   <th className="p-2">Title</th>
-                  <th className="p-2">English Name</th> {/* New column */}
+                  <th className="p-2">English Name</th>
                   <th className="p-2">Price</th>
                   <th className="p-2">Stock</th>
                   <th className="p-2">Condition</th>
