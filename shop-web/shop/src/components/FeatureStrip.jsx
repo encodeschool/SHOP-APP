@@ -41,8 +41,8 @@ const FeatureStrip = () => {
           <div key={index} className="flex justify-left md:justify-center items-center text-left md:text-center border-indigo">
             {f.icon}
             <div>
-              <p className="font-semibold text-sm mt-2">{f.title}</p>
-              <p className="text-xs text-gray-600">{f.subtitle}</p>
+              <p className="font-semibold text-sm mt-2">{t(f.title)}</p>
+              <p className="text-xs text-gray-600">{t(f.subtitle)}</p>
             </div>
           </div>
         ))}

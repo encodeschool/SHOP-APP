@@ -7,6 +7,7 @@ import { FaCartPlus } from 'react-icons/fa';
 import Breadcrumb from '../components/Breadcrumb';
 import CompareButton from '../components/CompareButton';
 import { LanguageContext } from '../contexts/LanguageContext';
+import { useTranslation } from "react-i18next";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -18,6 +19,7 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState('specification');
   const [brand, setBrand] = useState(null);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchBrand = async (brandId) => {
@@ -74,7 +76,7 @@ const ProductDetail = () => {
     dispatch(addToCart(product));
   };
 
-  if (!product) return <div className="p-6">Loading...</div>;
+  if (!product) return <div className="p-6">{t("Loading...")}</div>;
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -125,13 +127,13 @@ const ProductDetail = () => {
           <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
           <p className="text-5xl font-bold text-indigo-400 mb-4">${product.price}</p>
           <p className="mb-2">{product.description}</p>
-          <p className="mb-2">Stock: {product.stock}</p>
+          <p className="mb-2">{t("Stock")}: {product.stock}</p>
 
           <button
             className="bg-black text-white px-4 py-2 rounded flex items-center mb-3"
             onClick={handleAddToCart}
           >
-            <FaCartPlus className="mr-2" /> Add to Cart
+            <FaCartPlus className="mr-2" /> {t("Add to Cart")}
           </button>
 
           <CompareButton product={product} />
@@ -149,7 +151,7 @@ const ProductDetail = () => {
                 activeTab === tab ? 'text-black font-bold border-b-[4px] border-indigo-400' : 'text-gray-800'
               }`}
             >
-              {tab}
+              {t(tab)}
             </button>
           ))}
         </div>
@@ -158,7 +160,7 @@ const ProductDetail = () => {
           <div>
             {Object.entries(
               product.attributes.reduce((groups, attr) => {
-                const group = attr.group || 'Общие характеристики';
+                const group = attr.group || '';
                 if (!groups[group]) groups[group] = [];
                 groups[group].push(attr);
                 return groups;
@@ -183,15 +185,15 @@ const ProductDetail = () => {
 
         {activeTab === 'warehouse' && (
           <div>
-            <h3 className="text-lg font-semibold mb-2">Warehouse Info</h3>
-            <p>Coming soon...</p>
+            <h3 className="text-lg font-semibold mb-2">{t("Warehouse Info")}</h3>
+            <p>{t("Coming soon..")}.</p>
           </div>
         )}
 
         {activeTab === 'together' && (
           <div>
-            <h3 className="text-lg font-semibold mb-2">Frequently Bought Together</h3>
-            <p>Bundle suggestions will appear here.</p>
+            <h3 className="text-lg font-semibold mb-2">{t("Frequently Bought Together")}</h3>
+            <p>{t("Bundle suggestions will appear here.")}</p>
           </div>
         )}
       </div>
