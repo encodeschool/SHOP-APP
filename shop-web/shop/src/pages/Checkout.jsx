@@ -5,6 +5,10 @@ import { saveCheckoutInfo } from '../redux/checkoutSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import { useTranslation } from "react-i18next";
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialize Stripe with your publishable key
+const stripePromise = loadStripe('your-publishable-key-here'); // Replace with your Stripe publishable key
 
 const Checkout = () => {
   const cartItems = useSelector((state) => state.cart.items);
@@ -13,7 +17,6 @@ const Checkout = () => {
   const user = reduxUser || localUser;
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -40,14 +43,12 @@ const Checkout = () => {
     }
   }, [user, navigate, location, setValue]);
 
-  // ✅ Updated: calculate shipping price
   const shippingPrice = shippingMethod === 'express' ? 15 : 5;
   const itemsTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalPrice = itemsTotal + shippingPrice;
 
   const onSubmit = async (data) => {
     setLoading(true);
-    // ✅ Updated: Build checkout payload with full details
     const checkoutPayload = {
       userId: user.id,
       items: cartItems.map((item) => ({
@@ -55,10 +56,10 @@ const Checkout = () => {
         quantity: item.quantity,
         pricePerUnit: item.price,
       })),
-      shippingMethod: data.shippingMethod, // ✅ Updated
-      paymentMethod: data.paymentMethod,   // ✅ Updated
-      shippingPrice: shippingPrice,        // ✅ Updated
-      totalPrice: totalPrice,              // ✅ Updated
+      shippingMethod: data.shippingMethod,
+      paymentMethod: data.paymentMethod,
+      shippingPrice: shippingPrice,
+      totalPrice: totalPrice,
       shippingAddress: {
         name: data.name,
         email: data.email,
@@ -75,19 +76,44 @@ const Checkout = () => {
         vatNumber: data.vatNumber || '',
         legalAddress: data.legalAddress || '',
       },
+      agreeToTerms: data.agreeToTerms,
     };
 
     try {
-      const response = await axios.post('/orders', checkoutPayload); // ✅ Updated
-      const order = response.data;
-      console.log('Order created:', order);
-      dispatch(saveCheckoutInfo(data));
-      localStorage.setItem('checkoutInfo', JSON.stringify(data)); // ✅ Persistent
-      navigate('/order-confirmation');
-      setLoading(false);
+      // Create order
+      const orderResponse = await axios.post('/api/orders', checkoutPayload);
+      const order = orderResponse.data;
+
+      // Create Payment Intent for Stripe
+      if (data.paymentMethod === 'card' || data.paymentMethod === 'paypal') {
+        const paymentIntentResponse = await axios.post(`/api/orders/${order.id}/payment-intent`, {
+          paymentMethod: data.paymentMethod,
+        });
+
+        const clientSecret = paymentIntentResponse.data;
+
+        // Redirect to Stripe Checkout
+        const stripe = await stripePromise;
+        const result = await stripe.redirectToCheckout({
+          clientSecret,
+          mode: 'payment',
+          successUrl: `${window.location.origin}/order-confirmation?orderId=${order.id}`,
+          cancelUrl: `${window.location.origin}/checkout`,
+        });
+
+        if (result.error) {
+          console.error('Stripe redirect error:', result.error.message);
+          setLoading(false);
+          return;
+        }
+      } else {
+        // For non-Stripe payment methods (e.g., Cash on Delivery)
+        dispatch(saveCheckoutInfo(data));
+        localStorage.setItem('checkoutInfo', JSON.stringify(data));
+        navigate('/order-confirmation');
+      }
     } catch (error) {
-      console.error('Error submitting checkout:', error.response?.data || error.message);
-      setLoading(false);
+      console.error('Error during checkout:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
@@ -238,7 +264,7 @@ const Checkout = () => {
               {t("Processing...")}
             </>
           ) : (
-            'Confirm Order'
+            t("Proceed to Payment")
           )}
         </button>
       </form>
@@ -306,16 +332,14 @@ const Checkout = () => {
                   {t("Cash on Delivery")}
                 </label>
                 {errors.paymentMethod && (
-                  <p className="text-red-500 mt-1">{("Please select a payment method")}</p>
+                  <p className="text-red-500 mt-1">{t("Please select a payment method")}</p>
                 )}
               </td>
             </tr>
 
             <tr className="border-t-2 border-indigo-400 font-bold">
-              <td className='py-4'>{t("Total")}:</td>
-              <td className="text-right">
-                ${totalPrice.toFixed(2)} {/* ✅ Updated: total includes shipping */}
-              </td>
+              <td className="py-4">{t("Total")}:</td>
+              <td className="text-right">${totalPrice.toFixed(2)}</td>
             </tr>
 
             <tr>
