@@ -1,6 +1,7 @@
 package uz.encode.ecommerce.Order.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,6 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.stripe.Stripe;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
+
 import jakarta.transaction.Transactional;
 import uz.encode.ecommerce.Order.dto.OrderItemResponseDTO;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
@@ -23,6 +28,8 @@ import uz.encode.ecommerce.Order.entity.OrderStatus;
 import uz.encode.ecommerce.Order.repository.OrderItemRepository;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Order.service.OrderService;
+import uz.encode.ecommerce.Payment.entity.Payment;
+import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.User.entity.User;
@@ -41,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
     private UserRepository userRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Value("${stripe.secret-key}")
     private String stripeSecretKey;
@@ -48,7 +57,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
-        // String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -58,23 +66,10 @@ public class OrderServiceImpl implements OrderService {
             .map(item -> item.getPricePerUnit().multiply(BigDecimal.valueOf(item.getQuantity())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Add shipping fee
-        BigDecimal shippingFee;
-        switch (dto.getShippingMethod()) {
-            case "express":
-                shippingFee = BigDecimal.valueOf(15);
-                break;
-            case "standard":
-            default:
-                shippingFee = BigDecimal.valueOf(5);
-                break;
-        }
-
+        BigDecimal shippingFee = dto.getShippingMethod().equals("express") ? BigDecimal.valueOf(15) : BigDecimal.valueOf(5);
         BigDecimal totalPrice = productTotal.add(shippingFee);
         order.setTotalPrice(totalPrice);
-
         order.setStatus(OrderStatus.PENDING);
-
         order.setCountry(dto.getCountry());
         order.setCity(dto.getCity());
         order.setZip(dto.getZip());
@@ -91,7 +86,6 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = dto.getItems().stream().map(i -> {
             Product product = productRepository.findById(i.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-
             return new OrderItem(null, order, product, i.getQuantity(), i.getPricePerUnit());
         }).collect(Collectors.toList());
 
@@ -105,24 +99,62 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
+    public String createPaymentIntent(UUID orderId, String paymentMethod) {
+        Stripe.apiKey = stripeSecretKey;
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        try {
+            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                .setAmount(order.getTotalPrice().multiply(BigDecimal.valueOf(100)).longValue()) // Convert to cents
+                .setCurrency("usd") // Adjust currency as needed
+                .addPaymentMethodType(paymentMethod.equals("card") ? "card" : "paypal")
+                .putAllMetadata(java.util.Map.of("orderId", orderId.toString()))
+                .build();
+
+            PaymentIntent paymentIntent = PaymentIntent.create(params);
+            order.setClientSecret(paymentIntent.getClientSecret());
+            orderRepository.save(order);
+
+            // Save payment details
+            Payment payment = new Payment();
+            payment.setOrder(order);
+            payment.setUser(order.getUser());
+            payment.setProvider("Stripe");
+            payment.setPaymentId(paymentIntent.getId());
+            payment.setSuccess(false); // Will be updated on webhook
+            payment.setAmount(order.getTotalPrice());
+            payment.setMethod(paymentMethod);
+            payment.setStatus("PENDING");
+            payment.setPaidAt(LocalDateTime.now());
+            paymentRepository.save(payment);
+
+            return paymentIntent.getClientSecret();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Payment Intent: " + e.getMessage());
+        }
+    }
+
+    @Override
     public OrderResponseDTO getOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() -> new RuntimeException("Order not found"));
         return mapToDTO(order);
     }
 
     @Override
     public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
-                .stream()
-                .map(this::mapToDTO)
-                .toList();
+            .stream()
+            .map(this::mapToDTO)
+            .toList();
     }
 
     @Override
     public OrderResponseDTO updateStatus(UUID orderId, String status) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() -> new RuntimeException("Order not found"));
 
         try {
             order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
@@ -151,18 +183,18 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return orderPage.getContent().stream()
-                .map(this::mapToDTO)
-                .toList();
+            .map(this::mapToDTO)
+            .toList();
     }
 
     private OrderResponseDTO mapToDTO(Order order) {
         List<OrderItemResponseDTO> itemDTOs = order.getItems().stream()
-                .map(item -> new OrderItemResponseDTO(
-                        item.getProduct().getId(),
-                        item.getProduct().getTitle(),
-                        item.getQuantity(),
-                        item.getPricePerUnit()
-                )).toList();
+            .map(item -> new OrderItemResponseDTO(
+                item.getProduct().getId(),
+                item.getProduct().getTitle(),
+                item.getQuantity(),
+                item.getPricePerUnit()
+            )).toList();
 
         return new OrderResponseDTO(
             order.getId(),
