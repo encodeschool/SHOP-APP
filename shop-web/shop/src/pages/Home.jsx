@@ -223,7 +223,6 @@ const Home = () => {
               swiper.params.navigation.prevEl = categoryPrevRef.current;
               swiper.params.navigation.nextEl = categoryNextRef.current;
             }}
-            pagination={{ clickable: true }}
             className="category-swiper"
             breakpoints={{
               640: { slidesPerView: 2 },
