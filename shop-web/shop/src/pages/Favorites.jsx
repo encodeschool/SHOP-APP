@@ -1,10 +1,12 @@
 import React, {useState, useEffect} from "react";
 import axios from '../api/axios';
+import { useTranslation } from "react-i18next";
 
 export default function Favorites() {
     const [favorites, setFavorites] = useState([]);
     const token = localStorage.getItem('token');
     const BASE_URL = process.env.REACT_APP_BASE_URL;
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -52,7 +54,7 @@ export default function Favorites() {
         <div className="container mx-auto px-4 py-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {favorites.length === 0 ? (
-                    <p className="text-gray-600">You don't have any favorite products yet.</p>
+                    <p className="text-gray-600">{t("You don't have any favorite products yet.")}</p>
                 ) : (
                     favorites.map(product => (
                     <div key={product.id} className="border p-4 rounded-xl relative">
@@ -60,7 +62,7 @@ export default function Favorites() {
                         className="absolute top-2 right-2 text-red-500"
                         onClick={() => handleRemoveFavorite(product.id)}
                         >
-                        Remove ❤️
+                        {t("Remove")} ❤️
                         </button>
                         <img
                         src={

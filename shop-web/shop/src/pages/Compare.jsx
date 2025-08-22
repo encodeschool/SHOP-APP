@@ -3,16 +3,18 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFromCompare, clearCompare, selectCompareItems } from '../redux/compareSlice';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const Compare = () => {
   const dispatch = useDispatch();
   const items = useSelector(selectCompareItems);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
   if (items.length === 0) {
     return (
       <div className="text-center py-10">
-        <h2 className="text-xl font-bold">No products selected for comparison</h2>
+        <h2 className="text-xl font-bold">{t("No products selected for comparison")}</h2>
       </div>
     );
   }
@@ -30,20 +32,20 @@ const Compare = () => {
   return (
     <div className="container mx-auto p-4 overflow-x-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Compare Products</h1>
+        <h1 className="text-2xl font-bold">{t("Compare Products")}</h1>
         <button
           onClick={() => dispatch(clearCompare())}
           className="text-red-600 hover:underline"
         >
-          Clear All
+          {t("Clear All")}
         </button>
       </div>
 
       <div className="grid grid-cols-[200px_repeat(auto-fill,minmax(250px,1fr))] gap-4">
         <div className="font-semibold text-gray-700">
-          <div className='mb-[12.3rem]'>Feature</div>
+          <div className='mb-[12.3rem]'>{t("Feature")}</div>
           {featureList.map((feature) => (
-            <div key={feature} className="my-0 text-gray-400 py-2 border-b">{feature}</div>
+            <div key={feature} className="my-0 text-gray-400 py-2 border-b">{t(feature)}</div>
           ))}
         </div>
 

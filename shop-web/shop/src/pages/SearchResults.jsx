@@ -10,6 +10,7 @@ import CompareButton from '../components/CompareButton';
 // Redux imports
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import { useTranslation } from "react-i18next";
 
 
 function useQuery() {
@@ -22,6 +23,7 @@ export default function SearchResults() {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
 
   useEffect(() => {
@@ -63,9 +65,9 @@ export default function SearchResults() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h2 className="text-2xl mb-4">Search Results for: <span className="font-bold">"{query}"</span></h2>
+      <h2 className="text-2xl mb-4">{t("Search Results for")}: <span className="font-bold">"{query}"</span></h2>
       {results.length === 0 ? (
-        <p>No products found.</p>
+        <p>{t("No products found")}.</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {results.map(product => (
@@ -81,12 +83,12 @@ export default function SearchResults() {
                     {product.condition === 'NEW' ? (
                       <>
                         <FaStar className="inline mr-1" />
-                        NEW
+                        {t("NEW")}
                       </>
                     ) : (
                       <>
                         <FaRecycle className="inline mr-1" />
-                        USED
+                        {t("USED")}
                       </>
                     )}
                   </p>

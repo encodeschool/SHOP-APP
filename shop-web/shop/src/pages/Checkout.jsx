@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { saveCheckoutInfo } from '../redux/checkoutSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
+import { useTranslation } from "react-i18next";
 
 const Checkout = () => {
   const cartItems = useSelector((state) => state.cart.items);
@@ -15,6 +16,7 @@ const Checkout = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const {
     register,
@@ -94,9 +96,9 @@ const Checkout = () => {
   if (cartItems.length === 0) {
     return (
       <div className="container mx-auto p-4 text-center">
-        <h2 className="text-xl font-semibold mb-2">Your cart is empty.</h2>
+        <h2 className="text-xl font-semibold mb-2">{t("Your cart is empty.")}</h2>
         <Link to="/" className="text-blue-500 underline">
-          Go back to shop
+          {t("Go back to shop")}
         </Link>
       </div>
     );
@@ -106,90 +108,90 @@ const Checkout = () => {
     <div className="container mx-auto p-4 py-[50px] grid md:grid-cols-3 gap-8">
       {/* Checkout Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-4">
-        <h2 className="text-2xl font-bold">Contact Information</h2>
+        <h2 className="text-2xl font-bold">{t("Contact Information")}</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label>Full Name *</label>
+            <label>{t("Full Name")}*</label>
             <input {...register('name', { required: true })} className="input" />
-            {errors.name && <span className="text-red-500">Required</span>}
+            {errors.name && <span className="text-red-500">{t("Required")}</span>}
           </div>
           <div>
-            <label>Email *</label>
+            <label>{t("Email")} *</label>
             <input type="email" {...register('email', { required: true })} className="input" />
-            {errors.email && <span className="text-red-500">Required</span>}
+            {errors.email && <span className="text-red-500">{t("Required")}</span>}
           </div>
         </div>
 
         <div>
-          <label>Phone *</label>
+          <label>{t("Phone")} *</label>
           <input type="tel" {...register('phone', { required: true })} className="input" />
-          {errors.phone && <span className="text-red-500">Required</span>}
+          {errors.phone && <span className="text-red-500">{t("Required")}</span>}
         </div>
 
         <div>
           <label className="flex items-center gap-2">
             <input type="checkbox" {...register('isLegalEntity')} />
-            I am a legal entity
+            {t("I am a legal entity")}
           </label>
         </div>
 
         {isLegalEntity && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Company Information</h3>
+            <h3 className="text-lg font-semibold">{t("Company Information")}</h3>
             <div>
-              <label>Company Name *</label>
+              <label>{t("Company Name")} *</label>
               <input {...register('companyName', { required: true })} className="input" />
-              {errors.companyName && <span className="text-red-500">Required</span>}
+              {errors.companyName && <span className="text-red-500">{t("Required")}</span>}
             </div>
             <div>
-              <label>Registration Nr *</label>
+              <label>{("Registration Nr")} *</label>
               <input {...register('registrationNr', { required: true })} className="input" />
-              {errors.registrationNr && <span className="text-red-500">Required</span>}
+              {errors.registrationNr && <span className="text-red-500">{t("Required")}</span>}
             </div>
             <div>
-              <label>VAT Number</label>
+              <label>{t("VAT Number")}</label>
               <input {...register('vatNumber')} className="input" />
             </div>
             <div>
-              <label>Legal Address *</label>
+              <label>{t("Legal Address")} *</label>
               <input {...register('legalAddress', { required: true })} className="input" />
-              {errors.legalAddress && <span className="text-red-500">Required</span>}
+              {errors.legalAddress && <span className="text-red-500">{t("Required")}</span>}
             </div>
           </div>
         )}
 
-        <h3 className="text-xl font-semibold">Shipping Address</h3>
+        <h3 className="text-xl font-semibold">{t("Shipping Address")}</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label>Country *</label>
+            <label>{t("Country")} *</label>
             <input {...register('country', { required: true })} className="input" />
-            {errors.country && <span className="text-red-500">Required</span>}
+            {errors.country && <span className="text-red-500">{t("Required")}</span>}
           </div>
           <div>
-            <label>Post Code / ZIP *</label>
+            <label>{t("Post Code / ZIP")} *</label>
             <input {...register('zip', { required: true })} className="input" />
-            {errors.zip && <span className="text-red-500">Required</span>}
+            {errors.zip && <span className="text-red-500">{t("Required")}</span>}
           </div>
         </div>
 
         <div>
-          <label>City *</label>
+          <label>{t("City")} *</label>
           <input {...register('city', { required: true })} className="input" />
-          {errors.city && <span className="text-red-500">Required</span>}
+          {errors.city && <span className="text-red-500">{t("Required")}</span>}
         </div>
 
         <div>
-          <label>Order Notes</label>
+          <label>{t("Order Notes")}</label>
           <textarea {...register('notes')} className="input" rows={3} />
         </div>
 
         <div>
           <label className="flex items-center gap-2">
             <input type="checkbox" {...register('agreeToTerms', { required: true })} />
-            I have read and agree to the website terms and conditions *
+            {t("I have read and agree to the website terms and conditions")} *
           </label>
-          {errors.agreeToTerms && <span className="text-red-500">You must accept the terms</span>}
+          {errors.agreeToTerms && <span className="text-red-500">{("You must accept the terms")}</span>}
         </div>
 
         <button
@@ -233,7 +235,7 @@ const Checkout = () => {
                   fill="#E5E7EB"
                 />
               </svg>
-              Processing...
+              {t("Processing...")}
             </>
           ) : (
             'Confirm Order'
@@ -243,12 +245,12 @@ const Checkout = () => {
 
       {/* Order Summary */}
       <div className="border sticky rounded p-4 bg-gray-100">
-        <h2 className="text-3xl border-b-2 border-b-indigo-400 pb-6 pt-3">Order Summary</h2>
+        <h2 className="text-3xl border-b-2 border-b-indigo-400 pb-6 pt-3">{t("Order Summary")}</h2>
         <table className="w-full">
           <thead>
             <tr className="border-b-2 border-indigo-400">
-              <th className="text-left">Product</th>
-              <th className="text-right">Total</th>
+              <th className="text-left">{t("Product")}</th>
+              <th className="text-right">{t("Total")}</th>
             </tr>
           </thead>
           <tbody>
@@ -260,7 +262,7 @@ const Checkout = () => {
             ))}
 
             <tr className="border-t-2 border-indigo-400">
-              <td colSpan={2} className="pt-4 pb-4 font-semibold">Shipping Method</td>
+              <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Shipping Method")}</td>
             </tr>
             <tr>
               <td colSpan={2}>
@@ -272,14 +274,14 @@ const Checkout = () => {
                       {...register('shippingMethod', { required: true })}
                       defaultChecked
                     />
-                    Standard Shipping
+                    {t("Standard Shipping")}
                   </span>
                   <span>$5.00</span>
                 </label>
                 <label className="flex items-center justify-between mt-2">
                   <span>
                     <input type="radio" value="express" {...register('shippingMethod')} />
-                    Express Shipping
+                    {t("Express Shipping")}
                   </span>
                   <span>$15.00</span>
                 </label>
@@ -287,30 +289,30 @@ const Checkout = () => {
             </tr>
 
             <tr className="border-t-2 border-indigo-400">
-              <td colSpan={2} className="pt-4 pb-4 font-semibold">Payment Method</td>
+              <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Payment Method")}</td>
             </tr>
             <tr>
               <td colSpan={2}>
                 <label className="block">
                   <input type="radio" value="card" {...register('paymentMethod', { required: true })} defaultChecked />
-                  Credit / Debit Card
+                  {t("Credit / Debit Card")}
                 </label>
                 <label className="block mt-2">
                   <input type="radio" value="paypal" {...register('paymentMethod')} />
-                  PayPal
+                  {t("PayPal")}
                 </label>
                 <label className="block mt-2">
                   <input type="radio" value="cod" {...register('paymentMethod')} />
-                  Cash on Delivery
+                  {t("Cash on Delivery")}
                 </label>
                 {errors.paymentMethod && (
-                  <p className="text-red-500 mt-1">Please select a payment method</p>
+                  <p className="text-red-500 mt-1">{("Please select a payment method")}</p>
                 )}
               </td>
             </tr>
 
             <tr className="border-t-2 border-indigo-400 font-bold">
-              <td className='py-4'>Total:</td>
+              <td className='py-4'>{t("Total")}:</td>
               <td className="text-right">
                 ${totalPrice.toFixed(2)} {/* ✅ Updated: total includes shipping */}
               </td>
@@ -318,8 +320,7 @@ const Checkout = () => {
 
             <tr>
               <td colSpan={2} className="text-sm text-gray-600 pt-4">
-                Your personal data will be used to process your order, support your experience
-                throughout this website, and for other purposes described in our privacy policy.
+                {t("Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.")}
               </td>
             </tr>
           </tbody>

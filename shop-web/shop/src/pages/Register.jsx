@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
+import { useTranslation } from "react-i18next";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -11,6 +12,7 @@ export default function Register() {
 
   const { login } = useContext(AuthContext);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -47,11 +49,11 @@ export default function Register() {
 
   return (
     <div className="max-w-md mx-auto mt-10 text-center my-6">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
+      <h2 className="text-2xl font-bold mb-4">{t("Register")}</h2>
       <form onSubmit={handleRegister} className="space-y-4">
         <input
           type="text"
-          placeholder="Name"
+          placeholder={t("Full Name")}
           required
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -59,7 +61,7 @@ export default function Register() {
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("Email")}
           required
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -67,7 +69,7 @@ export default function Register() {
         />
         <input
           type="text"
-          placeholder="Username"
+          placeholder={t("Username")}
           required
           value={form.username}
           onChange={(e) => setForm({ ...form, username: e.target.value })}
@@ -75,7 +77,7 @@ export default function Register() {
         />
         <input
           type="text"
-          placeholder="Phone"
+          placeholder={t("Phone")}
           required
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -83,7 +85,7 @@ export default function Register() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("Password")}
           required
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -91,16 +93,16 @@ export default function Register() {
         />
         <input
           type="password"
-          placeholder="Confirm Password"
+          placeholder={t("Confirm Password")}
           required
           value={form.confirm}
           onChange={(e) => setForm({ ...form, confirm: e.target.value })}
           className="w-full px-4 py-2 border rounded"
         />
         {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="w-full bg-black text-white py-2 rounded">Register</button>
+        <button type="submit" className="w-full bg-black text-white py-2 rounded">{t("Register")}</button>
         <div>
-          <Link to='/login' className='text-center'>Already have an account? Sign in</Link>
+          <Link to='/login' className='text-center'>{t("Already have an account? Sign in")}</Link>
         </div>
       </form>
     </div>

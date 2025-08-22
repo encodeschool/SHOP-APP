@@ -10,6 +10,7 @@ import FavoriteButton from '../components/FavoriteButton';
 
 // Redux imports
 import { addToCart } from '../redux/cartSlice';
+import { useTranslation } from "react-i18next";
 
 export default function FilterPage() {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ export default function FilterPage() {
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
   
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -112,15 +114,15 @@ export default function FilterPage() {
 
       <div className="flex-1">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold">Collectible Figures</h1>
+          <h1 className="text-2xl font-semibold">{t("Collectible Figures")}</h1>
           <select
             className="border px-3 py-2 rounded"
             value={sort}
             onChange={(e) => dispatch(setSort(e.target.value))}
           >
-            <option value="default">Default sorting</option>
-            <option value="price-asc">Sort by price: low to high</option>
-            <option value="price-desc">Sort by price: high to low</option>
+            <option value="default">{t("Default sorting")}</option>
+            <option value="price-asc">{t("Sort by price: low to high")}</option>
+            <option value="price-desc">{t("Sort by price: high to low")}</option>
           </select>
         </div>
 
@@ -159,7 +161,7 @@ export default function FilterPage() {
                 
             </div>
           ))}
-          {products.length === 0 && <p>No products found.</p>}
+          {products.length === 0 && <p>{t("No products found.")}</p>}
         </div>
       </div>
     </div>

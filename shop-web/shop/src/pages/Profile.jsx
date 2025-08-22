@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import DynamicAttributeForm from '../components/DynamicAttributeForm';
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -45,6 +46,7 @@ export default function Profile() {
   const [productImages, setProductImages] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchCategories();
@@ -409,7 +411,7 @@ export default function Profile() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h2 className="text-2xl font-bold mb-4">My Account</h2>
+      <h2 className="text-2xl font-bold mb-4">{t("My Account")}</h2>
       <div className="flex gap-6 mb-6">
         {['profile', 'favorites', 'orders', 'Product'].map((tab) => (
           <button
@@ -417,7 +419,7 @@ export default function Profile() {
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-black text-white' : 'bg-gray-100'}`}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {t(tab.charAt(0).toUpperCase() + tab.slice(1))}
           </button>
         ))}
       </div>
@@ -427,7 +429,7 @@ export default function Profile() {
           <input
             type="text"
             name="name"
-            placeholder="Name"
+            placeholder={t("Full Name")}
             value={user.name}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded"
@@ -435,7 +437,7 @@ export default function Profile() {
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={t("Email")}
             value={user.email}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded"
@@ -443,7 +445,7 @@ export default function Profile() {
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder={t("Username")}
             value={user.username}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded"
@@ -451,13 +453,13 @@ export default function Profile() {
           <input
             type="text"
             name="phone"
-            placeholder="Phone"
+            placeholder={t("Phone")}
             value={user.phone}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded"
           />
           <div>
-            <label>Profile Picture:</label>
+            <label>{t("Profile Picture")}:</label>
             <input
               type="file"
               accept="image/*"
@@ -467,7 +469,7 @@ export default function Profile() {
           </div>
           {message && <p className="text-sm text-green-600">{message}</p>}
           <button type="submit" className="bg-black text-white px-6 py-2 rounded">
-            Update Profile
+            {t("Update Profile")}
           </button>
         </form>
       )}
@@ -475,7 +477,7 @@ export default function Profile() {
       {activeTab === 'favorites' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {favorites.length === 0 ? (
-            <p className="text-gray-600">You don't have any favorite products yet.</p>
+            <p className="text-gray-600">{t("You don't have any favorite products yet")}.</p>
           ) : (
             favorites.map(product => (
               <div key={product.id} className="border p-4 rounded-xl relative">
@@ -483,7 +485,7 @@ export default function Profile() {
                   className="absolute top-2 right-2 text-red-500"
                   onClick={() => handleRemoveFavorite(product.id)}
                 >
-                  Remove ❤️
+                  {t("Remove")} ❤️
                 </button>
                 <img
                   src={
@@ -505,18 +507,18 @@ export default function Profile() {
       {activeTab === 'orders' && (
         <div className="space-y-4">
           {orders.length === 0 ? (
-            <p className="text-gray-600">You have no orders yet.</p>
+            <p className="text-gray-600">{t("You have no orders yet")}.</p>
           ) : (
             orders.map(order => (
               <div key={order.id} className="border p-4 rounded-lg">
-                <h3 className="text-lg font-semibold">Order ID: {order.id}</h3>
-                <p>Status: {order.status}</p>
-                <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
-                <p>Shipping Method: {order.shippingMethod}</p>
-                <p>Shipping Cost: ${order.shippingCost}</p>
-                <p className="font-semibold">Total: ${order.totalPrice}</p>
+                <h3 className="text-lg font-semibold">{t("Order ID")}: {order.id}</h3>
+                <p>{t("Status")}: {order.status}</p>
+                <p>{t("Created At")}: {new Date(order.createdAt).toLocaleString()}</p>
+                <p>{t("Shipping Method")}: {order.shippingMethod}</p>
+                <p>{t("Shipping Cost")}: ${order.shippingCost}</p>
+                <p className="font-semibold">{t("Total")}: ${order.totalPrice}</p>
                 <div className="mt-2">
-                  <h4 className="font-medium">Items:</h4>
+                  <h4 className="font-medium">{t("Items")}:</h4>
                   <ul className="list-disc ml-6">
                     {order.items.map((item, index) => (
                       <li key={`${order.id}-${index}`}>
@@ -535,7 +537,7 @@ export default function Profile() {
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-4/5">
             {products.length === 0 ? (
-              <p className="text-gray-600">You haven't added any products yet.</p>
+              <p className="text-gray-600">{t("You haven't added any products yet")}.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {products.map((product) => (
@@ -544,13 +546,13 @@ export default function Profile() {
                       className="absolute top-2 right-2 text-red-600"
                       onClick={() => handleDeleteProduct(product.id)}
                     >
-                      Delete
+                      {t("Delete")}
                     </button>
                     <button
                       className="absolute top-2 right-14 text-blue-600"
                       onClick={() => handleEditProduct(product)}
                     >
-                      Edit
+                      {t("Edit")}
                     </button>
                     <img
                       src={
@@ -578,7 +580,7 @@ export default function Profile() {
               <input
                 type="text"
                 name="title"
-                placeholder="Title"
+                placeholder={t("Title")}
                 value={newProduct.title}
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
@@ -587,7 +589,7 @@ export default function Profile() {
               <input
                 type="number"
                 name="price"
-                placeholder="Price"
+                placeholder={t("Price")}
                 value={newProduct.price}
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
@@ -595,7 +597,7 @@ export default function Profile() {
               />
               <textarea
                 name="description"
-                placeholder="Description"
+                placeholder={t("Description")}
                 value={newProduct.description}
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
@@ -607,14 +609,13 @@ export default function Profile() {
                 className="w-full border px-2 py-1 rounded"
                 required
               >
-                <option value="NEW">New</option>
-                <option value="USED">Used</option>
-                <option value="REFURBISHED">Refurbished</option>
+                <option value="NEW">{t("NEW")}</option>
+                <option value="USED">{t("USED")}</option>
               </select>
               <input
                 type="number"
                 name="stock"
-                placeholder="Stock Quantity"
+                placeholder={t("Stock Quantity")}
                 value={newProduct.stock}
                 onChange={handleNewProductChange}
                 className="w-full border px-2 py-1 rounded"
@@ -627,7 +628,7 @@ export default function Profile() {
                 className="w-full border px-2 py-1 rounded"
                 required
               >
-                <option value="">Select Category</option>
+                <option value="">{t("Select Category")}</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -641,7 +642,7 @@ export default function Profile() {
                   className="w-full border px-2 py-1 rounded"
                   required
                 >
-                  <option value="">Select Subcategory</option>
+                  <option value="">{t("Select Subcategory")}</option>
                   {subcategories.map((sub) => (
                     <option key={sub.id} value={sub.id}>
                       {sub.name}
@@ -655,7 +656,7 @@ export default function Profile() {
                   onChange={handleSubSubCategoryChange}
                   className="w-full border px-2 py-1 rounded"
                 >
-                  <option value="">Select Sub-subcategory</option>
+                  <option value="">{t("Select Sub-subcategory")}</option>
                   {subsubcategories.map((subsub) => (
                     <option key={subsub.id} value={subsub.id}>
                       {subsub.name}
@@ -669,7 +670,7 @@ export default function Profile() {
                 className="w-full border px-2 py-1 rounded"
                 required
               >
-                <option value="">Select Brand</option>
+                <option value="">{t("Select Brand")}</option>
                 {brands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}

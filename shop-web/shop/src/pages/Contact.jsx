@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function Contact() {
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useTranslation();
 
   const validate = () => {
     const newErrors = {};
@@ -35,14 +37,14 @@ export default function Contact() {
 
   return (
     <div className="my-8 px-4 container mx-auto">
-      <h1 className="text-center text-3xl font-bold mb-6">Contact Us</h1>
+      <h1 className="text-center text-3xl font-bold mb-6">{t("Contact Us")}</h1>
 
       <div className="grid md:grid-cols-2 gap-10">
         {/* Contact Info */}
         <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Get in Touch</h2>
+          <h2 className="text-xl font-semibold">{t("Get in Touch")}</h2>
           <p className="text-gray-600">
-            Have questions or need assistance? Fill out the form or reach us using the details below.
+            {t("Have questions or need assistance? Fill out the form or reach us using the details below.")}
           </p>
           <div className="flex items-center gap-3">
             <FaMapMarkerAlt className="text-indigo-400 text-xl" />
@@ -61,10 +63,10 @@ export default function Contact() {
         {/* Contact Form */}
         <form onSubmit={handleSubmit} className="space-y-4 bg-white rounded">
           <div>
-            <label className="block font-medium">Name</label>
+            <label className="block font-medium">{t("Full Name")}</label>
             <input
               type="text"
-              placeholder="Enter your name..."
+              placeholder={t("Enter your name...")}
               className="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring focus:border-indigo-400"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -73,10 +75,10 @@ export default function Contact() {
           </div>
 
           <div>
-            <label className="block font-medium">Email</label>
+            <label className="block font-medium">{t("Email")}</label>
             <input
               type="email"
-              placeholder="Enter your email.."
+              placeholder={t("Enter your email..")}
               className="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring focus:border-indigo-400"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -85,9 +87,9 @@ export default function Contact() {
           </div>
 
           <div>
-            <label className="block font-medium">Message</label>
+            <label className="block font-medium">{t("Message")}</label>
             <textarea
-              placeholder="Enter your message"
+              placeholder={t("Enter your message")}
               className="border border-gray-300 rounded w-full px-3 py-2 h-32 focus:outline-none focus:ring focus:border-indigo-400"
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -99,12 +101,12 @@ export default function Contact() {
             type="submit"
             className="bg-indigo-400 text-white px-4 py-2 rounded hover:bg-indigo-400"
           >
-            Send Message
+            {t("Send Message")}
           </button>
 
           {submitted && (
             <p className="text-green-600 font-medium mt-2">
-              ✅ Your message has been sent successfully!
+              {t("✅ Your message has been sent successfully!")}
             </p>
           )}
         </form>

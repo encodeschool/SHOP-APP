@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLoading } from "../contexts/LoadingContext";
 import axios from "../api/axios";
 import { FaClipboardList, FaMoneyBill, FaTruck, FaCheckCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 // ✅ Timeline Component
 function OrderTrackingTimeline({ status }) {
@@ -13,6 +14,7 @@ function OrderTrackingTimeline({ status }) {
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.key === status);
+  const { t } = useTranslation();
 
   return (
     <div className="flex justify-between items-center w-full container mx-auto mt-8">
@@ -38,7 +40,7 @@ function OrderTrackingTimeline({ status }) {
                 isCompleted ? "text-green-600" : "text-gray-500"
               }`}
             >
-              {step.label}
+              {t(step.label)}
             </span>
 
             {/* Connecting Line */}
@@ -63,6 +65,7 @@ export default function TrackOrder() {
   const [orderId, setOrderId] = useState("");
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   const handleTrackOrder = async () => {
     if (!orderId.trim()) {
@@ -88,7 +91,7 @@ export default function TrackOrder() {
 
   return (
     <div className="my-8 px-8 container mx-auto">
-      <h1 className="text-center text-3xl font-bold mb-6">Track your Order</h1>
+      <h1 className="text-center text-3xl font-bold mb-6">{t("Track your Order")}</h1>
 
       {/* Input & Button */}
       <div className="flex items-center gap-2 justify-center mb-[50px]">
@@ -96,14 +99,14 @@ export default function TrackOrder() {
           type="text"
           value={orderId}
           onChange={(e) => setOrderId(e.target.value)}
-          placeholder="Enter your Order ID"
+          placeholder={t("Enter your Order ID")}
           className="border border-gray-300 rounded px-4 py-2 w-64 focus:outline-none focus:ring focus:border-indigo-400"
         />
         <button
           onClick={handleTrackOrder}
           className="bg-indigo-400 text-white px-4 py-2 rounded hover:bg-indigo-600"
         >
-          Track Order
+          {t("Track Order")}
         </button>
       </div>
 
@@ -116,17 +119,17 @@ export default function TrackOrder() {
           {/* Timeline */}
           <OrderTrackingTimeline status={order.status} />
           <div className="border rounded p-4 mt-[50px] shadow container mx-auto">
-            <h2 className="text-lg font-bold mb-2">Order #{order.id}</h2>
+            <h2 className="text-lg font-bold mb-2">{t("Order")} #{order.id}</h2>
             <p>
-              Status:{" "}
+              {t("Status")}:{" "}
               <span className="font-medium">{order.status}</span>
             </p>
             <table className="w-full my-4 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-white uppercase bg-indigo-400 dark:text-white">
                 <tr>
-                  <th className="p-2">Title</th>
-                  <th className="p-2">Quantity</th>
-                  <th className="p-2">Price per unit</th>
+                  <th className="p-2">{t("Title")}</th>
+                  <th className="p-2">{t("Quantity")}</th>
+                  <th className="p-2">{t("Price per unit")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -139,8 +142,8 @@ export default function TrackOrder() {
                 ))}
               </tbody>
             </table>
-            <p>Total: ${order.totalPrice}</p>
-            <p>Placed on: {new Date(order.createdAt).toLocaleString()}</p>
+            <p>{t("Total")}: ${order.totalPrice}</p>
+            <p>{t("Placed on")}: {new Date(order.createdAt).toLocaleString()}</p>
           </div>
         </>
       )}

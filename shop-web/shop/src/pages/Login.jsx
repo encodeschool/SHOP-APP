@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {AuthContext} from '../contexts/AuthContext';
 import Register from '../pages/Register';
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
 
 
   const handleLogin = async (e) => {
@@ -44,11 +46,11 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto m-10  text-center">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
+      <h2 className="text-2xl font-bold mb-4">{t("Login")}</h2>
       <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("Email")}
           value={email}
           required
           onChange={(e) => setEmail(e.target.value)}
@@ -56,16 +58,16 @@ export default function Login() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("Password")}
           value={password}
           required
           onChange={(e) => setPassword(e.target.value)}
           className="w-full px-4 py-2 border rounded"
         />
         {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="w-full mb-3 bg-indigo-400 text-white py-2 rounded">Login</button>
+        <button type="submit" className="w-full mb-3 bg-indigo-400 text-white py-2 rounded">{t("Login")}</button>
         <div>
-          <Link to='/register' className='text-center'>Don't have an account? Create account</Link>
+          <Link to='/register' className='text-center'>{t("Don't have an account? Create account")}</Link>
         </div>
       </form>
     </div>
