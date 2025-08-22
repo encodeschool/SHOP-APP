@@ -104,7 +104,7 @@ code {
   box-shadow: 0!important;
 }
 
-.swiper-wrapper {
+.category-swiper .swiper-wrapper {
   margin-bottom: 0!important;
 }
 
@@ -120,13 +120,13 @@ code {
 }
 
 /* Ensure Swiper wrapper doesn't interfere with dropdown */
-.swiper-wrapper {
+.category-swiper .swiper-wrapper {
   margin-bottom: 0 !important;
 }
 
 /* Style navigation buttons */
-.swiper-button-prev-custom,
-.swiper-button-next-custom {
+.category-swiper .swiper-button-prev-custom,
+.category-swiper .swiper-button-next-custom {
   z-index: 50 !important;
 }
 
@@ -135,6 +135,6 @@ code {
   z-index: 100 !important;
 }
 
-.swiper-slide {
+.category-swiper .swiper-slide {
   width: auto!important;
 }
