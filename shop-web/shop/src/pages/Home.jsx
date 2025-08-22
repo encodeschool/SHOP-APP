@@ -192,19 +192,20 @@ const Home = () => {
 
   return (
     <div>
+      {/* Category Carousel */}
       <div className="w-full bg-indigo-400 relative">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center relative justify-between">
+          <div className="flex items-center justify-between relative">
             <div className="flex gap-2">
               <button
                 ref={categoryPrevRef}
-                className="swiper-button-prev-custom absolute left-0 text-white rounded-full hover:cursor-pointer z-50"
+                className="swiper-button-prev-custom absolute left-0 text-white rounded-full z-50"
               >
                 ❮
               </button>
               <button
                 ref={categoryNextRef}
-                className="swiper-button-next-custom absolute right-0 text-white rounded-full hover:cursor-pointer z-50"
+                className="swiper-button-next-custom absolute right-0 text-white rounded-full z-50"
               >
                 ❯
               </button>
@@ -223,13 +224,16 @@ const Home = () => {
               swiper.params.navigation.nextEl = categoryNextRef.current;
             }}
             pagination={{ clickable: true }}
-            className="category-swiper mb-0"
+            className="category-swiper"
             breakpoints={{
               640: { slidesPerView: 2 },
               768: { slidesPerView: 4 },
               1024: { slidesPerView: 6 },
             }}
-            style={{ overflow: 'visible' }} // Allow dropdown to be visible
+            style={{ overflow: 'visible' }}
+            onTouchMove={(swiper, event) => {
+              event.stopPropagation(); // Prevent touch events from scrolling the page
+            }}
           >
             {categories.map((category, index) => (
               <SwiperSlide
@@ -241,9 +245,9 @@ const Home = () => {
                   setHoveredSubcategory(null);
                   setSelectedSubImage(null);
                 }}
-                onClick={() => handleCategoryClick(category)} // Mobile support
+                onClick={() => handleCategoryClick(category)}
               >
-                <div className="flex items-center mx-5 text-white text-base font-medium">
+                <div className="flex items-center text-white text-base font-medium px-2">
                   <img
                     src={
                       category.icon

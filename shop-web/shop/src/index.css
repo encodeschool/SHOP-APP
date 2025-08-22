@@ -110,3 +110,26 @@ code {
 .category-swiper {
   margin-bottom: 0!important;
 }
+
+/* Prevent Swiper from clipping dropdowns */
+.category-swiper {
+  overflow: visible !important;
+  touch-action: pan-y; /* Allow vertical scroll, block horizontal page scroll */
+  overscroll-behavior-x: contain; /* Prevent overscroll from affecting page */
+}
+
+/* Ensure Swiper wrapper doesn't interfere with dropdown */
+.swiper-wrapper {
+  margin-bottom: 0 !important;
+}
+
+/* Style navigation buttons */
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+  z-index: 50 !important;
+}
+
+/* Ensure dropdown is above all elements */
+.category-swiper .swiper-slide .absolute {
+  z-index: 100 !important;
+}
