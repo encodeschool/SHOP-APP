@@ -102,3 +102,11 @@ code {
 .carousel .control-dots .dot {
   box-shadow: 0!important;
 }
+
+.swiper-wrapper {
+  margin-bottom: 0!important;
+}
+
+.category-swiper {
+  margin-bottom: 0!important;
+}
