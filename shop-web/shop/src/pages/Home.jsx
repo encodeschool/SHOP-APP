@@ -246,7 +246,7 @@ const Home = () => {
                 }}
                 onClick={() => handleCategoryClick(category)}
               >
-                <div className="flex mx-8 items-center text-white text-base font-medium px-2">
+                <div className="flex items-center text-white text-base font-medium px-2">
                   <img
                     src={
                       category.icon
@@ -260,7 +260,7 @@ const Home = () => {
                 </div>
                 {/* Mega Menu Dropdown */}
                 {hoveredCategory?.id === category.id && (
-                  <div className="absolute top-full left-8 bg-white text-black shadow-lg z-[100] flex p-6 mt-1 rounded w-auto max-w-[calc(100vw-2rem)]">
+                  <div className="absolute top-full left-0 bg-white text-black shadow-lg z-[100] flex p-6 mt-1 rounded w-auto max-w-[calc(100vw-2rem)]">
                     <div className="grid gap-4 w-auto flex-1">
                       {category.subcategories?.map((sub, subIndex) => (
                         <div
