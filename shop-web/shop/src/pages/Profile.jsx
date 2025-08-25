@@ -47,6 +47,7 @@ export default function Profile() {
   const [editingId, setEditingId] = useState(null);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
   const { t } = useTranslation();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -353,6 +354,7 @@ export default function Profile() {
       setSelectedBrand('');
       setAttributes([]);
       setProductImages([]);
+      setIsDrawerOpen(false);
       setEditingId(null);
       fetchUserProducts();
     } catch (err) {
@@ -407,6 +409,7 @@ export default function Profile() {
       console.error('Failed to load subcategories or attributes:', err);
     }
     setSelectedBrand(product.brandId);
+    setIsDrawerOpen(true);
   };
 
   return (
@@ -536,6 +539,30 @@ export default function Profile() {
       {activeTab === 'Product' && (
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-4/5">
+            <button
+                className='bg-green-500 mb-4 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
+                onClick={() => {
+                  setEditingId(null);
+                  setNewProduct({
+                    title: '',
+                    description: '',
+                    price: '',
+                    stock: '',
+                    condition: 'NEW',
+                    categoryId: '',
+                    subcategoryId: '',
+                    userId: '',
+                    featured: false,
+                    images: [],
+                    attributes: [],
+                    brandId: '',
+                    translations: [],
+                  });
+                  setIsDrawerOpen(true);
+                }}
+              >
+                +
+            </button>
             {products.length === 0 ? (
               <p className="text-gray-600">{t("You haven't added any products yet")}.</p>
             ) : (
@@ -549,7 +576,7 @@ export default function Profile() {
                       {t("Delete")}
                     </button>
                     <button
-                      className="absolute top-2 right-14 text-blue-600"
+                      className="absolute top-2 left-2 text-blue-600"
                       onClick={() => handleEditProduct(product)}
                     >
                       {t("Edit")}
@@ -572,144 +599,161 @@ export default function Profile() {
             )}
           </div>
 
-          <div className="w-full lg:w-1/5 border p-4 rounded">
-            <h3 className="text-lg font-semibold mb-2">
-              {editingId ? 'Edit Product' : 'Add Product'}
-            </h3>
-            <form onSubmit={handleProductSubmit} className="space-y-2">
-              <input
-                type="text"
-                name="title"
-                placeholder={t("Title")}
-                value={newProduct.title}
-                onChange={handleNewProductChange}
-                className="w-full border px-2 py-1 rounded"
-                required
-              />
-              <input
-                type="number"
-                name="price"
-                placeholder={t("Price")}
-                value={newProduct.price}
-                onChange={handleNewProductChange}
-                className="w-full border px-2 py-1 rounded"
-                required
-              />
-              <textarea
-                name="description"
-                placeholder={t("Description")}
-                value={newProduct.description}
-                onChange={handleNewProductChange}
-                className="w-full border px-2 py-1 rounded"
-              />
-              <select
-                name="condition"
-                value={newProduct.condition}
-                onChange={handleNewProductChange}
-                className="w-full border px-2 py-1 rounded"
-                required
-              >
-                <option value="NEW">{t("NEW")}</option>
-                <option value="USED">{t("USED")}</option>
-              </select>
-              <input
-                type="number"
-                name="stock"
-                placeholder={t("Stock Quantity")}
-                value={newProduct.stock}
-                onChange={handleNewProductChange}
-                className="w-full border px-2 py-1 rounded"
-                min="0"
-                required
-              />
-              <select
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                className="w-full border px-2 py-1 rounded"
-                required
-              >
-                <option value="">{t("Select Category")}</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              {subcategories.length > 0 && (
-                <select
-                  value={selectedSubcategory}
-                  onChange={handleSubcategoryChange}
-                  className="w-full border px-2 py-1 rounded"
-                  required
-                >
-                  <option value="">{t("Select Subcategory")}</option>
-                  {subcategories.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {subsubcategories.length > 0 && (
-                <select
-                  value={newProduct.subsubcategoryId}
-                  onChange={handleSubSubCategoryChange}
-                  className="w-full border px-2 py-1 rounded"
-                >
-                  <option value="">{t("Select Sub-subcategory")}</option>
-                  {subsubcategories.map((subsub) => (
-                    <option key={subsub.id} value={subsub.id}>
-                      {subsub.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              <select
-                value={selectedBrand}
-                onChange={handleBrandChange}
-                className="w-full border px-2 py-1 rounded"
-                required
-              >
-                <option value="">{t("Select Brand")}</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
-              </select>
-              {(selectedSubcategory || selectedCategory) && (
-                <DynamicAttributeForm
-                  categoryId={newProduct.subcategoryId || newProduct.categoryId}
-                  productId={editingId}
-                  onChange={handleDynamicAttributesChange}
-                />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="w-full border px-2 py-1 rounded"
-                onChange={(e) => setProductImages(Array.from(e.target.files))}
-              />
-              {productImages.length > 0 && (
-                <div className="flex gap-2 mt-2 overflow-x-auto">
-                  {productImages.map((file, idx) => (
-                    <img
-                      key={idx}
-                      src={URL.createObjectURL(file)}
-                      alt={`preview-${idx}`}
-                      className="h-16 w-16 object-cover rounded"
+          <div
+            className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+              isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={() => setIsDrawerOpen(false)}
+          ></div>
+
+          <div
+            className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+              isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+            } w-[100%] md:w-[500px] overflow-y-scroll`}
+          >
+            <div className="p-4">
+              <div className="p-4 bg-white h-fit">
+                <div className="w-full">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {editingId ? 'Edit Product' : 'Add Product'}
+                  </h3>
+                  <form onSubmit={handleProductSubmit} className="space-y-2">
+                    <input
+                      type="text"
+                      name="title"
+                      placeholder={t("Title")}
+                      value={newProduct.title}
+                      onChange={handleNewProductChange}
+                      className="w-full border px-2 py-1 rounded"
+                      required
                     />
-                  ))}
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder={t("Price")}
+                      value={newProduct.price}
+                      onChange={handleNewProductChange}
+                      className="w-full border px-2 py-1 rounded"
+                      required
+                    />
+                    <textarea
+                      name="description"
+                      placeholder={t("Description")}
+                      value={newProduct.description}
+                      onChange={handleNewProductChange}
+                      className="w-full border px-2 py-1 rounded"
+                    />
+                    <select
+                      name="condition"
+                      value={newProduct.condition}
+                      onChange={handleNewProductChange}
+                      className="w-full border px-2 py-1 rounded"
+                      required
+                    >
+                      <option value="NEW">{t("NEW")}</option>
+                      <option value="USED">{t("USED")}</option>
+                    </select>
+                    <input
+                      type="number"
+                      name="stock"
+                      placeholder={t("Stock Quantity")}
+                      value={newProduct.stock}
+                      onChange={handleNewProductChange}
+                      className="w-full border px-2 py-1 rounded"
+                      min="0"
+                      required
+                    />
+                    <select
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      className="w-full border px-2 py-1 rounded"
+                      required
+                    >
+                      <option value="">{t("Select Category")}</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                    {subcategories.length > 0 && (
+                      <select
+                        value={selectedSubcategory}
+                        onChange={handleSubcategoryChange}
+                        className="w-full border px-2 py-1 rounded"
+                        required
+                      >
+                        <option value="">{t("Select Subcategory")}</option>
+                        {subcategories.map((sub) => (
+                          <option key={sub.id} value={sub.id}>
+                            {sub.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {subsubcategories.length > 0 && (
+                      <select
+                        value={newProduct.subsubcategoryId}
+                        onChange={handleSubSubCategoryChange}
+                        className="w-full border px-2 py-1 rounded"
+                      >
+                        <option value="">{t("Select Sub-subcategory")}</option>
+                        {subsubcategories.map((subsub) => (
+                          <option key={subsub.id} value={subsub.id}>
+                            {subsub.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <select
+                      value={selectedBrand}
+                      onChange={handleBrandChange}
+                      className="w-full border px-2 py-1 rounded"
+                      required
+                    >
+                      <option value="">{t("Select Brand")}</option>
+                      {brands.map((brand) => (
+                        <option key={brand.id} value={brand.id}>
+                          {brand.name}
+                        </option>
+                      ))}
+                    </select>
+                    {(selectedSubcategory || selectedCategory) && (
+                      <DynamicAttributeForm
+                        categoryId={newProduct.subcategoryId || newProduct.categoryId}
+                        productId={editingId}
+                        onChange={handleDynamicAttributesChange}
+                      />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="w-full border px-2 py-1 rounded"
+                      onChange={(e) => setProductImages(Array.from(e.target.files))}
+                    />
+                    {productImages.length > 0 && (
+                      <div className="flex gap-2 mt-2 overflow-x-auto">
+                        {productImages.map((file, idx) => (
+                          <img
+                            key={idx}
+                            src={URL.createObjectURL(file)}
+                            alt={`preview-${idx}`}
+                            className="h-16 w-16 object-cover rounded"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      type="submit"
+                      className="bg-black text-white w-full py-1 rounded"
+                    >
+                      {editingId ? 'Update' : 'Create'}
+                    </button>
+                  </form>
                 </div>
-              )}
-              <button
-                type="submit"
-                className="bg-black text-white w-full py-1 rounded"
-              >
-                {editingId ? 'Update' : 'Create'}
-              </button>
-            </form>
+              </div>
+            </div>
           </div>
         </div>
       )}
