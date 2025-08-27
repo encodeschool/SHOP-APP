@@ -41,7 +41,7 @@ export default function SearchAppBar() {
     <header className="bg-white border-b shadow-sm w-full py-3">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo + Hamburger */}
-        <div className="flex items-center gap-4">
+        <div className="flex w-[100%] md:w-auto items-center gap-4">
           <Link to="/" className="text-3xl font-bold flex items-center justify-center">
             <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
             BAZAARLY

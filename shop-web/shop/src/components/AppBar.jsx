@@ -62,7 +62,7 @@ export default function AppBar() {
   };
 
   return (
-    <div className="bg-white text-sm border-b shadow-sm">
+    <div className="bg-white hidden md:block text-sm border-b shadow-sm">
       <div className="container mx-auto md:px-4 md:py-2 flex justify-between items-center">
         {/* Left Links - Desktop */}
         <div className="hidden md:flex gap-4">
