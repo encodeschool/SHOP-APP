@@ -50,6 +50,7 @@ export default function Orders() {
             <table className="w-full border bg-white shadow">
                 <thead>
                     <tr className="bg-gray-200 text-left">
+                        <th className="p-2">User Details</th>
                         <th className="p-2">Product Title & Quantity</th>
                         <th className="p-2">Total Price</th>
                         <th className="p-2">Created Date</th>
@@ -59,6 +60,10 @@ export default function Orders() {
                 <tbody>
                     {orders.map((o) => (
                         <tr key={o.id} className="hover:bg-gray-100">
+                            <td className="p-2">
+                                <p>Full name: <b><u>{o.user.name}</u></b></p>
+                                <p>Email: <b><u>{o.user.email}</u></b></p>
+                            </td>
                             <td className="p-2">
                                 {o.items.map((item, index) => (
                                     <div key={index}>

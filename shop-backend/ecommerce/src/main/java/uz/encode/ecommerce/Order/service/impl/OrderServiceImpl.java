@@ -199,6 +199,7 @@ public class OrderServiceImpl implements OrderService {
         return new OrderResponseDTO(
             order.getId(),
             order.getUser().getId(),
+            order.getUser(),
             itemDTOs,
             order.getTotalPrice(),
             order.getStatus().name(),
