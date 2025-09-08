@@ -106,7 +106,7 @@ const CategoryBar = () => {
   };
 
   return (
-    <div className="bg-white border-b shadow-sm w-full py-3 sticky top-0 z-[1000]">
+    <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[1000]">
       {/* Desktop Navigation (visible on md and up) */}
       <div className="container mx-auto px-4 py-2 hidden md:flex items-center justify-between">
         <button

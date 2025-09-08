@@ -138,3 +138,7 @@ code {
 .category-swiper .swiper-slide {
   width: auto!important;
 }
+
+.p-sticky {
+  position: sticky;
+}
