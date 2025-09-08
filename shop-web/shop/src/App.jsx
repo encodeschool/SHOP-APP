@@ -37,7 +37,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <AppBar />
           {/* <Navbar /> */}
-          <CategoryBar />
+          <CategoryBar className='sticky top-0' />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />

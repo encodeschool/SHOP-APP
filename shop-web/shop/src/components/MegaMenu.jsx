@@ -16,7 +16,7 @@ const MegaMenu = ({ categories, getLocalizedName, BASE_URL }) => {
                         : '/placeholder.jpg'
                     }
                     alt={category.name}
-                    className="w-[15px] object-contain w-full mr-2"
+                    className="w-[15px] object-contain mr-2"
                 />
                 {getLocalizedName(category)}
               </Link>
