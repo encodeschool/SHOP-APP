@@ -15,14 +15,11 @@ import { useLoading } from '../contexts/LoadingContext';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import { useTranslation } from 'react-i18next';
-import CategoryCarousel from '../components/CategoryBar';
+import CategoryBar from '../components/CategoryBar'; // Update the import
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [hoveredSubcategory, setHoveredSubcategory] = useState(null);
-  const [selectedSubImage, setSelectedSubImage] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [brands, setBrands] = useState([]);
   const { t, i18n } = useTranslation();
@@ -33,8 +30,6 @@ const Home = () => {
   const { setLoading } = useLoading();
   const dispatch = useDispatch();
   const BASE_URL = process.env.REACT_APP_BASE_URL || '';
-  const categoryPrevRef = useRef(null); // Ref for category carousel navigation
-  const categoryNextRef = useRef(null); // Ref for category carousel navigation
 
   // Get localized name from translations or fallback to default name
   const getLocalizedName = (item) => {
@@ -50,7 +45,6 @@ const Home = () => {
       try {
         const lang = i18n.language === 'lv' ? 'en' : i18n.language;
         const res = await axios.get(`/products/lang?lang=${lang}`);
-        console.log('Products API Response:', JSON.stringify(res.data, null, 2));
         setProducts(res.data);
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -67,7 +61,6 @@ const Home = () => {
     const fetchBrands = async () => {
       try {
         const res = await axios.get('/products/brands');
-        console.log('Brands API Response:', JSON.stringify(res.data, null, 2));
         setBrands(res.data);
       } catch (error) {
         console.error('Failed to fetch brands:', error);
@@ -85,9 +78,6 @@ const Home = () => {
       try {
         const lang = i18n.language === 'lv' ? 'en' : i18n.language;
         const res = await axios.get(`/categories?lang=${lang}`);
-        console.log('Categories API Response:', JSON.stringify(res.data, null, 2));
-        
-        // Deduplicate categories by ID
         const uniqueCategories = [];
         const seenIds = new Set();
         res.data.forEach((cat) => {
@@ -98,13 +88,9 @@ const Home = () => {
             console.warn(`Duplicate category ID detected: ${cat.id}, Name=${cat.name}`);
           }
         });
-
-        // Filter root categories with subcategories
         const rootCategories = uniqueCategories.filter(
           (cat) => cat.parentId === null && cat.subcategories && cat.subcategories.length > 0
         );
-
-        // Deduplicate subcategories
         rootCategories.forEach((cat) => {
           const uniqueSubcategories = [];
           const subSeenIds = new Set();
@@ -118,8 +104,6 @@ const Home = () => {
           });
           cat.subcategories = uniqueSubcategories;
         });
-
-        console.log('Deduplicated Categories:', JSON.stringify(rootCategories, null, 2));
         setCategories(rootCategories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -184,31 +168,10 @@ const Home = () => {
     dispatch(addToCart(product));
   };
 
-  // Handle click for mobile/touch devices
-  const handleCategoryClick = (category) => {
-    setHoveredCategory(hoveredCategory?.id === category.id ? null : category);
-    setHoveredSubcategory(null);
-    setSelectedSubImage(null);
-  };
-
   return (
     <div>
-      <CategoryCarousel
-        categories={categories}
-        getLocalizedName={getLocalizedName}
-        BASE_URL={BASE_URL}
-        handleCategoryClick={handleCategoryClick}
-        hoveredCategory={hoveredCategory}
-        setHoveredCategory={setHoveredCategory}
-        hoveredSubcategory={hoveredSubcategory}
-        setHoveredSubcategory={setHoveredSubcategory}
-        setSelectedSubImage={setSelectedSubImage}
-      />
-
       <CarouselBanner />
-
       <FeatureStrip />
-
       <div className="container mx-auto px-4 py-6">
         <h1 className="w-fit border-b-[4px] border-indigo-400 text-xl">{t('All Products')}</h1>
         <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -278,7 +241,6 @@ const Home = () => {
           ))}
         </div>
       </div>
-
       <div className="container mx-auto px-4 py-6 relative">
         <div className="flex items-center justify-between mb-4">
           <h1 className="border-b-[4px] border-indigo-400 text-xl">{t('Our Brands')}</h1>
@@ -334,7 +296,6 @@ const Home = () => {
           ))}
         </Swiper>
       </div>
-
       <div className="container mx-auto px-4 py-6 relative">
         <div className="flex items-center justify-between mb-4">
           <h1 className="border-b-[4px] border-indigo-400 text-xl">{t('Featured Products')}</h1>

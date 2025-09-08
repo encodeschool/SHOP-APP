@@ -1,14 +1,26 @@
 package uz.encode.ecommerce.Payment.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import uz.encode.ecommerce.Order.service.OrderService;
 
-import uz.encode.ecommerce.Payment.service.PaymentService;
+import java.util.UUID;
 
-@Controller
+@RestController
+@RequestMapping("/api/payments")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class PaymentController {
-    
-    @Autowired
-    private PaymentService paymentService;
 
+    private final OrderService orderService;
+
+    @PostMapping("/create-intent/{orderId}")
+    public ResponseEntity<String> createPaymentIntent(
+            @PathVariable UUID orderId,
+            @RequestParam(defaultValue = "card") String method
+    ) {
+        String clientSecret = orderService.createPaymentIntent(orderId, method);
+        return ResponseEntity.ok(clientSecret);
+    }
 }

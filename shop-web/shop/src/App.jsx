@@ -28,6 +28,7 @@ import { LoadingProvider } from './contexts/LoadingContext';
 import TrackOrder from './pages/TrackOrder';
 import Contact from './pages/Contact';
 import { LanguageProvider } from './contexts/LanguageContext';
+import CategoryBar from './components/CategoryBar';
 // 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <AppBar />
           {/* <Navbar /> */}
-          <SearchBar />
+          <CategoryBar />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />

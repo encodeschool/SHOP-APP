@@ -1,130 +1,251 @@
-import React, { useRef, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
-import { Link } from 'react-router-dom';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import MegaMenu from './MegaMenu'; // Import the new MegaMenu component
+import { useTranslation } from 'react-i18next';
 
-const CategoryCarousel = ({ categories, getLocalizedName, BASE_URL, handleCategoryClick, hoveredCategory, setHoveredCategory, hoveredSubcategory, setHoveredSubcategory, setSelectedSubImage }) => {
-  const categoryPrevRef = useRef(null);
-  const categoryNextRef = useRef(null);
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaSyncAlt,
+  FaHeart,
+  FaShoppingBag,
+  FaSearch,
+  FaBars,
+  FaTimes,
+  FaPhone,
+  FaMailBulk,
+} from "react-icons/fa";
+import { useSelector } from 'react-redux';
+import { BsShop } from "react-icons/bs";
+import i18n from "../i18n";
+import React, { useEffect, useState, useRef } from 'react';
+import axios from '../api/axios';
+import { useLoading } from '../contexts/LoadingContext';
+
+const CategoryBar = () => {
+  const [categories, setCategories] = useState([]);
+  // Get localized name from translations or fallback to default name
+  const getLocalizedName = (item) => {
+    if (!item) return '';
+    const lang = i18n.language === 'lv' ? 'en' : i18n.language;
+    const translation = item.translations?.find(t => t.language === lang);
+    return translation?.name || item.name || 'Unnamed';
+  };
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const BASE_URL = process.env.REACT_APP_BASE_URL || '';
+  const { setLoading } = useLoading();
+
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm(""); // Optional: reset after search
+      setMobileMenuOpen(false); // Optional: close mobile menu
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchCategories = async () => {
+      try {
+        const lang = i18n.language === 'lv' ? 'en' : i18n.language;
+        const res = await axios.get(`/categories?lang=${lang}`);
+        const uniqueCategories = [];
+        const seenIds = new Set();
+        res.data.forEach((cat) => {
+          if (!seenIds.has(cat.id)) {
+            seenIds.add(cat.id);
+            uniqueCategories.push(cat);
+          } else {
+            console.warn(`Duplicate category ID detected: ${cat.id}, Name=${cat.name}`);
+          }
+        });
+        const rootCategories = uniqueCategories.filter(
+          (cat) => cat.parentId === null && cat.subcategories && cat.subcategories.length > 0
+        );
+        rootCategories.forEach((cat) => {
+          const uniqueSubcategories = [];
+          const subSeenIds = new Set();
+          cat.subcategories.forEach((sub) => {
+            if (!subSeenIds.has(sub.id)) {
+              subSeenIds.add(sub.id);
+              uniqueSubcategories.push(sub);
+            } else {
+              console.warn(`Duplicate subcategory ID detected: ${sub.id}, Name=${sub.name}, ParentID=${cat.id}`);
+            }
+          });
+          cat.subcategories = uniqueSubcategories;
+        });
+        setCategories(rootCategories);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, [i18n.language, setLoading]);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
+
+  // Toggles the desktop MegaMenu
+  const toggleDesktopMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  // Toggles the mobile side menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
-    <div className="w-full bg-indigo-400 relative">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between relative">
-          <div className="flex gap-2">
-            <button
-              ref={categoryPrevRef}
-              className="swiper-button-prev-custom absolute bg-white left-0 p-[1px] px-[9px] text-indigo-400 font-bold rounded z-50"
-            >
-              ❮
-            </button>
-            <button
-              ref={categoryNextRef}
-              className="swiper-button-next-custom absolute right-0 bg-white p-[1px] px-[9px] text-indigo-400 font-bold rounded z-50"
-            >
-              ❯
+    <div className="bg-white border-b shadow-sm w-full py-3">
+      {/* Desktop Navigation (visible on md and up) */}
+      <div className="container mx-auto px-4 py-2 hidden md:flex items-center justify-between">
+        <button
+          onClick={toggleDesktopMenu}
+          className="flex items-center text-white text-base font-medium px-4 py-2 bg-indigo-400 rounded-md transition-all hover:bg-indigo-500"
+        >
+          {t('Open Categories')}
+          <span className="ml-2 transition-transform duration-300 transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+            ▼
+          </span>
+        </button>
+        <div className="flex-1 mx-6 max-w-3xl flex">
+          <input
+            type="text"
+            placeholder="Search for Products"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="flex-1 px-4 py-2 rounded-l-xl border-[4px] border-indigo-400 focus:outline-none"
+          />
+          <button onClick={handleSearch} className="bg-indigo-400 px-4 rounded-r-xl text-white transition-all hover:bg-indigo-500">
+            <FaSearch />
+          </button>
+        </div>
+        <div className="flex items-center gap-6 text-gray-700">
+          <Link to="/compare" title="Compare Products">
+            <FaSyncAlt size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
+          </Link>
+          <Link to="/favorites" title="My Favorites">
+            <FaHeart size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
+          </Link>
+          <Link to="/cart" className="relative flex items-center" title="My Shopping Cart">
+            <FaShoppingBag size={25} className="mr-1" />
+            {totalQuantity > 0 && (
+              <span className="absolute -bottom-3 left-[15px] bg-indigo-400 text-white rounded-full px-2 p-1 text-xs font-bold transition-all transform hover:scale-110">
+                {totalQuantity}
+              </span>
+            )}
+            <span className="ml-2 text-xl font-bold">€{totalPrice.toFixed(2)}</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Mobile Navigation (visible on smaller screens) */}
+      <div className="container mx-auto px-4 py-2 md:hidden flex items-center justify-between">
+        {/* Hamburger menu button */}
+        <button onClick={toggleMobileMenu} className="text-gray-700">
+          <FaBars size={25} />
+        </button>
+        {/* Mobile search bar */}
+        <div className="flex-1 mx-4 flex">
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="flex-1 px-4 py-2 rounded-xl border-[2px] border-gray-300 focus:outline-none"
+          />
+        </div>
+        {/* Mobile cart icon */}
+        <Link to="/cart" className="relative flex items-center" title="My Shopping Cart">
+          <FaShoppingBag size={25} className="mr-1" />
+          {totalQuantity > 0 && (
+            <span className="absolute -bottom-2 left-[15px] bg-indigo-400 text-white rounded-full px-2 p-1 text-xs font-bold transition-all transform hover:scale-110">
+              {totalQuantity}
+            </span>
+          )}
+        </Link>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 bg-white z-50 transform transition-transform duration-300 ease-in-out ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        } md:hidden`}
+      >
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-xl font-bold">{t('Menu')}</h2>
+          <button onClick={toggleMobileMenu} className="text-gray-700">
+            <FaTimes size={25} />
+          </button>
+        </div>
+        <div className="p-4">
+          <div className="flex-1 mb-4 flex">
+            <input
+              type="text"
+              placeholder="Search for Products"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="flex-1 px-4 py-2 rounded-l-xl border-[4px] border-indigo-400 focus:outline-none"
+            />
+            <button onClick={handleSearch} className="bg-indigo-400 px-4 rounded-r-xl text-white">
+              <FaSearch />
             </button>
           </div>
-        </div>
-        <Swiper
-          modules={[Navigation, Pagination]}
-          spaceBetween={20}
-          slidesPerView={1}
-          navigation={{
-            prevEl: categoryPrevRef.current,
-            nextEl: categoryNextRef.current,
-          }}
-          onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = categoryPrevRef.current;
-            swiper.params.navigation.nextEl = categoryNextRef.current;
-          }}
-          className="category-swiper"
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 4 },
-            1024: { slidesPerView: 6 },
-          }}
-          style={{ overflow: 'visible' }}
-          onTouchMove={(swiper, event) => {
-            event.stopPropagation();
-          }}
-        >
-          {categories.map((category, index) => (
-            <SwiperSlide
-              key={`${category.id}-${index}`}
-              className="relative"
-              onClick={() => handleCategoryClick(category)}
-            >
-              <div className="flex items-center text-white text-base font-medium px-2">
-                <img
-                  src={
-                    category.icon
-                      ? `${BASE_URL}${category.icon}`
-                      : '/placeholder.jpg'
-                  }
-                  alt={getLocalizedName(category)}
-                  className="w-[20px] invert-[100%] mr-2 object-contain"
-                />
-                <button className="hover:underline">{getLocalizedName(category)}</button>
+          <nav className="flex flex-col space-y-4">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                to={`/category/${category.id}`}
+                onClick={toggleMobileMenu}
+                className="text-gray-700 font-medium text-lg hover:text-indigo-400 transition-colors"
+              >
+                {getLocalizedName(category)}
+              </Link>
+            ))}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="font-bold text-gray-800 mb-2">{t('My Account')}</h3>
+              <div className="flex flex-col space-y-2">
+                <Link to="/compare" onClick={toggleMobileMenu} className="text-gray-600 hover:text-indigo-400 flex items-center gap-2">
+                  <FaSyncAlt />
+                  {t('Compare Products')}
+                </Link>
+                <Link to="/favorites" onClick={toggleMobileMenu} className="text-gray-600 hover:text-indigo-400 flex items-center gap-2">
+                  <FaHeart />
+                  {t('My Favorites')}
+                </Link>
+                <Link to="/cart" onClick={toggleMobileMenu} className="text-gray-600 hover:text-indigo-400 flex items-center gap-2">
+                  <FaShoppingBag />
+                  {t('My Cart')}
+                </Link>
               </div>
-              {/* Mega Menu Dropdown */}
-              {hoveredCategory?.id === category.id && (
-                <div className="absolute top-full left-0 bg-white text-black shadow-lg z-[100] flex p-6 mt-1 rounded w-auto max-w-[calc(100vw-2rem)]">
-                  <div className="grid gap-4 w-auto flex-1">
-                    {category.subcategories?.map((sub, subIndex) => (
-                      <div
-                        key={`${sub.id}-${subIndex}`}
-                        className="relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setHoveredSubcategory(hoveredSubcategory?.id === sub.id ? null : sub);
-                          setSelectedSubImage(sub.imageUrl);
-                        }}
-                      >
-                        <Link
-                          to={`/category/${sub.id}`}
-                          className="hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {getLocalizedName(sub)}
-                        </Link>
-                        {hoveredSubcategory?.id === sub.id && sub.subcategories?.length > 0 && (
-                          <div className="absolute left-full top-0 bg-white text-black shadow-lg p-4 rounded ml-2 w-fit z-[100]">
-                            {sub.subcategories.map((subsub, subsubIndex) => (
-                              <Link
-                                key={`${subsub.id}-${subsubIndex}`}
-                                to={`/category/${subsub.id}`}
-                                className="block hover:underline py-1"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {getLocalizedName(subsub)}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {hoveredSubcategory?.imageUrl && (
-                    <div className="ml-4">
-                      <img
-                        src={`${BASE_URL}${hoveredSubcategory.imageUrl}`}
-                        alt="Subcategory"
-                        className="w-32 h-32 object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            </div>
+          </nav>
+        </div>
       </div>
+
+      {/* The MegaMenu component for desktop view */}
+      {isOpen && (
+        <MegaMenu
+          categories={categories}
+          getLocalizedName={getLocalizedName}
+          BASE_URL={BASE_URL}
+        />
+      )}
     </div>
   );
 };
 
-export default CategoryCarousel;
+export default CategoryBar;

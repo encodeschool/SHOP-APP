@@ -46,6 +46,7 @@ export default function SearchAppBar() {
             <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
             BAZAARLY
           </Link>
+          {/* Add Mega Menu here */}
           <button
             className="md:hidden text-xl ml-auto"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
