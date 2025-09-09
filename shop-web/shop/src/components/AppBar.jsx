@@ -101,7 +101,7 @@ export default function AppBar() {
               )}
             </button>
             {accountOpen && (
-              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
+              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-[101]">
                 {isLoggedIn ? (
                   <>
                     <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">{t("Profile")}</Link>
@@ -120,7 +120,7 @@ export default function AppBar() {
               {language === 'en' ? 'English' : language === 'ru' ? 'Russian' : language === 'uz' ? 'Uzbek' : 'Latvian'}
             </button>
             {languageOpen && (
-              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-10">
+              <div className="absolute right-0 mt-1 bg-white shadow-md border rounded z-[101]">
                 <button onClick={() => handleLanguageChange('en')} className="block px-4 py-2 hover:bg-gray-100">English</button>
                 <button onClick={() => handleLanguageChange('lv')} className="block px-4 py-2 hover:bg-gray-100">Latvian</button>
                 <button onClick={() => handleLanguageChange('ru')} className="block px-4 py-2 hover:bg-gray-100">Russian</button>

@@ -538,7 +538,7 @@ export default function Profile() {
 
       {activeTab === 'Product' && (
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-4/5">
+          <div className="w-full">
             <button
                 className='bg-green-500 mb-4 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
                 onClick={() => {
@@ -600,14 +600,14 @@ export default function Profile() {
           </div>
 
           <div
-            className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+            className={`fixed inset-0 bg-black bg-opacity-30 z-[101] transition-opacity ${
               isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
             onClick={() => setIsDrawerOpen(false)}
           ></div>
 
           <div
-            className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+            className={`fixed top-0 right-0 h-full bg-white shadow-lg z-[101] transform transition-transform duration-300 ${
               isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
             } w-[100%] md:w-[500px] overflow-y-scroll`}
           >
