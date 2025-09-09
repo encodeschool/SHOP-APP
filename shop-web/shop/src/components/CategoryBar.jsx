@@ -105,7 +105,7 @@ const CategoryBar = () => {
   };
 
   return (
-    <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[9]">
+    <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[99]">
       {/* Desktop Navigation (visible on md and up) */}
       <div className="container mx-auto px-4 py-2 hidden md:flex items-center justify-between">
         <Link to="/" className="text-3xl font-bold flex items-center justify-center">
@@ -128,7 +128,7 @@ const CategoryBar = () => {
             )}
           </button>
           {/* Tooltip for the category toggle button */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+          <div className="absolute top-full  left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
             {isOpen ? t('Close Categories') : t('Open Categories')}
           </div>
         </div>
@@ -151,7 +151,7 @@ const CategoryBar = () => {
               <FaSyncAlt size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
             </Link>
             {/* Tooltip for compare link */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+            <div className="absolute top-full  left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
               Compare Products
             </div>
           </div>
@@ -160,7 +160,7 @@ const CategoryBar = () => {
               <FaHeart size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
             </Link>
             {/* Tooltip for favorites link */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+            <div className="absolute top-full  left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
               My Favorites
             </div>
           </div>
@@ -175,7 +175,7 @@ const CategoryBar = () => {
               <span className="ml-2 text-xl font-bold">€{totalPrice.toFixed(2)}</span>
             </Link>
             {/* Tooltip for cart link */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+            <div className="absolute top-full  left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
               My Shopping Cart
             </div>
           </div>
