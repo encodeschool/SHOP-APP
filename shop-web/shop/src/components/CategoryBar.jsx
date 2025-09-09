@@ -1,6 +1,5 @@
-import MegaMenu from './MegaMenu'; // Import the new MegaMenu component
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaSyncAlt,
@@ -15,9 +14,9 @@ import {
 import { useSelector } from 'react-redux';
 import { BsShop } from "react-icons/bs";
 import i18n from "../i18n";
-import React, { useEffect, useState, useRef } from 'react';
 import axios from '../api/axios';
 import { useLoading } from '../contexts/LoadingContext';
+import MegaMenu from './MegaMenu';
 
 const CategoryBar = () => {
   const [categories, setCategories] = useState([]);
@@ -106,31 +105,33 @@ const CategoryBar = () => {
   };
 
   return (
-    <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[1000]">
+    <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[9]">
       {/* Desktop Navigation (visible on md and up) */}
       <div className="container mx-auto px-4 py-2 hidden md:flex items-center justify-between">
         <Link to="/" className="text-3xl font-bold flex items-center justify-center">
           <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
           BAZAARLY
         </Link>
-        <button
-          onClick={toggleDesktopMenu}
-          className="flex items-center text-white text-base font-medium ml-5 p-3 bg-indigo-400 rounded-md transition-all hover:bg-indigo-500"
-        >
-          {/* {t('Open Categories')} */}
-          {(!isOpen ? 
-
-            <span className="transition-transform duration-300 transform">
-              <FaBars />
-            </span>
-            : 
-            
-            <span className="transition-transform duration-300 transform">
-              <FaTimes />
-            </span>
-          )}
-          
-        </button>
+        <div className="relative group">
+          <button
+            onClick={toggleDesktopMenu}
+            className="flex items-center text-white text-base font-medium ml-5 p-3 bg-indigo-400 rounded-md transition-all hover:bg-indigo-500"
+          >
+            {(!isOpen ?
+              <span className="transition-transform duration-300 transform">
+                <FaBars />
+              </span>
+              :
+              <span className="transition-transform duration-300 transform">
+                <FaTimes />
+              </span>
+            )}
+          </button>
+          {/* Tooltip for the category toggle button */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+            {isOpen ? t('Close Categories') : t('Open Categories')}
+          </div>
+        </div>
         <div className="flex-1 mx-6 max-w-3xl flex">
           <input
             type="text"
@@ -145,21 +146,39 @@ const CategoryBar = () => {
           </button>
         </div>
         <div className="flex items-center gap-6 text-gray-700">
-          <Link to="/compare" title="Compare Products">
-            <FaSyncAlt size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
-          </Link>
-          <Link to="/favorites" title="My Favorites">
-            <FaHeart size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
-          </Link>
-          <Link to="/cart" className="relative flex items-center" title="My Shopping Cart">
-            <FaShoppingBag size={25} className="mr-1" />
-            {totalQuantity > 0 && (
-              <span className="absolute -bottom-3 left-[15px] bg-indigo-400 text-white rounded-full px-2 p-1 text-xs font-bold transition-all transform hover:scale-110">
-                {totalQuantity}
-              </span>
-            )}
-            <span className="ml-2 text-xl font-bold">€{totalPrice.toFixed(2)}</span>
-          </Link>
+          <div className="relative group">
+            <Link to="/compare" title="Compare Products">
+              <FaSyncAlt size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
+            </Link>
+            {/* Tooltip for compare link */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              Compare Products
+            </div>
+          </div>
+          <div className="relative group">
+            <Link to="/favorites" title="My Favorites">
+              <FaHeart size={25} className="cursor-pointer hover:text-indigo-400 transition-colors" />
+            </Link>
+            {/* Tooltip for favorites link */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              My Favorites
+            </div>
+          </div>
+          <div className="relative group">
+            <Link to="/cart" className="relative flex items-center" title="My Shopping Cart">
+              <FaShoppingBag size={25} className="mr-1" />
+              {totalQuantity > 0 && (
+                <span className="absolute -bottom-3 left-[15px] bg-indigo-400 text-white rounded-full px-2 p-1 text-xs font-bold transition-all transform hover:scale-110">
+                  {totalQuantity}
+                </span>
+              )}
+              <span className="ml-2 text-xl font-bold">€{totalPrice.toFixed(2)}</span>
+            </Link>
+            {/* Tooltip for cart link */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-indigo-400 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              My Shopping Cart
+            </div>
+          </div>
         </div>
       </div>
 
