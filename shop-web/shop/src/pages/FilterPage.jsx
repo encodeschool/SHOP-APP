@@ -5,7 +5,7 @@ import { setSort } from '../redux/filterSlice';
 import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
 
-import { FaCartPlus, FaHeart } from 'react-icons/fa';
+import { FaCartPlus } from 'react-icons/fa';
 import FavoriteButton from '../components/FavoriteButton';
 
 // Redux imports
@@ -18,9 +18,11 @@ export default function FilterPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0); // Add state for current page
+  const [totalPages, setTotalPages] = useState(0); // Add state for total pages
   const BASE_URL = process.env.REACT_APP_BASE_URL;
   const { t } = useTranslation();
-  
+
   useEffect(() => {
     const fetchFavorites = async () => {
       const userId = localStorage.getItem('userId');
@@ -31,7 +33,6 @@ export default function FilterPage() {
           const res = await axios.get(`/favorites/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          // Map to productId array
           const productIds = res.data.map(fav => fav.productId);
           setFavorites(productIds);
         } catch (error) {
@@ -42,7 +43,6 @@ export default function FilterPage() {
 
     fetchFavorites();
   }, []);
-
 
   const handleFavoriteToggle = async (productId) => {
     const userId = localStorage.getItem('userId');
@@ -72,11 +72,10 @@ export default function FilterPage() {
     }
   };
 
-
-
   const handleAddToCart = (product) => {
     dispatch(addToCart(product));
   };
+
   // Sync URL sort param -> Redux state
   useEffect(() => {
     if (searchParams.has('sort')) {
@@ -84,27 +83,37 @@ export default function FilterPage() {
     }
   }, [searchParams, dispatch]);
 
-  // Fetch products whenever filters change
+  // Fetch products whenever filters or page number change
   useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      try {
-        const params = new URLSearchParams();
+      const fetchFilteredProducts = async () => {
+          try {
+              const params = new URLSearchParams();
 
-        if (brands.length) brands.forEach((b) => params.append('brands', b));
-        if (inStock) params.set('inStock', true);
-        if (priceRange[1] < 220) params.set('maxPrice', priceRange[1]);
-        if (sort && sort !== 'default') params.set('sort', sort);
+              if (brands.length) brands.forEach((b) => params.append('brands', b));
+              if (inStock) params.set('inStock', true);
+              if (priceRange[1] < 220) params.set('maxPrice', priceRange[1]);
+              if (sort && sort !== 'default') params.set('sort', sort);
 
-        const res = await axios.get(`/products/filtered?${params.toString()}`);
-        setProducts(res.data);
-      } catch (err) {
-        console.error('Failed to fetch filtered products:', err);
-      }
-    };
+              params.set('page', currentPage);
+              params.set('size', 12);
 
-    fetchFilteredProducts();
-  }, [brands, inStock, priceRange, sort]);
+              const res = await axios.get(`/products/filtered?${params.toString()}`);
+              setProducts(res.data.content);
+              setTotalPages(res.data.totalPages);
+          } catch (err) {
+              console.error('Failed to fetch filtered products:', err);
+          }
+      };
 
+      fetchFilteredProducts();
+  }, [brands, inStock, priceRange, sort, currentPage]); // <-- 'sort' is added here
+
+  // Pagination handlers
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row my-5 gap-6 container mx-auto px-4 py-3">
@@ -126,7 +135,7 @@ export default function FilterPage() {
           </select>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products.map((p) => (
             <div key={p.id} className="border relative items-center grid grid-cols-2 justify-between p-4 rounded-xl shadow">
               <div className="mr-3 img_wrapper">
@@ -144,25 +153,53 @@ export default function FilterPage() {
                 <h2 className="font-bold">{p.title}</h2>
                 <p className='text-indigo-600 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
                 <button
-                      className="flex items-center absolute bottom-0 right-0 bg-indigo-400 p-5 rounded-br-xl rounded-2 text-white hover:bg-indigo-500"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(p);
-                      }}
-                    >
-                    <FaCartPlus size={15} />
+                  className="flex items-center absolute bottom-0 right-0 bg-indigo-400 p-5 rounded-br-xl rounded-2 text-white hover:bg-indigo-500"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddToCart(p);
+                  }}
+                >
+                  <FaCartPlus size={15} />
                 </button>
               </div>
-                <FavoriteButton
-                  productId={p.id}
-                  favorites={favorites}
-                  setFavorites={setFavorites}
-                />
-                
+              <FavoriteButton
+                productId={p.id}
+                favorites={favorites}
+                setFavorites={setFavorites}
+              />
             </div>
           ))}
           {products.length === 0 && <p>{t("No products found.")}</p>}
         </div>
+
+        {/* --- Pagination Controls --- */}
+        <div className="flex justify-center mt-8 space-x-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index)}
+              className={`px-4 py-2 border rounded-lg ${currentPage === index ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+        {/* --------------------------- */}
+
       </div>
     </div>
   );

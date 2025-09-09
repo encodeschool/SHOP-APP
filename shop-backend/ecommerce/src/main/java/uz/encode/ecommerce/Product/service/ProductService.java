@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +39,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> getFeatured();
 
-    List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort);
+    Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort, Pageable pageable);
 
     List<ProductAttributeDTO> findByCategoryId(UUID categoryId); // UPDATED: Use DTO
 

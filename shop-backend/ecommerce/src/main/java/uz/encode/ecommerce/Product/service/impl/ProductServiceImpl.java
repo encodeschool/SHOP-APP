@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +47,19 @@ import uz.encode.ecommerce.Product.service.ProductService;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
+
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
+import uz.encode.ecommerce.Product.entity.Product;
+import uz.encode.ecommerce.Product.repository.ProductRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -327,30 +343,40 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort) {
-        List<Product> products = productRepository.findAll();
+    public Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort, Pageable pageable) {
+        // Create a Specification to build the dynamic query
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        Stream<Product> stream = products.stream();
+            // Filter by brands
+            if (brands != null && !brands.isEmpty()) {
+                // CORRECTED: Compare the 'name' property of the Brand entity
+                predicates.add(root.get("brand").get("name").in(brands));
+            }
 
-        if (brands != null && !brands.isEmpty()) {
-            stream = stream.filter(p -> brands.contains(p.getBrand()));
-        }
+            // Filter by in-stock status
+            if (inStock != null && inStock) {
+                predicates.add(cb.isTrue(root.get("inStock")));
+            }
 
-        if (inStock != null && inStock) {
-            stream = stream.filter(Product::isInStock);
-        }
+            // Filter by maximum price
+            if (maxPrice != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
 
-        if (maxPrice != null) {
-            stream = stream.filter(p -> p.getPrice().doubleValue() <= maxPrice);
-        }
+            // Combine all predicates with AND logic
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
 
-        if ("price-asc".equals(sort)) {
-            stream = stream.sorted(Comparator.comparing( p -> p.getPrice().doubleValue()));
-        } else if ("price-desc".equals(sort)) {
-            stream = stream.sorted(Comparator.comparing((Product p) -> p.getPrice().doubleValue()).reversed());
-        }
+        // Note: The 'sort' parameter from the request is handled by the Pageable object
+        // passed from the controller, which automatically applies the sorting to the query.
+        // We no longer need to manually sort with streams here.
 
-        return stream.map(this::mapToDto).toList();
+        // Fetch the paginated and filtered results from the database
+        Page<Product> productPage = productRepository.findAll(spec, pageable);
+
+        // Map the page of Product entities to a page of ProductResponseDTOs
+        return productPage.map(this::mapToDto);
     }
 
     @Override

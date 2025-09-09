@@ -142,3 +142,7 @@ code {
 .p-sticky {
   position: sticky;
 }
+
+.w-webkit-fill-available {
+  width: -webkit-fill-available;
+}

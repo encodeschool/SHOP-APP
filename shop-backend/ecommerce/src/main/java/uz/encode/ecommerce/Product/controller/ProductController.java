@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -109,12 +112,21 @@ public class ProductController {
     }
 
     @GetMapping("/filtered")
-    public ResponseEntity<List<ProductResponseDTO>> getAllFiltered(
+    public ResponseEntity<Page<ProductResponseDTO>> getAllFiltered(
             @RequestParam(required = false) List<String> brands,
             @RequestParam(required = false) Boolean inStock,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) String sort) {
-        return ResponseEntity.ok(productService.getFiltered(brands, inStock, maxPrice, sort));
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "0") int page, // Add page parameter
+            @RequestParam(defaultValue = "12") int size) { // Add size parameter
+        
+        // Create a Pageable object
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Call a new service method that handles pagination
+        Page<ProductResponseDTO> filteredProductsPage = productService.getFiltered(brands, inStock, maxPrice, sort, pageable);
+        
+        return ResponseEntity.ok(filteredProductsPage);
     }
 
     @GetMapping("/attributes/category/{categoryId}")
