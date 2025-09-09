@@ -109,14 +109,27 @@ const CategoryBar = () => {
     <div className="bg-white border-b shadow-sm w-full py-3 p-sticky top-0 z-[1000]">
       {/* Desktop Navigation (visible on md and up) */}
       <div className="container mx-auto px-4 py-2 hidden md:flex items-center justify-between">
+        <Link to="/" className="text-3xl font-bold flex items-center justify-center">
+          <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
+          BAZAARLY
+        </Link>
         <button
           onClick={toggleDesktopMenu}
-          className="flex items-center text-white text-base font-medium px-4 py-2 bg-indigo-400 rounded-md transition-all hover:bg-indigo-500"
+          className="flex items-center text-white text-base font-medium ml-5 p-3 bg-indigo-400 rounded-md transition-all hover:bg-indigo-500"
         >
-          {t('Open Categories')}
-          <span className="ml-2 transition-transform duration-300 transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-            ▼
-          </span>
+          {/* {t('Open Categories')} */}
+          {(!isOpen ? 
+
+            <span className="transition-transform duration-300 transform">
+              <FaBars />
+            </span>
+            : 
+            
+            <span className="transition-transform duration-300 transform">
+              <FaTimes />
+            </span>
+          )}
+          
         </button>
         <div className="flex-1 mx-6 max-w-3xl flex">
           <input
@@ -185,7 +198,10 @@ const CategoryBar = () => {
         } md:hidden`}
       >
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-bold">{t('Menu')}</h2>
+          <Link to="/" className="text-3xl font-bold flex items-center justify-center">
+            <BsShop className="mr-2 font-[900] text-indigo-400" size={40} />
+            BAZAARLY
+          </Link>
           <button onClick={toggleMobileMenu} className="text-gray-700">
             <FaTimes size={25} />
           </button>
