@@ -1,0 +1,204 @@
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from '../api/axios';
+import { addToCart } from '../redux/cartSlice';
+import { useDispatch } from 'react-redux';
+import { FaCartPlus } from 'react-icons/fa';
+import Breadcrumb from '../components/Breadcrumb';
+import CompareButton from '../components/CompareButton';
+import { LanguageContext } from '../contexts/LanguageContext';
+import { useTranslation } from "react-i18next";
+
+const ProductDetail = () => {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const { language } = useContext(LanguageContext);
+  const dispatch = useDispatch();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [activeTab, setActiveTab] = useState('specification');
+  const [brand, setBrand] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    const fetchBrand = async (brandId) => {
+      try {
+        const res = await axios.get(`/products/brands/${brandId}`);
+        setBrand(res.data);
+      } catch (err) {
+        console.error('Error fetching brand:', err);
+      }
+    };
+    if (product?.brandId) {
+      fetchBrand(product.brandId);
+    }
+  }, [product]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        // Fallback to 'en' if language is 'lv' (not supported by backend)
+        const apiLang = language === 'lv' ? 'en' : language;
+        const res = await axios.get(`/products/lang/${id}?lang=${apiLang}`);
+        setProduct(res.data);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+      }
+    };
+    fetchProduct();
+  }, [id, language]);
+
+  useEffect(() => {
+    const buildBreadcrumbPath = async (categoryId) => {
+      const path = [];
+      let currentId = categoryId;
+      while (currentId) {
+        try {
+          const res = await axios.get(`/categories/${currentId}`);
+          const currentCategory = res.data;
+          path.unshift(currentCategory);
+          currentId = currentCategory.parentId;
+        } catch (err) {
+          console.error('Error fetching category path:', err);
+          break;
+        }
+      }
+      setBreadcrumbPath(path);
+    };
+
+    if (product?.categoryId) {
+      buildBreadcrumbPath(product.categoryId);
+    }
+  }, [product]);
+
+  const handleAddToCart = () => {
+    dispatch(addToCart(product));
+  };
+
+  if (!product) return <div className="p-6">{t("Loading...")}</div>;
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <Breadcrumb pathArray={breadcrumbPath} productTitle={product.title} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left - Image section */}
+        <div>
+          <img
+            src={
+              product.imageUrls?.[currentImageIndex]
+                ? `${BASE_URL}${product.imageUrls[currentImageIndex]}`
+                : '/placeholder.jpg'
+            }
+            alt={`${product.title} image`}
+            className="object-contain h-[400px] w-full"
+          />
+          <div className="flex mt-4 justify-center gap-2">
+            {product.imageUrls?.map((imgUrl, index) => (
+              <img
+                key={index}
+                src={`${BASE_URL}${imgUrl}`}
+                alt={`Thumbnail ${index + 1}`}
+                className={`w-16 h-16 object-contain cursor-pointer border-2 ${
+                  index === currentImageIndex ? 'border-black' : 'border-transparent'
+                }`}
+                onClick={() => setCurrentImageIndex(index)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Right - Product Info */}
+        <div>
+          <div className="flex mb-3">
+            <div>
+              <img
+                src={
+                  brand?.icon
+                    ? `${BASE_URL}${brand.icon}`
+                    : '/placeholder.jpg'
+                }
+                alt={`${brand?.name} image`}
+                className="object-contain h-[25px]"
+              />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
+          <p className="text-5xl font-bold text-indigo-400 mb-4">${product.price}</p>
+          <p className="mb-2">{product.description}</p>
+          <p className="mb-2">{t("Stock")}: {product.stock}</p>
+
+          <button
+            className="bg-black text-white px-4 py-2 rounded flex items-center mb-3"
+            onClick={handleAddToCart}
+          >
+            <FaCartPlus className="mr-2" /> {t("Add to Cart")}
+          </button>
+
+          <CompareButton product={product} />
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="mt-10">
+        <div className="flex space-x-4 pb-2 mb-6">
+          {['specification', 'warehouse', 'together'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`capitalize py-4 ml-0 text-2xl rounded-t ${
+                activeTab === tab ? 'text-black font-bold border-b-[4px] border-indigo-400' : 'text-gray-800'
+              }`}
+            >
+              {t(tab)}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'specification' && product.attributes?.length > 0 && (
+          <div>
+            {Object.entries(
+              product.attributes.reduce((groups, attr) => {
+                const group = attr.group || '';
+                if (!groups[group]) groups[group] = [];
+                groups[group].push(attr);
+                return groups;
+              }, {})
+            ).map(([groupName, attrs]) => (
+              <div key={groupName} className="mb-8">
+                <h3 className="text-lg font-semibold mb-3">{groupName.toUpperCase()}</h3>
+                <table className="w-full border-separate border-spacing-y-2">
+                  <tbody>
+                    {attrs.map((attr, idx) => (
+                      <tr key={idx}>
+                        <td className="text-gray-600 w-1/3">{attr.attributeName}:</td>
+                        <td className="text-black font-medium">{attr.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'warehouse' && (
+          <div>
+            <h3 className="text-lg font-semibold mb-2">{t("Warehouse Info")}</h3>
+            <p>{t("Coming soon..")}.</p>
+          </div>
+        )}
+
+        {activeTab === 'together' && (
+          <div>
+            <h3 className="text-lg font-semibold mb-2">{t("Frequently Bought Together")}</h3>
+            <p>{t("Bundle suggestions will appear here.")}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetail;

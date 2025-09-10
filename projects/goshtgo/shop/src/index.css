@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Playwrite+HU:wght@100..400&display=swap');
+
+:root {
+  --primary-color: #aa282c;
+  --secondary-color: #f1e9e7;
+}
+
+.logo {
+  font-family: "Playwrite HU", cursive;
+}
+
+body {
+  margin: 0;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif; */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "Lexend Deca", sans-serif;
+  overflow-x: hidden;
+  font-weight: 300;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.bloody {
+  background-color: var(--primary-color);
+}
+
+.pinkish {
+  background-color: var(--secondary-color);
+}
+
+.swiper-button-next, .swiper-button-prev {
+  color: var(--primary-color)!important;
+}

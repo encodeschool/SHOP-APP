@@ -1,0 +1,17 @@
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+const API_URL = `${BASE_URL}/api/auth`; 
+
+export const login = (credentials) => axios.post(`${API_URL}/login`, credentials);
+
+export const register = (userData) => axios.post(`${API_URL}/register`, userData);
+
+export const getUserById = (id) => {
+    const token = localStorage.getItem('token');
+    return axios.get(`${BASE_URL}/api/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  };
