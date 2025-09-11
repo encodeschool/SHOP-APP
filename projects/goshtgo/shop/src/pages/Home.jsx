@@ -21,7 +21,7 @@ import { GrValidate } from 'react-icons/gr';
 import { TbTruckDelivery } from 'react-icons/tb';
 import { GiCow } from 'react-icons/gi';
 import CategorySection from '../components/CategorySection';
-import { GiRoastChicken } from "react-icons/gi";
+import { GiRoastChicken,GiRabbit  } from "react-icons/gi";
 
 
 const Home = () => {
@@ -187,6 +187,10 @@ const Home = () => {
   const chickenSubcategory = categories
     .flatMap((cat) => cat.subcategories || [])
     .find((sub) => getLocalizedName(sub).toLowerCase().includes("chicken"));
+
+  const rabbitSubcategory = categories
+    .flatMap((cat) => cat.subcategories || [])
+    .find((sub) => getLocalizedName(sub).toLowerCase().includes("rabbit"));
 
   return (
     <div>
@@ -436,6 +440,7 @@ const Home = () => {
           BASE_URL={BASE_URL}
           favorites={favorites}
           setFavorites={setFavorites}
+          bgcolor="pinkish"
         />
       )}
       {/* Beef for a week Section Ends Here */}
@@ -664,9 +669,25 @@ const Home = () => {
           BASE_URL={BASE_URL}
           favorites={favorites}
           setFavorites={setFavorites}
+          bgcolor="pinkish"
         />
       )}
       {/* Chicken for a week Section Ends Here */}
+
+      {/* Rabbit for a week Section Goes Here */}
+      {rabbitSubcategory && (
+        <CategorySection
+          title="Chicken Meats"
+          icon={GiRabbit  }
+          products={products}
+          categoryId={chickenSubcategory.id}
+          BASE_URL={BASE_URL}
+          favorites={favorites}
+          setFavorites={setFavorites}
+          bgcolor="bg-white"
+        />
+      )}
+      {/* Rabbit for a week Section Ends Here */}
 
       {/* Ddelivery Section Goes Here */}
       <div className="container mx-auto px-4 md:px-10 py-10 relative">

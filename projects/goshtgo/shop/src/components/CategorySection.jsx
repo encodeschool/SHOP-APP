@@ -14,7 +14,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, favorites, setFavorites }) => {
+const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, favorites, setFavorites, bgcolor }) => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, fa
   const filteredProducts = products.filter((p) => p.categoryId === categoryId);
 
   return (
-    <div className="pinkish py-10 mt-10">
+    <div className={`${bgcolor} py-10 mt-10`}>
       <div className="container mx-auto px-4 md:px-10 py-6">
         {/* Title */}
         <div className="flex items-center justify-center mb-4">
