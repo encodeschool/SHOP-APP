@@ -117,9 +117,11 @@ export default function FilterPage() {
 
   return (
     <div className="flex flex-col md:flex-row my-5 gap-6 container mx-auto px-4 py-3">
-      <div className="w-full md:w-64">
-        <FilterSidebar />
-      </div>
+      <aside className="hidden md:block w-64">
+        <div className="sticky top-24 h-fit">
+          <FilterSidebar />
+        </div>
+      </aside>
 
       <div className="flex-1">
         <div className="flex items-center justify-between mb-4">
