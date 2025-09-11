@@ -65,7 +65,7 @@ export default function Login() {
           className="w-full px-4 py-2 border rounded"
         />
         {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="w-full mb-3 bg-indigo-400 text-white py-2 rounded">{t("Login")}</button>
+        <button type="submit" className="w-full mb-3 bg-red-800 text-white py-2 rounded">{t("Login")}</button>
         <div>
           <Link to='/register' className='text-center'>{t("Don't have an account? Create account")}</Link>
         </div>

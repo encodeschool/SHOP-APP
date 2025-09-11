@@ -197,7 +197,7 @@ const Checkout = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`bg-indigo-400 w-full text-white px-6 py-2 rounded hover:bg-indigo-600 flex justify-center items-center ${
+          className={`bg-red-800 w-full text-white px-6 py-2 rounded hover:bg-red-800 flex justify-center items-center ${
             loading ? 'cursor-not-allowed opacity-70' : ''
           }`}
         >
@@ -245,10 +245,10 @@ const Checkout = () => {
 
       {/* Order Summary */}
       <div className="border sticky rounded p-4 bg-gray-100">
-        <h2 className="text-3xl border-b-2 border-b-indigo-400 pb-6 pt-3">{t("Order Summary")}</h2>
+        <h2 className="text-3xl border-b-2 border-b-red-800 pb-6 pt-3">{t("Order Summary")}</h2>
         <table className="w-full">
           <thead>
-            <tr className="border-b-2 border-indigo-400">
+            <tr className="border-b-2 border-red-800">
               <th className="text-left">{t("Product")}</th>
               <th className="text-right">{t("Total")}</th>
             </tr>
@@ -261,7 +261,7 @@ const Checkout = () => {
               </tr>
             ))}
 
-            <tr className="border-t-2 border-indigo-400">
+            <tr className="border-t-2 border-red-800">
               <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Shipping Method")}</td>
             </tr>
             <tr>
@@ -288,7 +288,7 @@ const Checkout = () => {
               </td>
             </tr>
 
-            <tr className="border-t-2 border-indigo-400">
+            <tr className="border-t-2 border-red-800">
               <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Payment Method")}</td>
             </tr>
             <tr>
@@ -311,7 +311,7 @@ const Checkout = () => {
               </td>
             </tr>
 
-            <tr className="border-t-2 border-indigo-400 font-bold">
+            <tr className="border-t-2 border-red-800 font-bold">
               <td className='py-4'>{t("Total")}:</td>
               <td className="text-right">
                 ${totalPrice.toFixed(2)} {/* ✅ Updated: total includes shipping */}

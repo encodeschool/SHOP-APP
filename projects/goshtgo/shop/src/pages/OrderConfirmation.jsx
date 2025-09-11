@@ -46,7 +46,7 @@ const OrderConfirmation = () => {
           {checkoutInfo.notes && <p><strong>{t("Notes")}:</strong> {checkoutInfo.notes}</p>}
         </div>
 
-        <Link to="/" className="mt-6 inline-block bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+        <Link to="/" className="mt-6 inline-block bg-red-800 text-white px-6 py-2 rounded hover:bg-red-800">
           {t("Continue Shopping")}
         </Link>
       </div>

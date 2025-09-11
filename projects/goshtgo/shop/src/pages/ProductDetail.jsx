@@ -125,7 +125,7 @@ const ProductDetail = () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
-          <p className="text-5xl font-bold text-indigo-400 mb-4">${product.price}</p>
+          <p className="text-5xl font-bold text-red-800 mb-4">${product.price}</p>
           <p className="mb-2">{product.description}</p>
           <p className="mb-2">{t("Stock")}: {product.stock}</p>
 
@@ -148,7 +148,7 @@ const ProductDetail = () => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`capitalize py-4 ml-0 text-2xl rounded-t ${
-                activeTab === tab ? 'text-black font-bold border-b-[4px] border-indigo-400' : 'text-gray-800'
+                activeTab === tab ? 'text-black font-bold border-b-[4px] border-red-800' : 'text-gray-800'
               }`}
             >
               {t(tab)}

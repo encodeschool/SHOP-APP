@@ -151,9 +151,9 @@ export default function FilterPage() {
               </div>
               <div className="content_wrapper p-2">
                 <h2 className="font-bold">{p.title}</h2>
-                <p className='text-indigo-600 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
+                <p className='text-red-800 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
                 <button
-                  className="flex items-center absolute bottom-0 right-0 bg-indigo-400 p-5 rounded-br-xl rounded-2 text-white hover:bg-indigo-500"
+                  className="flex items-center absolute bottom-0 right-0 bg-red-800 p-5 rounded-br-xl rounded-2 text-white hover:bg-red-800"
                   onClick={(e) => {
                     e.preventDefault();
                     handleAddToCart(p);
@@ -185,7 +185,7 @@ export default function FilterPage() {
             <button
               key={index}
               onClick={() => handlePageChange(index)}
-              className={`px-4 py-2 border rounded-lg ${currentPage === index ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 border rounded-lg ${currentPage === index ? 'bg-red-800 text-white' : 'hover:bg-gray-100'}`}
             >
               {index + 1}
             </button>

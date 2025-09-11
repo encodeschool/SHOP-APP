@@ -85,7 +85,10 @@ export default function AppBar() {
                 </div>
                 <div>
                     <div>
-                        <button className="w-full text-center justify-center text-red-600 flex items-center border rounded-full px-5 py-2 border-white bg-white"><FaLocationDot className='mr-2' />Tashkent</button>
+                        <Link to="/track" className="w-full uppercase text-center justify-center text-red-600 flex items-center border rounded-full px-5 py-2 border-white bg-white">
+                            <TbTruckDelivery className="mr-1" />{t('Track Your Order')}
+                        </Link>
+                        {/* <button className="w-full text-center justify-center text-red-600 flex items-center border rounded-full px-5 py-2 border-white bg-white"><FaLocationDot className='mr-2' />Tashkent</button> */}
                     </div>
                     <div className=' mt-5'>
                         <Link className='text-right hover:underline text-red-600 hover:bold'> 

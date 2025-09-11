@@ -100,11 +100,11 @@ export default function TrackOrder() {
           value={orderId}
           onChange={(e) => setOrderId(e.target.value)}
           placeholder={t("Enter your Order ID")}
-          className="border border-gray-300 rounded px-4 py-2 w-64 focus:outline-none focus:ring focus:border-indigo-400"
+          className="border border-gray-300 rounded px-4 py-2 w-64 focus:outline-none focus:ring focus:border-red-800"
         />
         <button
           onClick={handleTrackOrder}
-          className="bg-indigo-400 text-white px-4 py-2 rounded hover:bg-indigo-600"
+          className="bg-red-800 text-white px-4 py-2 rounded hover:bloody"
         >
           {t("Track Order")}
         </button>
