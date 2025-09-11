@@ -185,11 +185,13 @@ const CategoryPage = () => {
   );
 
   return (
-    <div className='container mx-auto px-4 py-3'>
+    <div className='container mx-auto px-4 py-3 md:px-10'>
       <div className="flex flex-col md:flex-row my-5 gap-6">
-        <div className="w-full md:w-64">
-          <FilterSidebar />
-        </div>
+        <aside className="hidden md:block w-64 md:w-[350px]">
+          <div className="sticky top-24 h-fit">
+            <FilterSidebar />
+          </div>
+        </aside>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-semibold">{t("Collectible Figures")}</h1>

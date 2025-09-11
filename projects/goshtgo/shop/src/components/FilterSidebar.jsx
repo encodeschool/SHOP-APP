@@ -10,6 +10,7 @@ import i18n from "../i18n";
 export default function FilterSidebar() {
   const dispatch = useDispatch();
   const selectedBrands = useSelector((state) => state.filters.brands);
+  const [brandsToShow, setBrandsToShow] = useState(1);
   const inStock = useSelector((state) => state.filters.inStock);
   const priceRange = useSelector((state) => state.filters.priceRange);
 
@@ -41,6 +42,10 @@ export default function FilterSidebar() {
     dispatch(setBrands(newBrands));
   };
 
+  const handleExpand = () => {
+    setBrandsToShow(prev => prev + 6);
+  }
+
   return (
     <Disclosure>
       {({ open }) => (
@@ -53,10 +58,10 @@ export default function FilterSidebar() {
             <div className="space-y-6 p-4 border-[4px] border-red-800 rounded-b-xl">
               
               {/* Brands Filter */}
-              <div>
+              <div className='border border-gray-[5px] p-3'>
                 <h2 className="font-bold">{t("Brands")}</h2>
-                {brands.map((brand) => (
-                  <label key={brand.id} className="block">
+                {brands.slice(0, brandsToShow).map((brand, index) => (
+                  <label key={`${brand.id}-${index}`} className="block">
                     <input
                       type="checkbox"
                       checked={selectedBrands.includes(brand.name)}
@@ -66,10 +71,20 @@ export default function FilterSidebar() {
                     {brand.name}
                   </label>
                 ))}
+                {brandsToShow < brands.length && (
+                  <div className="flex justify-center mt-3">
+                    <button
+                      onClick={handleExpand}
+                      className="text-red-600 px-6 rounded-full hover:underline transition delay-150"
+                    >
+                      Show More
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* In Stock Filter */}
-              <div>
+              <div className='border border-gray-[5px] p-3'>
                 <h2 className="font-bold">{t("In stock")}</h2>
                 <label>
                   <input
@@ -83,7 +98,7 @@ export default function FilterSidebar() {
               </div>
 
               {/* Price Range Filter */}
-              <div>
+              <div className='border border-gray-[5px] p-3'>
                 <h2 className="font-bold">{t("Price range")}</h2>
                 <input
                   type="range"
