@@ -20,7 +20,8 @@ import { MdOutlineMenuBook, MdOutlineWorkspacePremium } from 'react-icons/md';
 import { GrValidate } from 'react-icons/gr';
 import { TbTruckDelivery } from 'react-icons/tb';
 import { GiCow } from 'react-icons/gi';
-
+import CategorySection from '../components/CategorySection';
+import { GiRoastChicken } from "react-icons/gi";
 
 
 const Home = () => {
@@ -178,6 +179,14 @@ const Home = () => {
   const handleExpand = () => {
     setProductsToShow(prev => prev + 6);
   };
+
+  const beefSubcategory = categories
+    .flatMap((cat) => cat.subcategories || [])
+    .find((sub) => getLocalizedName(sub).toLowerCase().includes("beef"));
+
+  const chickenSubcategory = categories
+    .flatMap((cat) => cat.subcategories || [])
+    .find((sub) => getLocalizedName(sub).toLowerCase().includes("chicken"));
 
   return (
     <div>
@@ -418,113 +427,17 @@ const Home = () => {
       {/* Ideas for a week Section Ends Here */}
 
       {/* Beef for a week Section Goes Here */}
-      <div className='pinkish py-10 mt-10'>
-        <div className="container mx-auto px-4 md:px-10 py-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="flex gap-2 items-center">
-              <button
-                ref={featuredPrevRef}
-                className="swiper-button-prev-custom text-red-500 p-2 px-4 rounded-full hover:text-red-500 hover:cursor-pointer"
-              >
-                <FaLongArrowAltLeft />
-              </button>
-              <h1 className="text-center font-[100] text-3xl uppercase flex justify-center items-center"><GiCow size={50} className='mr-3' />Beef Meats</h1>
-              <button
-                ref={featuredNextRef}
-                className="swiper-button-next-custom text-red-500 p-2 px-4 rounded-full hover:text-red-500 hover:cursor-pointer"
-              >
-                <FaLongArrowAltRight />
-              </button>
-            </div>
-          </div>
-          <div className="mb-14 flex justify-center items-center">
-            <Link to='/filtered' className='text-sm text-red-600 underline hover:text-red-800 transition delay-150'>See all</Link>
-          </div>
-          <Swiper
-            modules={[Navigation, Pagination]}
-            spaceBetween={20}
-            slidesPerView={1}
-            navigation={{
-              prevEl: featuredPrevRef.current,
-              nextEl: featuredNextRef.current,
-            }}
-            onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = featuredPrevRef.current;
-              swiper.params.navigation.nextEl = featuredNextRef.current;
-            }}
-            
-            className="pb-10"
-            breakpoints={{
-              640: { slidesPerView: 1 },
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 },
-            }}
-          >
-            {products.filter((p) => p.featured).length > 0 ? (
-              products
-                .filter((p) => p.featured)
-                .map((product, index) => (
-                  <SwiperSlide key={`${product.id}-${index}`}>
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="relative border p-4 bg-white rounded-xl hover:shadow group h-full block"
-                    >
-                      <p
-                        className="absolute top-0 px-3 py-1 flex items-center justify-center left-0 z-10 bg-gray-100 text-red-600 rounded-tl-xl"
-                      >
-                        {product.condition === 'NEW' ? (
-                          <>
-                            <FaStar className="inline mr-1" />
-                            {t('NEW')}
-                          </>
-                        ) : (
-                          <>
-                            <FaRecycle className="inline mr-1" />
-                            {t('USED')}
-                          </>
-                        )}
-                      </p>
-                      <img
-                        src={
-                          product.imageUrls?.[0]
-                            ? `${BASE_URL}${product.imageUrls[0]}`
-                            : '/placeholder.jpg'
-                        }
-                        alt={product.title}
-                        className="h-40 object-contain w-full"
-                      />
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
-                          <p className="text-red-600 text-3xl font-bold mt-2">${product.price}</p>
-                          <CompareButton product={product} />
-                        </div>
-                        <FavoriteButton
-                          productId={product.id}
-                          favorites={favorites}
-                          setFavorites={setFavorites}
-                        />
-                        <button
-                          className="bg-red-600 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-red-600"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddToCart(product);
-                          }}
-                        >
-                          <FaCartPlus size={15} />
-                        </button>
-                      </div>
-                    </Link>
-                  </SwiperSlide>
-                ))
-            ) : (
-              <SwiperSlide>
-                <p className="text-center w-full">{t('There are no featured products.')}</p>
-              </SwiperSlide>
-            )}
-          </Swiper>
-        </div>
-      </div>
+      {beefSubcategory && (
+        <CategorySection
+          title="Beef Meats"
+          icon={GiCow}
+          products={products}
+          categoryId={beefSubcategory.id}
+          BASE_URL={BASE_URL}
+          favorites={favorites}
+          setFavorites={setFavorites}
+        />
+      )}
       {/* Beef for a week Section Ends Here */}
 
       {/* <div className="container mx-auto px-4 md:px-10 py-6 relative">
@@ -740,6 +653,20 @@ const Home = () => {
         </div>
       </div>
       {/* Accessories Section Ends Here */}
+
+      {/* Chicken for a week Section Goes Here */}
+      {chickenSubcategory && (
+        <CategorySection
+          title="Chicken Meats"
+          icon={GiRoastChicken }
+          products={products}
+          categoryId={chickenSubcategory.id}
+          BASE_URL={BASE_URL}
+          favorites={favorites}
+          setFavorites={setFavorites}
+        />
+      )}
+      {/* Chicken for a week Section Ends Here */}
 
       {/* Ddelivery Section Goes Here */}
       <div className="container mx-auto px-4 md:px-10 py-10 relative">
