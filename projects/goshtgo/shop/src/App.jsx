@@ -22,6 +22,7 @@ import Compare from './pages/Compare';
 import Favorites from './pages/Favorites';
 import TrackOrder from './pages/TrackOrder';
 import {ToastContainer} from 'react-toastify';
+import SearchResults from './pages/SearchResults';
 
 function App() {
     return (
@@ -53,7 +54,7 @@ function App() {
                                 </PrivateRoute>
                                 }
                             />
-                            
+                            <Route path="/search" element={<SearchResults />} />
                             <Route path="/category/:categoryId" element={<CategoryPage />} />
                             {/* <Route path='/about' element={<About />} />
                             <Route path='/terms' element={<TermCondition />} /> */}
