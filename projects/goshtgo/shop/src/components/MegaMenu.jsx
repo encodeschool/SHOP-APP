@@ -4,7 +4,7 @@ import { RiDiscountPercentLine } from "react-icons/ri";
 
 const MegaMenu = ({ categories, getLocalizedName, BASE_URL }) => {
   return (
-    <div className="absolute left-0 right-0 bloody text-white shadow-lg z-[100] flex flex-wrap p-6 rounded-b-xl">
+    <div className="absolute md:px-10 left-0 right-0 bloody text-white shadow-lg z-[100] flex flex-wrap p-6 rounded-b-xl">
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category) => (
           <div key={category.id} className="flex flex-col">

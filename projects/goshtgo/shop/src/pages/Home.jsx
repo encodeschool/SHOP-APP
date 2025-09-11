@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from '../api/axios';
 import { Link } from 'react-router-dom';
 import CarouselBanner from '../components/CarouselBanner';
-import { FaCartPlus, FaHeart, FaStar, FaRecycle, FaCalendarAlt,FaLongArrowAltRight, FaLongArrowAltLeft  } from 'react-icons/fa';
+import { FaCartPlus, FaHeart, FaStar, FaRecycle, FaCalendarAlt, FaLongArrowAltRight, FaLongArrowAltLeft } from 'react-icons/fa';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -15,15 +15,17 @@ import { useLoading } from '../contexts/LoadingContext';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import { useTranslation } from 'react-i18next';
-import CategoryBar from '../components/CategoryBar'; // Update the import
-import { MdOutlineMenuBook } from "react-icons/md";
-import { GrValidate } from "react-icons/gr";
-import { TbTruckDelivery } from "react-icons/tb";
-import { GiCow } from "react-icons/gi";
+import CategoryBar from '../components/CategoryBar';
+import { MdOutlineMenuBook, MdOutlineWorkspacePremium } from 'react-icons/md';
+import { GrValidate } from 'react-icons/gr';
+import { TbTruckDelivery } from 'react-icons/tb';
+import { GiCow } from 'react-icons/gi';
+
 
 
 const Home = () => {
   const [products, setProducts] = useState([]);
+  const [productsToShow, setProductsToShow] = useState(8); // Add state for products to show
   const [categories, setCategories] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -173,6 +175,10 @@ const Home = () => {
     dispatch(addToCart(product));
   };
 
+  const handleExpand = () => {
+    setProductsToShow(prev => prev + 6);
+  };
+
   return (
     <div>
       <CarouselBanner />
@@ -189,11 +195,8 @@ const Home = () => {
             <FaStar className='mx-1' size={25} />
           </div>
           <h1 className="mb-4 text-center font-[100] text-3xl uppercase">Popular Meat Products</h1>
-          <div className="mb-8 flex justify-center items-center">
-            <Link to='/filtered' className='text-sm text-red-600 underline hover:text-red-800 transition delay-150'>See all products</Link>
-          </div>
           <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.map((product, index) => (
+            {products.slice(0, productsToShow).map((product, index) => (
               <Link
                 to={`/product/${product.id}`}
                 key={`${product.id}-${index}`}
@@ -258,6 +261,16 @@ const Home = () => {
               </Link>
             ))}
           </div>
+          {productsToShow < products.length && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleExpand}
+                className="text-white bg-red-600 py-2 px-6 rounded-full hover:bg-red-800 transition delay-150"
+              >
+                Show More
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {/* The most popular meats Section Ends Here */}
@@ -265,20 +278,30 @@ const Home = () => {
       {/* Meal Section Goes Here */}
       <div className='container mx-auto px-4 md:px-10 py-3'>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 py-10">
-          <Link to='/filtered' className="text-white text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/100/rkcgt2qjs04d6hft2ryxqaw4tvfenzmf/midi_uzhin.webp')"}}>
-            For Home Supper
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/100/rkcgt2qjs04d6hft2ryxqaw4tvfenzmf/midi_uzhin.webp')"}}>
+            <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
+              For Home Supper
+            </p>
           </Link>
-          <Link to='/filtered' className="text-white text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/3ca/fs4l14f2mwzdiy0datcbsr3bcy5kwoij/banner_360kh360_shashlyk_new.webp)"}}>
-            For Shashlik
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/3ca/fs4l14f2mwzdiy0datcbsr3bcy5kwoij/banner_360kh360_shashlyk_new.webp)"}}>
+            <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
+              For Shashlik
+            </p>
           </Link>
-          <Link to='/filtered' className="text-white text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/f71/42ili6yme5omfvd7xagaei11c46rk3ph/banner_360kh360_kotlety_new.webp')"}}>
-            For Burgers
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/f71/42ili6yme5omfvd7xagaei11c46rk3ph/banner_360kh360_kotlety_new.webp')"}}>
+            <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
+              For Burgers
+            </p>
           </Link>
-          <Link to='/filtered' className="text-white text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ed7/l9p288v02doy0y7nppl6zhjndil3tn0o/kolbaski.webp')"}}>
-            Sausages
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ed7/l9p288v02doy0y7nppl6zhjndil3tn0o/kolbaski.webp')"}}>
+            <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
+              Sausages
+            </p>
           </Link>
-          <Link to='/filtered' className="text-white text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/560/ijvhpcbgsk23pabzooybqgyd2h2g5lr6/banner_360kh360_kulinaria.webp')"}}>
-            Cooking
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/560/ijvhpcbgsk23pabzooybqgyd2h2g5lr6/banner_360kh360_kulinaria.webp')"}}>
+            <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
+              Cooking
+            </p>
           </Link>
         </div>
       </div>
@@ -664,10 +687,7 @@ const Home = () => {
 
       {/* Ddelivery Section Goes Here */}
       <div className="container mx-auto px-4 md:px-10 py-10 relative">
-        <h1 className="mb-4 text-center font-[100] text-3xl uppercase">Delivery to Home</h1>
-        <div className="mb-14 flex justify-center items-center">
-          <Link to='/filtered' className='text-sm text-red-600 underline hover:text-red-800 transition delay-150'>See all products</Link>
-        </div>
+        <h1 className="mb-14 text-center font-[100] text-3xl uppercase">Delivery to Home</h1>
         <div className="grid md:grid-cols-9 grid-cols-1 gap-4">
           <div className='flex md:justify-end justify-center md:mr-6'>
             <MdOutlineMenuBook size={75} />
@@ -691,9 +711,7 @@ const Home = () => {
             <p className='text-sm text-gray-400'>Мы доставляем свежее охлаждённое мясо по Москве, Московской области, Санкт-Петербургу и Ленинградской области ежедневно c 9.30 до 21.00 (кроме 1, 2 и 3 января). Так же Вы можете воспользоваться услугой "Экспресс-доставка в день заказа".</p>
           </div>
         </div>
-      </div>
-      {/* Ddelivery Section Ends Here */}
-
+      </div>      {/* Ddelivery Section Ends Here */}
     </div>
   );
 };

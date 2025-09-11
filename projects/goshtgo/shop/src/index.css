@@ -41,3 +41,13 @@ code {
 .swiper-button-next, .swiper-button-prev {
   color: var(--primary-color)!important;
 }
+
+.primary-gradient {
+  /* background: #AA282C;
+  background: linear-gradient(0deg, rgba(170, 40, 44, 1) 0%, rgba(170, 40, 44, 1) 32%, rgba(0, 0, 0, 1) 95%); */
+  background: linear-gradient(transparent 0%, #aa282c 100%);
+}
+
+.transition-anim {
+  transition: all .3s ease;
+}

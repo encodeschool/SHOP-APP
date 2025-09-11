@@ -1,0 +1,59 @@
+name: Deploy Gosht Go Project to VDS
+on:
+  push:
+      paths:
+          - 'projects/goshtgo/**'
+  pull_request:
+      paths:
+          - 'projects/goshtgo/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: projects/goshtgo/shop
+
+      # - name: Run tests
+      #   run: npm test -- --watchAll=false
+      #   working-directory: projects/goshtgo/shop
+
+      - name: Build project (log output)
+        run: |
+          cp .env.production .env
+          CI=false npm run build | tee build-logs.txt
+        working-directory: projects/goshtgo/shop
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-web-build-logs
+          path: projects/goshtgo/shop/build-logs.txt
+
+      - name: Deploy to VDS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          source: "projects/goshtgo/shop/build/*"
+          target: "~/goshtgo/web"
+
+      - name: Restart Nginx (if needed)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          script: |
+            sudo systemctl restart nginx

@@ -15,6 +15,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import PrivateRoute from './api/PrivateRoutes';
+import CategoryPage from './pages/CategoryPage';
+import OrderConfirmation from './pages/OrderConfirmation';
+import FilterPage from './pages/FilterPage';
+import Compare from './pages/Compare';
+import Favorites from './pages/Favorites';
+import TrackOrder from './pages/TrackOrder';
+import {ToastContainer} from 'react-toastify';
 
 function App() {
     return (
@@ -46,23 +53,24 @@ function App() {
                                 </PrivateRoute>
                                 }
                             />
-{/*                             
+                            
                             <Route path="/category/:categoryId" element={<CategoryPage />} />
-                            <Route path='/about' element={<About />} />
-                            <Route path='/terms' element={<TermCondition />} />
+                            {/* <Route path='/about' element={<About />} />
+                            <Route path='/terms' element={<TermCondition />} /> */}
                             <Route path='/order-confirmation' element={< OrderConfirmation />} />
                             <Route path="/filtered" element={<FilterPage />} />
                             
                             <Route path="/compare" element={<Compare />} />
-                            <Route path="/search" element={<SearchResults />} />
+                            {/* <Route path="/search" element={<SearchResults />} /> */}
                             
                             <Route path='/favorites' element={< Favorites />} />
                             <Route path='/track' element={<TrackOrder />} />
-                            <Route path='/contacts' element={<Contact />} /> */}
+                            {/* <Route path='/contacts' element={<Contact />} /> */}
                         </Routes>
                     </main>
                     <NewsletterFooter />
                     <Footer />
+                    <ToastContainer position="top-right" autoClose={2000} />
                 </div>
             </LanguageProvider>
         </LoadingProvider>
