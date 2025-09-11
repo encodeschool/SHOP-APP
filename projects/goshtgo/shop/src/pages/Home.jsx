@@ -183,19 +183,19 @@ const Home = () => {
 
   const beefSubcategory = categories
     .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("beef"));
+    .find((sub) => sub.toLowerCase().includes("beef"));
 
   const chickenSubcategory = categories
     .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("chicken"));
+    .find((sub) => sub.toLowerCase().includes("chicken"));
 
   const rabbitSubcategory = categories
     .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("rabbit"));
+    .find((sub) => sub.toLowerCase().includes("rabbit"));
 
   const marbledBeef = categories
     .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("Marbled beef"));
+    .find((sub) => sub.toLowerCase().includes("marbled beef"));
 
   return (
     <div>
@@ -737,6 +737,7 @@ const Home = () => {
         </div>
       </div>      
       {/* Ddelivery Section Ends Here */}
+
     </div>
   );
 };
