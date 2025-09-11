@@ -45,12 +45,12 @@ export default function FilterSidebar() {
     <Disclosure>
       {({ open }) => (
         <div>
-          <Disclosure.Button className="w-full rounded-t-xl p-2 bg-indigo-400 text-white">
+          <Disclosure.Button className="w-full rounded-t-xl p-2 bg-red-800 text-white">
             {open ? 'Hide Filters' : 'Show Filters'}
           </Disclosure.Button>
 
           <Disclosure.Panel className="md:block">
-            <div className="space-y-6 p-4 border-[4px] border-indigo-400 rounded-b-xl">
+            <div className="space-y-6 p-4 border-[4px] border-red-800 rounded-b-xl">
               
               {/* Brands Filter */}
               <div>

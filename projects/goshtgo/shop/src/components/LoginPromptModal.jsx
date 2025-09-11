@@ -73,14 +73,14 @@ const LoginPromptModal = ({ open, onClose }) => {
         <div className="flex justify-end gap-2">
           <button
             ref={cancelButtonRef}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-red-800"
             onClick={typeof onClose === 'function' ? onClose : () => {}}
           >
             {t('Cancel', 'Cancel')}
           </button>
           <Link
             to="/login"
-            className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-800"
           >
             {t('Login', 'Login')}
           </Link>
