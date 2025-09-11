@@ -39,7 +39,7 @@ const MegaMenu = ({ categories, getLocalizedName, BASE_URL }) => {
           </div>
         ))}
       </div>
-      <div className='relative hidden md:block'>
+      <div className='relative md:block' style={{height: "fit-content"}}>
         <img src="https://primemeat.ru/local/templates/primemeat/static/images/menu__banner-img-1.webp" className='object-cover' alt="" />
         <div className="absolute left-0 right-0 text-[24px] uppercase justify-between w-full bottom-0 box px-2 py-3 bg-yellow-300 flex items-center">
           <RiDiscountPercentLine size={80} className='mx-4' />
