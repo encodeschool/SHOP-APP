@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from '../../api/axios';
+import { FaTrash } from "react-icons/fa";
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -24,7 +25,6 @@ export default function Orders() {
         axios
             .patch(`/orders/${orderId}/status`, null, { params: { status: newStatus } })
             .then((res) => {
-                // Update status in state without refetching all
                 setOrders(prev =>
                     prev.map(o =>
                         o.id === orderId ? { ...o, status: res.data.status } : o
@@ -33,6 +33,18 @@ export default function Orders() {
             })
             .catch(() => {
                 alert("Failed to update status");
+            });
+    };
+
+    const deleteOrder = (orderId) => {
+        if (!window.confirm("Are you sure you want to delete this order?")) return;
+        axios
+            .delete(`/orders/${orderId}`)
+            .then(() => {
+                setOrders(prev => prev.filter(o => o.id !== orderId));
+            })
+            .catch(() => {
+                alert("Failed to delete order");
             });
     };
 
@@ -55,6 +67,7 @@ export default function Orders() {
                         <th className="p-2">Total Price</th>
                         <th className="p-2">Created Date</th>
                         <th className="p-2">Status</th>
+                        <th className="p-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,6 +104,17 @@ export default function Orders() {
                                     <option value="DELIVERED">DELIVERED</option>
                                     <option value="CANCELLED">CANCELLED</option>
                                 </select>
+                            </td>
+                            <td className="p-2">
+                                {o.status === "CANCELLED" && (
+                                    <button
+                                        onClick={() => deleteOrder(o.id)}
+                                        className="text-red-600 hover:text-red-800 p-1"
+                                        title="Delete order"
+                                    >
+                                        <FaTrash  size={18} />
+                                    </button>
+                                )}
                             </td>
                         </tr>
                     ))}

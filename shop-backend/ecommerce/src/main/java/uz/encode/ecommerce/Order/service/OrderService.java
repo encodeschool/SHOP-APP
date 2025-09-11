@@ -13,4 +13,5 @@ public interface OrderService {
     OrderResponseDTO updateStatus(UUID orderId, String status);
     List<OrderResponseDTO> getAllOrders(int page, int size, String status);
     String createPaymentIntent(UUID orderId, String paymentMethod);
+    void deleteOrder(UUID orderId);
 }

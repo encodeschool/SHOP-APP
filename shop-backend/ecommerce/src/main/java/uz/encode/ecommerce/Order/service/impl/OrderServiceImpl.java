@@ -207,4 +207,9 @@ public class OrderServiceImpl implements OrderService {
             order.getClientSecret()
         );
     }
+
+    @Override
+    public void deleteOrder(UUID orderId) {
+        orderRepository.deleteById(orderId);
+    }
 }

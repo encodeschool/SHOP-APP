@@ -4,10 +4,12 @@ package uz.encode.ecommerce.Order.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,5 +76,11 @@ public class OrderController {
             @RequestParam String status
     ) {
         return ResponseEntity.ok(orderService.updateStatus(orderId, status));
+    }
+
+    @DeleteMapping("/{orderId}")
+    @Operation(summary = "Delete Order")
+    public void deleteOrder(@PathVariable UUID orderId) {
+        orderService.deleteOrder(orderId);
     }
 }
