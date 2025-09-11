@@ -677,10 +677,10 @@ const Home = () => {
       {/* Rabbit for a week Section Goes Here */}
       {rabbitSubcategory && (
         <CategorySection
-          title="Chicken Meats"
+          title="Rabbit Meats"
           icon={GiRabbit  }
           products={products}
-          categoryId={chickenSubcategory.id}
+          categoryId={rabbitSubcategory.id}
           BASE_URL={BASE_URL}
           favorites={favorites}
           setFavorites={setFavorites}
