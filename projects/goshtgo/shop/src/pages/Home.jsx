@@ -22,6 +22,7 @@ import { TbTruckDelivery } from 'react-icons/tb';
 import { GiCow } from 'react-icons/gi';
 import CategorySection from '../components/CategorySection';
 import { GiRoastChicken,GiRabbit  } from "react-icons/gi";
+import { LuBeef } from "react-icons/lu";
 
 
 const Home = () => {
@@ -191,6 +192,10 @@ const Home = () => {
   const rabbitSubcategory = categories
     .flatMap((cat) => cat.subcategories || [])
     .find((sub) => getLocalizedName(sub).toLowerCase().includes("rabbit"));
+
+  const marbledBeef = categories
+    .flatMap((cat) => cat.subcategories || [])
+    .find((sub) => getLocalizedName(sub).toLowerCase().includes("Marbled beef"));
 
   return (
     <div>
@@ -659,11 +664,26 @@ const Home = () => {
       </div>
       {/* Accessories Section Ends Here */}
 
+      {/* Marbled beef for a week Section Goes Here */}
+      {marbledBeef && (
+        <CategorySection
+          title="Marbled beef Meats"
+          icon={LuBeef}
+          products={products}
+          categoryId={marbledBeef.id}
+          BASE_URL={BASE_URL}
+          favorites={favorites}
+          setFavorites={setFavorites}
+          bgcolor="bg-white"
+        />
+      )}
+      {/* Marbled beef for a week Section Ends Here */}
+
       {/* Chicken for a week Section Goes Here */}
       {chickenSubcategory && (
         <CategorySection
           title="Chicken Meats"
-          icon={GiRoastChicken }
+          icon={GiRoastChicken}
           products={products}
           categoryId={chickenSubcategory.id}
           BASE_URL={BASE_URL}
@@ -678,7 +698,7 @@ const Home = () => {
       {rabbitSubcategory && (
         <CategorySection
           title="Rabbit Meats"
-          icon={GiRabbit  }
+          icon={GiRabbit}
           products={products}
           categoryId={rabbitSubcategory.id}
           BASE_URL={BASE_URL}

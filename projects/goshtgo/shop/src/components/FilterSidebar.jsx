@@ -10,7 +10,7 @@ import i18n from "../i18n";
 export default function FilterSidebar() {
   const dispatch = useDispatch();
   const selectedBrands = useSelector((state) => state.filters.brands);
-  const [brandsToShow, setBrandsToShow] = useState(1);
+  const [brandsToShow, setBrandsToShow] = useState(3);
   const inStock = useSelector((state) => state.filters.inStock);
   const priceRange = useSelector((state) => state.filters.priceRange);
 
