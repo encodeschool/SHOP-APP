@@ -6,6 +6,26 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import { useTranslation } from "react-i18next";
 
+// ✅ Reusable FormField
+const FormField = ({ label, name, type = "text", register, rules, errors, required }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      {label} {required && "*"}
+    </label>
+    <input
+      type={type}
+      {...register(name, rules)}
+      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800"
+    />
+    {errors[name] && (
+      <span className="text-red-500 text-sm">
+        {errors[name].message || "Required"}
+      </span>
+    )}
+  </div>
+);
+
 const Checkout = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const reduxUser = useSelector((state) => state.auth?.user);
@@ -40,14 +60,13 @@ const Checkout = () => {
     }
   }, [user, navigate, location, setValue]);
 
-  // ✅ Updated: calculate shipping price
+  // ✅ Calculate totals
   const shippingPrice = shippingMethod === 'express' ? 15 : 5;
   const itemsTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalPrice = itemsTotal + shippingPrice;
 
   const onSubmit = async (data) => {
     setLoading(true);
-    // ✅ Updated: Build checkout payload with full details
     const checkoutPayload = {
       userId: user.id,
       items: cartItems.map((item) => ({
@@ -55,10 +74,10 @@ const Checkout = () => {
         quantity: item.quantity,
         pricePerUnit: item.price,
       })),
-      shippingMethod: data.shippingMethod, // ✅ Updated
-      paymentMethod: data.paymentMethod,   // ✅ Updated
-      shippingPrice: shippingPrice,        // ✅ Updated
-      totalPrice: totalPrice,              // ✅ Updated
+      shippingMethod: data.shippingMethod,
+      paymentMethod: data.paymentMethod,
+      shippingPrice,
+      totalPrice,
       shippingAddress: {
         name: data.name,
         email: data.email,
@@ -78,16 +97,14 @@ const Checkout = () => {
     };
 
     try {
-      const response = await axios.post('/orders', checkoutPayload); // ✅ Updated
+      const response = await axios.post('/orders', checkoutPayload);
       const order = response.data;
       console.log('Order created:', order);
       dispatch(saveCheckoutInfo(data));
-      localStorage.setItem('checkoutInfo', JSON.stringify(data)); // ✅ Persistent
+      localStorage.setItem('checkoutInfo', JSON.stringify(data));
       navigate('/order-confirmation');
-      setLoading(false);
     } catch (error) {
       console.error('Error submitting checkout:', error.response?.data || error.message);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -105,29 +122,40 @@ const Checkout = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 py-[50px] grid md:grid-cols-3 gap-8">
+    <div className="container mx-auto p-4 py-[50px] grid md:grid-cols-3 md:px-10 gap-8">
       {/* Checkout Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-6">
         <h2 className="text-2xl font-bold">{t("Contact Information")}</h2>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label>{t("Full Name")}*</label>
-            <input {...register('name', { required: true })} className="input" />
-            {errors.name && <span className="text-red-500">{t("Required")}</span>}
-          </div>
-          <div>
-            <label>{t("Email")} *</label>
-            <input type="email" {...register('email', { required: true })} className="input" />
-            {errors.email && <span className="text-red-500">{t("Required")}</span>}
-          </div>
+          <FormField
+            label={t("Full Name")}
+            name="name"
+            register={register}
+            rules={{ required: true }}
+            errors={errors}
+            required
+          />
+          <FormField
+            label={t("Email")}
+            name="email"
+            type="email"
+            register={register}
+            rules={{ required: true }}
+            errors={errors}
+            required
+          />
         </div>
 
-        <div>
-          <label>{t("Phone")} *</label>
-          <input type="tel" {...register('phone', { required: true })} className="input" />
-          {errors.phone && <span className="text-red-500">{t("Required")}</span>}
-        </div>
+        <FormField
+          label={t("Phone")}
+          name="phone"
+          type="tel"
+          register={register}
+          rules={{ required: true }}
+          errors={errors}
+          required
+        />
 
         <div>
           <label className="flex items-center gap-2">
@@ -139,51 +167,75 @@ const Checkout = () => {
         {isLegalEntity && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t("Company Information")}</h3>
-            <div>
-              <label>{t("Company Name")} *</label>
-              <input {...register('companyName', { required: true })} className="input" />
-              {errors.companyName && <span className="text-red-500">{t("Required")}</span>}
-            </div>
-            <div>
-              <label>{("Registration Nr")} *</label>
-              <input {...register('registrationNr', { required: true })} className="input" />
-              {errors.registrationNr && <span className="text-red-500">{t("Required")}</span>}
-            </div>
-            <div>
-              <label>{t("VAT Number")}</label>
-              <input {...register('vatNumber')} className="input" />
-            </div>
-            <div>
-              <label>{t("Legal Address")} *</label>
-              <input {...register('legalAddress', { required: true })} className="input" />
-              {errors.legalAddress && <span className="text-red-500">{t("Required")}</span>}
-            </div>
+            <FormField
+              label={t("Company Name")}
+              name="companyName"
+              register={register}
+              rules={{ required: true }}
+              errors={errors}
+              required
+            />
+            <FormField
+              label={t("Registration Nr")}
+              name="registrationNr"
+              register={register}
+              rules={{ required: true }}
+              errors={errors}
+              required
+            />
+            <FormField
+              label={t("VAT Number")}
+              name="vatNumber"
+              register={register}
+              errors={errors}
+            />
+            <FormField
+              label={t("Legal Address")}
+              name="legalAddress"
+              register={register}
+              rules={{ required: true }}
+              errors={errors}
+              required
+            />
           </div>
         )}
 
         <h3 className="text-xl font-semibold">{t("Shipping Address")}</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label>{t("Country")} *</label>
-            <input {...register('country', { required: true })} className="input" />
-            {errors.country && <span className="text-red-500">{t("Required")}</span>}
-          </div>
-          <div>
-            <label>{t("Post Code / ZIP")} *</label>
-            <input {...register('zip', { required: true })} className="input" />
-            {errors.zip && <span className="text-red-500">{t("Required")}</span>}
-          </div>
+          <FormField
+            label={t("Country")}
+            name="country"
+            register={register}
+            rules={{ required: true }}
+            errors={errors}
+            required
+          />
+          <FormField
+            label={t("Post Code / ZIP")}
+            name="zip"
+            register={register}
+            rules={{ required: true }}
+            errors={errors}
+            required
+          />
         </div>
+        <FormField
+          label={t("City")}
+          name="city"
+          register={register}
+          rules={{ required: true }}
+          errors={errors}
+          required
+        />
 
         <div>
-          <label>{t("City")} *</label>
-          <input {...register('city', { required: true })} className="input" />
-          {errors.city && <span className="text-red-500">{t("Required")}</span>}
-        </div>
-
-        <div>
-          <label>{t("Order Notes")}</label>
-          <textarea {...register('notes')} className="input" rows={3} />
+          <label className="block text-sm font-medium text-gray-700">{t("Order Notes")}</label>
+          <textarea
+            {...register('notes')}
+            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                       focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800"
+            rows={3}
+          />
         </div>
 
         <div>
@@ -191,15 +243,18 @@ const Checkout = () => {
             <input type="checkbox" {...register('agreeToTerms', { required: true })} />
             {t("I have read and agree to the website terms and conditions")} *
           </label>
-          {errors.agreeToTerms && <span className="text-red-500">{("You must accept the terms")}</span>}
+          {errors.agreeToTerms && (
+            <span className="text-red-500 text-sm">{t("You must accept the terms")}</span>
+          )}
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className={`bg-red-800 w-full text-white px-6 py-2 rounded hover:bg-red-800 flex justify-center items-center ${
-            loading ? 'cursor-not-allowed opacity-70' : ''
-          }`}
+          className={`bg-red-800 w-full text-white px-6 py-3 rounded-md font-medium 
+                     hover:bg-red-900 transition-colors flex justify-center items-center ${
+                       loading ? 'cursor-not-allowed opacity-70' : ''
+                     }`}
         >
           {loading ? (
             <>
@@ -238,15 +293,15 @@ const Checkout = () => {
               {t("Processing...")}
             </>
           ) : (
-            'Confirm Order'
+            t("Confirm Order")
           )}
         </button>
       </form>
 
       {/* Order Summary */}
-      <div className="border sticky rounded p-4 bg-gray-100">
-        <h2 className="text-3xl border-b-2 border-b-red-800 pb-6 pt-3">{t("Order Summary")}</h2>
-        <table className="w-full">
+      <div className="border sticky top-[116px] rounded p-6 bg-gray-100 h-fit">
+        <h2 className="text-2xl border-b-2 border-b-red-800 pb-4">{t("Order Summary")}</h2>
+        <table className="w-full mt-4">
           <thead>
             <tr className="border-b-2 border-red-800">
               <th className="text-left">{t("Product")}</th>
@@ -262,7 +317,7 @@ const Checkout = () => {
             ))}
 
             <tr className="border-t-2 border-red-800">
-              <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Shipping Method")}</td>
+              <td colSpan={2} className="pt-4 pb-2 font-semibold">{t("Shipping Method")}</td>
             </tr>
             <tr>
               <td colSpan={2}>
@@ -273,14 +328,14 @@ const Checkout = () => {
                       value="standard"
                       {...register('shippingMethod', { required: true })}
                       defaultChecked
-                    />
+                    />{" "}
                     {t("Standard Shipping")}
                   </span>
                   <span>$5.00</span>
                 </label>
                 <label className="flex items-center justify-between mt-2">
                   <span>
-                    <input type="radio" value="express" {...register('shippingMethod')} />
+                    <input type="radio" value="express" {...register('shippingMethod')} />{" "}
                     {t("Express Shipping")}
                   </span>
                   <span>$15.00</span>
@@ -289,38 +344,44 @@ const Checkout = () => {
             </tr>
 
             <tr className="border-t-2 border-red-800">
-              <td colSpan={2} className="pt-4 pb-4 font-semibold">{t("Payment Method")}</td>
+              <td colSpan={2} className="pt-4 pb-2 font-semibold">{t("Payment Method")}</td>
             </tr>
             <tr>
               <td colSpan={2}>
                 <label className="block">
-                  <input type="radio" value="card" {...register('paymentMethod', { required: true })} defaultChecked />
+                  <input
+                    type="radio"
+                    value="card"
+                    {...register('paymentMethod', { required: true })}
+                    defaultChecked
+                  />{" "}
                   {t("Credit / Debit Card")}
                 </label>
                 <label className="block mt-2">
-                  <input type="radio" value="paypal" {...register('paymentMethod')} />
-                  {t("PayPal")}
+                  <input type="radio" value="paypal" {...register('paymentMethod')} /> {t("PayPal")}
                 </label>
                 <label className="block mt-2">
-                  <input type="radio" value="cod" {...register('paymentMethod')} />
+                  <input type="radio" value="cod" {...register('paymentMethod')} />{" "}
                   {t("Cash on Delivery")}
                 </label>
                 {errors.paymentMethod && (
-                  <p className="text-red-500 mt-1">{t("Please select a payment method")}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {t("Please select a payment method")}
+                  </p>
                 )}
               </td>
             </tr>
 
             <tr className="border-t-2 border-red-800 font-bold">
-              <td className='py-4'>{t("Total")}:</td>
-              <td className="text-right">
-                ${totalPrice.toFixed(2)} {/* ✅ Updated: total includes shipping */}
-              </td>
+              <td className="py-4">{t("Total")}:</td>
+              <td className="text-right">${totalPrice.toFixed(2)}</td>
             </tr>
 
             <tr>
               <td colSpan={2} className="text-sm text-gray-600 pt-4">
-                {t("Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.")}
+                {t(
+                  "Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy."
+                )}
               </td>
             </tr>
           </tbody>
