@@ -181,21 +181,36 @@ const Home = () => {
     setProductsToShow(prev => prev + 6);
   };
 
-  const beefSubcategory = categories
-    .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("beef"));
+  const findSubcategoryByCode = (code) => {
+    if (!code || !Array.isArray(categories) || categories.length === 0) return null;
+    const lower = code.toLowerCase();
 
-  const chickenSubcategory = categories
-    .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("chicken"));
+    const searchNode = (node) => {
+      if (!node) return null;
+      if (node.categoryCode && node.categoryCode.toLowerCase().includes(lower)) {
+        return node;
+      }
+      if (node.subcategories?.length) {
+        for (const sub of node.subcategories) {
+          const found = searchNode(sub);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
 
-  const rabbitSubcategory = categories
-    .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("rabbit"));
+    for (const root of categories) {
+      const found = searchNode(root);
+      if (found) return found;
+    }
+    return null;
+  };
 
-  const marbledBeef = categories
-    .flatMap((cat) => cat.subcategories || [])
-    .find((sub) => getLocalizedName(sub).toLowerCase().includes("Marbled beef"));
+  // usage
+  const beefSubcategory = findSubcategoryByCode('beef');
+  const chickenSubcategory = findSubcategoryByCode('chicken');
+  const marbledBeef = findSubcategoryByCode('marbled');
+  const rabbitSubcategory = findSubcategoryByCode('rabbit');
 
   return (
     <div>

@@ -17,6 +17,7 @@ public class CategoryResponseDTO {
     private String name;
     private UUID parentId;
     private String icon;
+    private String categoryCode;
     private List<CategoryResponseDTO> subcategories;
     private List<CategoryTranslationDTO> translations;
     private String lang;
@@ -34,6 +35,7 @@ public class CategoryResponseDTO {
             : null;
         
         this.name = translation != null ? translation.getName() : category.getName();
+        this.categoryCode = category.getCategoryCode();
         this.icon = category.getIcon();
         this.parentId = category.getParent() != null ? category.getParent().getId() : null;
         this.subcategories = category.getSubcategories() != null

@@ -41,12 +41,14 @@ public class CategoryController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CategoryResponseDTO> create(
             @RequestParam("name") String name,
+            @RequestParam("categoryCode") String categoryCode,
             @RequestParam(value = "parentId", required = false) String parentId,
             @RequestPart(value = "icon", required = false) MultipartFile icon,
             @RequestParam(value = "translations", required = false) String translationsJson
     ) throws Exception {
         CategoryCreateDTO dto = new CategoryCreateDTO();
         dto.setName(name);
+        dto.setCategoryCode(categoryCode);
         if (parentId != null && !parentId.isEmpty()) {
             dto.setParentId(UUID.fromString(parentId));
         }
@@ -89,12 +91,14 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> update(
             @PathVariable UUID id,
             @RequestParam("name") String name,
+            @RequestParam("categoryCode") String categoryCode,
             @RequestParam(value = "parentId", required = false) String parentId,
             @RequestPart(value = "icon", required = false) MultipartFile icon,
             @RequestParam(value = "translations", required = false) String translationsJson
     ) throws Exception {
         CategoryCreateDTO dto = new CategoryCreateDTO();
         dto.setName(name);
+        dto.setCategoryCode(categoryCode);
         if (parentId != null && !parentId.isEmpty()) {
             dto.setParentId(UUID.fromString(parentId));
         }

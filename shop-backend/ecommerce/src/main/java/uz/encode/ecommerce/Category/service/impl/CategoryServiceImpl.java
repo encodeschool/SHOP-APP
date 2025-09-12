@@ -43,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = new Category();
         category.setName(dto.getName());
+        category.setCategoryCode(dto.getCategoryCode());
 
         // Validate and set parent
         if (dto.getParentId() != null) {
@@ -156,6 +157,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (dto.getName() != null && !dto.getName().trim().isEmpty()) {
             category.setName(dto.getName());
+        }
+
+        if (dto.getCategoryCode() != null && !dto.getCategoryCode().trim().isEmpty()) {
+            category.setCategoryCode(dto.getCategoryCode());
         }
 
         // Update parent

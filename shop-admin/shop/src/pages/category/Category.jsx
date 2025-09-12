@@ -11,6 +11,7 @@ export default function Categories() {
   const [form, setForm] = useState({
     name: "",
     parentId: "",
+    categoryCode: "",
     subParentId: "",
     icon: null,
     translations: [],
@@ -30,6 +31,7 @@ export default function Categories() {
         flat.push({
           id: cat.id,
           name: cat.name,
+          categoryCode: cat.categoryCode,
           parentId: cat.parentId || parentId,
           icon: cat.icon,
           translations: cat.translations || [],
@@ -55,9 +57,9 @@ export default function Categories() {
     axios
       .get("/categories?lang=en")
       .then((res) => {
-        console.log("API Response:", JSON.stringify(res.data, null, 2));
+        // console.log("API Response:", JSON.stringify(res.data, null, 2));
         const flatCategories = flattenCategories(res.data);
-        console.log("Flattened Categories:", JSON.stringify(flatCategories, null, 2));
+        // console.log("Flattened Categories:", JSON.stringify(flatCategories, null, 2));
         // Check for duplicate IDs
         const idCount = new Map();
         flatCategories.forEach(cat => {
@@ -84,7 +86,7 @@ export default function Categories() {
   }, []);
 
   useEffect(() => {
-    console.log("Categories State:", JSON.stringify(categories, null, 2));
+    // console.log("Categories State:", JSON.stringify(categories, null, 2));
   }, [categories]);
 
   const handleInputChange = (e) => {
@@ -130,6 +132,7 @@ export default function Categories() {
     try {
       const formData = new FormData();
       formData.append("name", form.name || form.translations.find(t => t.language === "en")?.name || "");
+      formData.append("categoryCode", form.categoryCode);
       const finalParentId = form.subParentId || form.parentId;
       if (finalParentId) formData.append("parentId", finalParentId);
       if (form.icon) formData.append("icon", form.icon);
@@ -148,6 +151,7 @@ export default function Categories() {
       setForm({
         name: "",
         parentId: "",
+        categoryCode: "",
         subParentId: "",
         icon: null,
         translations: [],
@@ -181,6 +185,7 @@ export default function Categories() {
       setForm({
         name: cat.name || "",
         parentId: parent.parentId,
+        categoryCode: cat.categoryCode,
         subParentId: parent.id,
         icon: null,
         translations,
@@ -189,6 +194,7 @@ export default function Categories() {
       setForm({
         name: cat.name || "",
         parentId: cat.parentId || "",
+        categoryCode: cat.categoryCode || "",
         subParentId: "",
         icon: null,
         translations,
@@ -201,7 +207,7 @@ export default function Categories() {
   const parentCategories = categories.filter((cat) => cat.parentId === null);
   const subCategories = (parentId) => {
     const subs = categories.filter((cat) => cat.parentId === parentId);
-    console.log(`subCategories for parentId ${parentId}:`, JSON.stringify(subs, null, 2));
+    // console.log(`subCategories for parentId ${parentId}:`, JSON.stringify(subs, null, 2));
     return subs;
   };
 
@@ -218,6 +224,7 @@ export default function Categories() {
               setForm({
                 name: "",
                 parentId: "",
+                categoryCode: "",
                 subParentId: "",
                 icon: null,
                 translations: [],
@@ -238,6 +245,7 @@ export default function Categories() {
                   <th className="p-2">Icon</th>
                   <th className="p-2">Main Category</th>
                   <th className="p-2">English Name</th>
+                  <th className="p-2">Category Code</th>
                   <th className="p-2">Subcategories</th>
                   <th className="p-2">Actions</th>
                 </tr>
@@ -259,6 +267,9 @@ export default function Categories() {
                     <td className="p-2 font-bold">{parent.name}</td>
                     <td className="p-2">
                       {parent.translations?.find((t) => t.language === "en")?.name || "N/A"}
+                    </td>
+                    <td className="p-2">
+                      {parent.categoryCode}
                     </td>
                     <td className="p-2">
                       {[...new Map(subCategories(parent.id).map((sub) => [sub.id, sub])).values()].map((sub, subIndex) => (
@@ -358,6 +369,14 @@ export default function Categories() {
                 name="name"
                 placeholder="Category Name (English)"
                 value={form.name}
+                onChange={handleInputChange}
+                className="border p-1 mb-3 w-full"
+              />
+
+              <input
+                name="categoryCode"
+                placeholder="Category Code"
+                value={form.categoryCode}
                 onChange={handleInputChange}
                 className="border p-1 mb-3 w-full"
               />
