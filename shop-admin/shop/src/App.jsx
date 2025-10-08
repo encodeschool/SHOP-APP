@@ -14,6 +14,7 @@ import RoleRoute from './routes/RoleRoute';
 import NotFound from "./pages/Errors/NotFound";
 import Forbidden from "./pages/Errors/Forbidden";
 import ServerError from "./pages/Errors/ServerError";
+import Widgets from "./pages/home/Widgets";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="product_attribute" element={<AttributeManagement />} />
           <Route path="brand" element={<Brand />} />
           <Route path="banner" element={<Banner />} />
+          <Route path="/home-widget" element={<Widgets />} />
         </Route>
 
         <Route path="/unauthorized" element={<Forbidden />} />

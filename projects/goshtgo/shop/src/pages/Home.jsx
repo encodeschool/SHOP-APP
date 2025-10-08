@@ -23,6 +23,8 @@ import { GiCow } from 'react-icons/gi';
 import CategorySection from '../components/CategorySection';
 import { GiRoastChicken,GiRabbit  } from "react-icons/gi";
 import { LuBeef } from "react-icons/lu";
+import * as GiIcons from "react-icons/gi";
+
 
 
 const Home = () => {
@@ -211,6 +213,14 @@ const Home = () => {
   const chickenSubcategory = findSubcategoryByCode('chicken');
   const marbledBeef = findSubcategoryByCode('marbled');
   const rabbitSubcategory = findSubcategoryByCode('rabbit');
+
+  const [widgets, setWidgets] = useState([]);
+
+  useEffect(() => {
+    axios.get('/home-widgets')
+      .then(res => setWidgets(res.data))
+      .catch(() => setWidgets([]));
+  }, []);
 
   return (
     <div>
@@ -464,6 +474,34 @@ const Home = () => {
         />
       )}
       {/* Beef for a week Section Ends Here */}
+
+      {widgets.length === 0 && (
+        <div className="text-center p-10 text-gray-500">Loading widgets...</div>
+      )}
+
+      {widgets.map((widget) => {
+        if (widget.widgetType === "CATEGORY_SECTION" && widget.category) {
+          // ✅ Dynamically select the correct icon from react-icons
+          const Icon =
+            GiIcons[widget.iconName] || GiIcons["GiCow"]; // fallback icon
+
+          return (
+            <CategorySection
+              key={widget.id}
+              title={widget.title}
+              icon={Icon}
+              products={products}
+              categoryId={widget.category?.id}
+              BASE_URL={BASE_URL}
+              favorites={favorites}
+              setFavorites={setFavorites}
+              bgcolor={widget.backgroundColor || "bg-white"}
+            />
+          );
+        }
+
+        return null;
+      })}
 
       {/* <div className="container mx-auto px-4 md:px-10 py-6 relative">
         <div className="flex items-center justify-between mb-4">

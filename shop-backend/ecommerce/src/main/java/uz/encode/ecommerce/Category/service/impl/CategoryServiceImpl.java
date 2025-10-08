@@ -259,4 +259,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return false;
     }
+
+    @Override
+    public Category findById(UUID id) {
+        return categoryRepository.findById(id).orElse(null);
+    }
 }

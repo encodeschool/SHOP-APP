@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import uz.encode.ecommerce.Category.dto.CategoryCreateDTO;
 import uz.encode.ecommerce.Category.dto.CategoryResponseDTO;
+import uz.encode.ecommerce.Category.entity.Category;
 
 @Service
 public interface CategoryService {
@@ -19,4 +20,5 @@ public interface CategoryService {
     CategoryResponseDTO update(UUID id, CategoryCreateDTO dto, MultipartFile multipartFile);
     void delete(UUID id);
     List<CategoryResponseDTO> getSubCategories(UUID id);
+    Category findById(UUID id);
 }

@@ -6,7 +6,8 @@ import {
   FaStream,
   FaSignOutAlt,
   FaClipboardList,
-  FaImages 
+  FaImages,
+  FaHome 
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getUserById } from "../api/authService";
@@ -78,6 +79,10 @@ export default function AdminLayout() {
             <NavLink to="/orders" className={linkClass}>
               <FaClipboardList  />
               <span>Orders</span>
+            </NavLink>
+            <NavLink to="/home-widget" className={linkClass}>
+              <FaHome />
+              <span>Home Widget</span>
             </NavLink>
             <NavLink to="/banner" className={linkClass}>
               <FaImages   />
