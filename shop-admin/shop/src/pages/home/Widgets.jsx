@@ -157,7 +157,7 @@ const Widgets = () => {
         </div>
       </div>
 
-      {/* Widget List with Drag/Drop */}
+      {/* Widget List with Drag'n'Drop */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="widgets">
           {(provided) => (
