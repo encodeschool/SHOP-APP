@@ -1,12 +1,14 @@
 import 'dart:convert';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
-
 import '../models/category_model.dart';
 
 
+final apiUrl = dotenv.env['API_URL'] ?? 'https://goshtgo.encode.uz/api';
+final appName = dotenv.env['APP_NAME'] ?? 'GoshtGo';
+
 class CategoryService {
-  final dio = Dio(BaseOptions(baseUrl: 'http://10.0.2.2:8080/api'));
+  final dio = Dio(BaseOptions(baseUrl: apiUrl));
 
   /// Fetches root categories.
   Future<List<Category>> fetchRootCategories() async {

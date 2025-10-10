@@ -23,10 +23,24 @@ import 'package:shop/screens/quality/quality_screen.dart';
 import 'package:shop/screens/settings/settings_screen.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey = "pk_test_"; // Replace with your Stripe test key
+
+  const bool isProd = bool.fromEnvironment('dart.vm.product');
+  final envFile = isProd ? ".env.production" : ".env.development";
+
+  try {
+    await dotenv.load(fileName: envFile);
+    print("Loaded $envFile successfully");
+  } catch (e) {
+    print("Failed to load $envFile: $e");
+  }
+
+  // Now safe to use env variables
+  final stripeKey = dotenv.env['STRIPE_KEY'] ?? "pk_test_fallback";
+  Stripe.publishableKey = stripeKey;
 
   final storage = FlutterSecureStorage();
   final token = await storage.read(key: 'token');
