@@ -26,6 +26,7 @@ import SearchResults from './pages/SearchResults';
 import About from './pages/About';
 import Quality from './pages/Quality';
 import Delivery from './pages/Delivery';
+import Contact from './pages/Contact';
 
 function App() {
     return (
@@ -71,7 +72,7 @@ function App() {
                             
                             <Route path='/favorites' element={< Favorites />} />
                             <Route path='/track' element={<TrackOrder />} />
-                            {/* <Route path='/contacts' element={<Contact />} /> */}
+                            <Route path='/contact' element={<Contact />} />
                         </Routes>
                     </main>
                     <NewsletterFooter />
