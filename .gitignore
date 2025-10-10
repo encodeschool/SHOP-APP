@@ -1,1 +1,2 @@
 shop-backend/ecommerce/uploads/**
+.github/workflows/playwright.yml
