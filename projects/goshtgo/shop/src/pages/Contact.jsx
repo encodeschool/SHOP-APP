@@ -36,7 +36,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="my-8 px-4 container mx-auto">
+    <div className="container mx-auto px-4 md:px-10 py-6 text-gray-800">
       <h1 className="text-center text-3xl font-bold mb-6">{t("Contact Us")}</h1>
 
       <div className="grid md:grid-cols-2 gap-10">
