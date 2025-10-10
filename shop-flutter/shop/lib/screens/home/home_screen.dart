@@ -30,6 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
   User? _user;
   bool _loading = true;
 
+  int _visibleTopCount = 4; // initial visible "Топ мясо"
+  int _visibleAllCount = 6; // initial visible "Все продукции"
+
   @override
   void initState() {
     super.initState();
@@ -43,8 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _products = await productService.fetchFeaturedProducts();
       _all_products = await productService.fetchAllProducts();
       _user = await userService.getUserDetails();
-
-      if (!mounted) return; // Prevent memory leak
+      if (!mounted) return;
     } catch (e) {
       print('Error loading data: $e');
       if (mounted) {
@@ -54,6 +56,18 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     setState(() => _loading = false);
+  }
+
+  void _loadMoreTop() {
+    setState(() {
+      _visibleTopCount = (_visibleTopCount + 4).clamp(0, _products.length);
+    });
+  }
+
+  void _loadMoreAll() {
+    setState(() {
+      _visibleAllCount = (_visibleAllCount + 6).clamp(0, _all_products.length);
+    });
   }
 
   @override
@@ -74,23 +88,49 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: primaryColor,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
+            SizedBox(height: 25),
+            // DrawerHeader(
+            //   decoration: BoxDecoration(
+            //     color: primaryColor,
+            //   ),
+            //   child: Text(
+            //     'Menu',
+            //     style: TextStyle(color: Colors.white, fontSize: 24),
+            //   ),
+            // ),
+            SizedBox(height: 25),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('О нас'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/about');
+              }
             ),
-            // ListTile(
-            //   leading: Icon(Icons.home),
-            //   title: Text('Home'),
-            // ),
-            // ListTile(
-            //   leading: Icon(Icons.settings),
-            //   title: Text('Settings'),
-            // ),
+            ListTile(
+              leading: Icon(Icons.delivery_dining),
+              title: Text('Доставка'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/delivery');
+              }
+            ),
+            ListTile(
+              leading: Icon(Icons.high_quality),
+              title: Text('Качество'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/quality');
+              }
+            ),
+            ListTile(
+              leading: Icon(Icons.support),
+              title: Text('Контакты'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/contact');
+              }
+            ),
           ],
         ),
       ),
@@ -238,9 +278,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   final product = _products[index];
                   return ProductCard(product: product);
                 },
-                childCount: _products.length,
+                childCount:
+                _visibleTopCount.clamp(0, _products.length),
               ),
             ),
+            // "Load more" button for Top
+            if (_visibleTopCount < _products.length)
+              SliverToBoxAdapter(
+                child: Center(
+                  child: TextButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            primaryColor
+                        )
+                    ),
+                    onPressed: _loadMoreTop,
+                    child: Text(
+                      "Показать больше",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+
+            // --- Все продукции section ---
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -261,7 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       (context, index) {
                     return ProductTile(product: _all_products[index]);
                   },
-                  childCount: _all_products.length,
+                  childCount: _visibleAllCount.clamp(
+                      0, _all_products.length),
                 ),
                 gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -272,7 +334,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            if (_visibleAllCount < _all_products.length)
+              SliverToBoxAdapter(
+                child: Center(
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        primaryColor
+                      )
+                    ),
+                    onPressed: _loadMoreAll,
+                    child: Text(
+                      "Показать больше",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50), // 👈 Custom radius here
+        ),
+        onPressed: () => context.push('/cart'),
+        backgroundColor: Colors.red[900],
+        child: const Icon(
+            Icons.shopping_cart,
+            color: Colors.white,
+            size: 24
         ),
       ),
     );

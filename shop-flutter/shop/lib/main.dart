@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop/screens/about/about_screen.dart';
 import 'package:shop/screens/auth/login_screen.dart';
 import 'package:shop/screens/auth/register_screen.dart';
 import 'package:shop/screens/cart/cart_screen.dart';
 import 'package:shop/screens/category/category_screen.dart';
 import 'package:shop/screens/checkout/checkout_screen.dart';
 import 'package:shop/screens/checkout/success_screen.dart';
+import 'package:shop/screens/contact/contact_screen.dart';
+import 'package:shop/screens/delivery/delivery_screen.dart';
 import 'package:shop/screens/home/home_screen.dart';
 import 'package:shop/screens/navigation/main_navigation_screen.dart';
 import 'package:shop/screens/orders/order_history_screen.dart';
@@ -16,6 +19,7 @@ import 'package:shop/screens/product/product_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/screens/profile/profile_edit_screen.dart';
 import 'package:shop/screens/profile/profile_screen.dart';
+import 'package:shop/screens/quality/quality_screen.dart';
 import 'package:shop/screens/settings/settings_screen.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
@@ -98,6 +102,10 @@ GoRouter createRouter(String initialRoute) => GoRouter(
         );
       },
     ),
+    GoRoute(path: '/about', builder: (_, __) => const AboutScreen()),
+    GoRoute(path: '/delivery', builder: (_, __) => const DeliveryScreen()),
+    GoRoute(path: '/quality', builder: (_, __) => const QualityScreen()),
+    GoRoute(path: '/contact', builder: (_, __) => const ContactScreen()),
   ],
 );
 

@@ -51,6 +51,9 @@ dependencies:
   flutter_launcher_icons:
   flutter_dotenv: ^6.0.0
   flutter_svg: ^2.2.1
+  url_launcher:
+  flutter_map:
+  latlong2:
 
 dev_dependencies:
   flutter_test:

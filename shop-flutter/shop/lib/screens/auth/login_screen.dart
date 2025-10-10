@@ -58,20 +58,20 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 24),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Почта'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Пароль'),
             ),
             const SizedBox(height: 24),
             if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
             ElevatedButton(
               onPressed: _loading ? null : _login,
               child: _loading ? const CircularProgressIndicator() : const Text(
-                  "Login",
+                  "Войти",
                   style: TextStyle(
                     color: Colors.white
                   )
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextButton(
               onPressed: () => context.go('/register'),
               child: Text(
-                  "Do not have an account? Create account",
+                  "У вас нет аккаунта? Создайте новый",
                   style: TextStyle(
                     color: Colors.grey
                   )

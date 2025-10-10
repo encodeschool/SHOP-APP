@@ -72,35 +72,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
               if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Full Name"),
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                decoration: const InputDecoration(labelText: "Полное имя"),
+                validator: (val) => val!.isEmpty ? "Обязательно" : null,
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-                validator: (val) => val!.contains('@') ? null : "Invalid email",
+                decoration: const InputDecoration(labelText: "Почта"),
+                validator: (val) => val!.contains('@') ? null : "Неправильная почта",
               ),
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(labelText: "Username"),
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                decoration: const InputDecoration(labelText: "Имя пользователя"),
+                validator: (val) => val!.isEmpty ? "Обязательно" : null,
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(labelText: "Phone"),
-                validator: (val) => val!.length < 7 ? "Invalid phone" : null,
+                decoration: const InputDecoration(labelText: "Телефон"),
+                validator: (val) => val!.length < 7 ? "Неправильный номер телефона" : null,
               ),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: "Password"),
-                validator: (val) => val!.length < 6 ? "Min 6 characters" : null,
+                decoration: const InputDecoration(labelText: "Пароль"),
+                validator: (val) => val!.length < 6 ? "Мин. 6 символов" : null,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loading ? null : _register,
                 child: _loading ? const CircularProgressIndicator() : const Text(
-                    "Register",
+                    "Регистрация",
                     style: TextStyle(
                       color: Colors.white
                     )
@@ -117,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextButton(
                 onPressed: () => context.go('/login'),
                 child: const Text(
-                    "Already have an account? Login",
+                    "У вас уже есть аккаунт? Войдите в учетную запись",
                     style: TextStyle(
                         color: Colors.grey
                     )

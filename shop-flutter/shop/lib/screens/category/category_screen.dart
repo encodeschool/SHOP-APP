@@ -56,7 +56,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               children: [
                 const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text("Subcategories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: Text("Под категории", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -75,7 +75,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text("Products", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text("Продукции", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           ..._products.map((product) => ProductCard(product: product)).toList(),
         ],
