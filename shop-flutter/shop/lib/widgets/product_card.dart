@@ -10,8 +10,11 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Colors.red[900];
     return Card(
+      color: Colors.grey[300],
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: SizedBox(
@@ -29,7 +32,11 @@ class ProductCard extends StatelessWidget {
         ),
         title: Text(product.title, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text("\$${product.price}"),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 24,
+            color: primaryColor
+        ),
         onTap: () {
           context.push('/product/${product.id}');
         },

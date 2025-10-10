@@ -107,8 +107,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'E-Commerce',
-      theme: ThemeData(useMaterial3: true),
+      title: 'Gosht Go',
+      theme: ThemeData(
+          useMaterial3: true,
+          // scaffoldBackgroundColor: const Color(0xFFD7D7D7), // light grey example
+      ),
       routerConfig: createRouter(initialRoute),
       debugShowCheckedModeBanner: false,
     );

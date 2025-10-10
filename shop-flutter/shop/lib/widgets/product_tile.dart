@@ -8,64 +8,78 @@ class ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Card(
       margin: const EdgeInsets.all(8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      elevation: 0,
+      color: Colors.grey[300],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Stack(
         children: [
-          Expanded(
-            child: product.images.isNotEmpty
-                ? ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-              child: Image.network(
-                'http://10.0.2.2:8080${product.images.isNotEmpty ? product.images[0] : '/images/default.png'}',
-                fit: BoxFit.contain,
-                height: 60,
-                width: 60,
-                errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, size: 60),
+          // Main column for product content
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Product image
+              Expanded(
+                child: ClipRRect(
+                  borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: product.images.isNotEmpty
+                      ? Image.network(
+                    'http://10.0.2.2:8080${product.images.first}',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, size: 60),
+                  )
+                      : const Icon(Icons.image, size: 60),
+                ),
               ),
-            )
-                : const Icon(Icons.image, size: 60),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+
+              // Product info
+              Padding(
+                padding:
+                const EdgeInsets.only(left: 15, right: 0, top: 8, bottom: 15),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      product.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 4),
-                    Text('\$${product.price.toStringAsFixed(2)}')
+                    Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        context.push('/product/${product.id}');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shadowColor: Colors.transparent,
-                        shape: const CircleBorder(), // <-- Circular shape
-                      ),
-                      child: Icon(
-                          Icons.arrow_forward,
-                          color: Colors.white
-                      ),
-                    )
-                  ]
-                )
-              ],
+              ),
+            ],
+          ),
+
+          // Fixed bottom-right button
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: ElevatedButton(
+              onPressed: () => context.push('/product/${product.id}'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[900],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(15),
+                  ),
+                ),
+                padding: const EdgeInsets.all(10),
+                minimumSize: const Size(44, 44),
+                elevation: 1,
+              ),
+              child: const Icon(Icons.arrow_forward, color: Colors.white),
             ),
           ),
         ],

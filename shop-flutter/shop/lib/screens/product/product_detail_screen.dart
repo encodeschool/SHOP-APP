@@ -33,6 +33,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _init() async {
     _userId = await authService.getUserId();
+    print("ID " + _userId.toString());
     await _loadProduct();
     if (_userId != null) {
       await _checkIfFavorite();

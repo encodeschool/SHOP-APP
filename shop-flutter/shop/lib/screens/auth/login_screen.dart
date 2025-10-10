@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final primaryColor = Colors.red[900];
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -47,10 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Text("Login", style: Theme.of(context).textTheme.headlineMedium),
-            Image.asset(
-                'assets/icon/playstore.png',
-                width: 50,
-                height: 50
+            SvgPicture.asset(
+              'assets/logo/logo.svg',
+              width: 80,
+              height: 80,
+              // placeholderBuilder: (context) => const CircularProgressIndicator(),
             ),
             const SizedBox(height: 24),
             TextField(
@@ -79,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12), // Rounded corners for aesthetics
                 ),
-                backgroundColor: Colors.orange,
+                backgroundColor: primaryColor,
               )
             ),
             TextButton(

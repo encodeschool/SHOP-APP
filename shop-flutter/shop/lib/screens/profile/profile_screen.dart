@@ -76,12 +76,12 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                ListTile(
-                  leading: const Icon(Icons.add),
-                  title: const Text("Add Product"),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () => context.go('/add-product'),
-                ),
+                // ListTile(
+                //   leading: const Icon(Icons.add),
+                //   title: const Text("Add Product"),
+                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                //   onTap: () => context.go('/add-product'),
+                // ),
                 ListTile(
                   leading: const Icon(Icons.history),
                   title: const Text("Order History"),

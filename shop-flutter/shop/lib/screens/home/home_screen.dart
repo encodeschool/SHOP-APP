@@ -9,6 +9,7 @@ import '../../services/user_service.dart';
 import '../../widgets/category_tile.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/product_tile.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,10 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _user = await userService.getUserDetails();
 
       if (!mounted) return; // Prevent memory leak
-
     } catch (e) {
       print('Error loading data: $e');
-      // Optionally show a snackbar or error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to load data: $e')),
@@ -58,89 +57,124 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final primaryColor = Colors.red[900];
+
     return Scaffold(
-      appBar: AppBar(
-        // title: const Text("E-Commerce"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () => context.push('/cart'),
-          ),
-        ],
+      // appBar: AppBar(
+      //   // title: const Text("E-Commerce"),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.shopping_cart),
+      //       onPressed: () => context.push('/cart'),
+      //     ),
+      //   ],
+      // ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: primaryColor,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            // ListTile(
+            //   leading: Icon(Icons.home),
+            //   title: Text('Home'),
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.settings),
+            //   title: Text('Settings'),
+            // ),
+          ],
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
         onRefresh: _loadData,
+        color: primaryColor,
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/logo/logo.svg',
+                          width: 50,
+                          height: 50,
+                          // placeholderBuilder: (context) => const CircularProgressIndicator(),
+                        ),
+                        Builder(
+                          builder: (context) => IconButton(
+                            icon: const Icon(Icons.menu, size: 32),
+                            onPressed: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                          ),
+                        ),
+                      ]
+                    ),
+                    const SizedBox(height: 15),
                     Text(
-                      'Find Your Best Product',
+                      'Мясо нового поколения',
                       style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange
-                      )
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
                     ),
                     Text(
-                        'The marketplace of products you add or you get',
-                        style: TextStyle(
-                            color: Colors.grey[450]
-                        )
+                      'Для нас мясо — это чистота, уважение и доверие.',
+                      style: TextStyle(
+                        color: primaryColor?.withOpacity(0.6),
+                      ),
                     ),
                   ],
-                )
-              )
+                ),
+              ),
             ),
             SliverToBoxAdapter(
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(width: 2.0, color: Colors.orange),
-                            bottom: BorderSide(width: 2.0, color: Colors.orange),
-                            right: BorderSide(width: 2.0, color: Colors.orange),
-                            left: BorderSide(width: 2.0, color: Colors.orange),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: primaryColor!, width: 2),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, color: primaryColor),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            hintText: 'Поиск продукции...',
+                            border: InputBorder.none,
+                            isDense: true,
                           ),
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          onChanged: (value) {},
+                        ),
                       ),
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(Icons.search),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                hintText: 'Search products...',
-                                border: InputBorder.none,
-                                isDense: true, // reduces height
-                              ),
-                              onChanged: (value) {
-                              },
-                            ),
-                          ),
-                          if (_loading) const CircularProgressIndicator(),
-                        ]
-                      )
-                    )
-                )
+                      if (_loading)
+                        CircularProgressIndicator(color: primaryColor),
+                    ],
+                  ),
+                ),
+              ),
             ),
             if (searchedProduct != null)
               Padding(
@@ -148,7 +182,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Product Found: ${searchedProduct!.title}', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      'Найденные продукты: ${searchedProduct!.title}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
                     Text(searchedProduct!.description),
                   ],
                 ),
@@ -157,8 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "Categories",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "Категории",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -177,10 +221,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  "Featured Products",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "Топ мясо",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -197,10 +245,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  'All Products',
-                  style: TextStyle(fontSize:18, fontWeight: FontWeight.bold)
-                )
-              )
+                  'Все продукции',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
             ),
             SliverPadding(
               padding: const EdgeInsets.all(8),
@@ -211,14 +263,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   childCount: _all_products.length,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   childAspectRatio: 0.7,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -42,13 +42,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
+    final primaryColor = Colors.red[900];
 
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onTap,
-        selectedItemColor: Colors.orange,
+        selectedItemColor: primaryColor,
         unselectedItemColor: Colors.grey,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         items: [

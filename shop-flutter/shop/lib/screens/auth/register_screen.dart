@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../services/auth_service.dart';
@@ -51,14 +52,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final primaryColor = Colors.red[900];
     return Scaffold(
-      appBar: AppBar(title: const Text("Register")),
+      // appBar: AppBar(title: const Text("Register")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // 🆕 Added logo at the top
+              SvgPicture.asset(
+                'assets/logo/logo.svg',
+                width: 80,
+                height: 80,
+              ),
+              const SizedBox(height: 24),
               if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
               TextFormField(
                 controller: _nameController,
@@ -101,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12), // Rounded corners for aesthetics
                   ),
-                  backgroundColor: Colors.orange,
+                  backgroundColor: primaryColor,
                 )
               ),
               TextButton(
