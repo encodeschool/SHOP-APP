@@ -303,6 +303,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // Products by category
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  if (beefCategory != null)
+                    CategorySection(
+                      title: "Beef Meats",
+                      icon: Icons.set_meal, // use any suitable icon
+                      products: _all_products,
+                      categoryId: beefCategory.id,
+                      onSeeAll: () => context.push('/filtered?category=${beefCategory.id}'),
+                    ),
+                ],
+              ),
+            ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -344,6 +359,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  if (chickenCategory != null)
+                    CategorySection(
+                      title: "Chicken Meats",
+                      icon: Icons.egg,
+                      products: _all_products,
+                      categoryId: chickenCategory.id,
+                      onSeeAll: () => context.push('/filtered?category=${chickenCategory.id}'),
+                    ),
+                  if (marbledBeef != null)
+                    CategorySection(
+                      title: "Marbled Beef",
+                      icon: Icons.restaurant,
+                      products: _all_products,
+                      categoryId: marbledBeef.id,
+                      onSeeAll: () => context.push('/filtered?category=${marbledBeef.id}'),
+                    ),
+                ],
+              ),
+            ),
 
             // --- Все продукции section ---
             SliverToBoxAdapter(
@@ -399,68 +436,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            // --- Все продукции section ---
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 16,
-                  bottom: 0,
-                  left: 16,
-                ),
-                child: Text(
-                  'Товары по категориям',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ),
-
-            // Products by category as  we do in our web (React)
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  if (beefCategory != null)
-                    CategorySection(
-                      title: "Beef Meats",
-                      icon: Icons.set_meal, // use any suitable icon
-                      products: _all_products,
-                      categoryId: beefCategory.id,
-                      backgroundColor: Colors.pink[50],
-                      onSeeAll: () => context.push('/filtered?category=${beefCategory.id}'),
-                    ),
-                  if (chickenCategory != null)
-                    CategorySection(
-                      title: "Chicken Meats",
-                      icon: Icons.egg,
-                      products: _all_products,
-                      categoryId: chickenCategory.id,
-                      backgroundColor: Colors.yellow[50],
-                      onSeeAll: () => context.push('/filtered?category=${chickenCategory.id}'),
-                    ),
-                  if (marbledBeef != null)
-                    CategorySection(
-                      title: "Marbled Beef",
-                      icon: Icons.restaurant,
-                      products: _all_products,
-                      categoryId: marbledBeef.id,
-                      backgroundColor: Colors.red[50],
-                      onSeeAll: () => context.push('/filtered?category=${marbledBeef.id}'),
-                    ),
-                  if (rabbitCategory != null)
-                    CategorySection(
-                      title: "Rabbit Meats",
-                      icon: Icons.pets,
-                      products: _all_products,
-                      categoryId: rabbitCategory.id,
-                      backgroundColor: Colors.grey[100],
-                      onSeeAll: () => context.push('/filtered?category=${rabbitCategory.id}'),
-                    ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

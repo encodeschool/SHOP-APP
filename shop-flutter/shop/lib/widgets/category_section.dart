@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop/widgets/product_tile.dart';
 import '../models/product_model.dart';
 import '../widgets/product_card.dart';
 
@@ -7,7 +8,6 @@ class CategorySection extends StatelessWidget {
   final IconData? icon;
   final List<Product> products;
   final String categoryId;
-  final Color? backgroundColor;
   final VoidCallback? onSeeAll;
 
   const CategorySection({
@@ -16,7 +16,6 @@ class CategorySection extends StatelessWidget {
   required this.products,
   required this.categoryId,
   this.icon,
-  this.backgroundColor,
   this.onSeeAll,
   });
 
@@ -29,27 +28,26 @@ class CategorySection extends StatelessWidget {
     if (filteredProducts.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      color: backgroundColor ?? Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title row with optional icon
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
                 if (icon != null)
                   Icon(
                     icon,
-                    size: 40,
+                    size: 24,
                     color: Colors.red[900],
                   ),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.red[900],
                   ),
@@ -61,7 +59,7 @@ class CategorySection extends StatelessWidget {
 
           // Horizontal product list
           SizedBox(
-            height: 100,
+            height: 250,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -69,25 +67,10 @@ class CategorySection extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 return SizedBox(
-                  width: 350, // FIXED WIDTH for horizontal list
-                  child: ProductCard(product: filteredProducts[index]),
+                  width: 200, // FIXED WIDTH for horizontal list
+                  child: ProductTile(product: filteredProducts[index]),
                 );
               },
-            ),
-          ),
-
-          // "See all" button
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: onSeeAll,
-              child: const Text(
-                "See all",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ),
           ),
         ],
