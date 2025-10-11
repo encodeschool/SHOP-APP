@@ -8,6 +8,7 @@ import '../../models/user_model.dart';
 import '../../services/category_service.dart';
 import '../../services/product_service.dart';
 import '../../services/user_service.dart';
+import '../../widgets/category_section.dart';
 import '../../widgets/category_tile.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/product_tile.dart';
@@ -34,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _visibleTopCount = 4; // initial visible "Топ мясо"
   int _visibleAllCount = 6; // initial visible "Все продукции"
+  Map<String, List<Product>> _productsByCategory = {};
 
   @override
   void initState() {
@@ -48,6 +50,16 @@ class _HomeScreenState extends State<HomeScreen> {
       _products = await productService.fetchFeaturedProducts();
       _all_products = await productService.fetchAllProducts();
       _user = await userService.getUserDetails();
+
+      // Group products by category
+      _productsByCategory = {};
+      for (var product in _all_products) {
+        if (!_productsByCategory.containsKey(product.categoryId)) {
+          _productsByCategory[product.categoryId] = [];
+        }
+        _productsByCategory[product.categoryId]!.add(product);
+      }
+
       if (!mounted) return;
     } catch (e) {
       print('Error loading data: $e');
@@ -59,6 +71,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     setState(() => _loading = false);
   }
+
+  Category? findSubcategoryByCode(String code) {
+    if (code.isEmpty || _categories.isEmpty) return null;
+    final lower = code.toLowerCase();
+
+    Category? searchNode(Category? node) {
+      if (node == null) return null;
+      if (node.categoryCode != null && node.categoryCode!.toLowerCase().contains(lower)) {
+        return node;
+      }
+      if (node.subcategories != null && node.subcategories!.isNotEmpty) {
+        for (var sub in node.subcategories!) {
+          final found = searchNode(sub);
+          if (found != null) return found;
+        }
+      }
+      return null;
+    }
+
+    for (var root in _categories) {
+      final found = searchNode(root);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
 
   void _loadMoreTop() {
     setState(() {
@@ -75,6 +113,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Colors.red[900];
+    final beefCategory = findSubcategoryByCode('beef');
+    final chickenCategory = findSubcategoryByCode('chicken');
+    final marbledBeef = findSubcategoryByCode('marbled');
+    final rabbitCategory = findSubcategoryByCode('rabbit');
 
     return Scaffold(
       // appBar: AppBar(
@@ -306,7 +348,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // --- Все продукции section ---
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  bottom: 0,
+                  left: 16,
+                ),
                 child: Text(
                   'Все продукции',
                   style: TextStyle(
@@ -353,6 +399,68 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+            // --- Все продукции section ---
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  bottom: 0,
+                  left: 16,
+                ),
+                child: Text(
+                  'Товары по категориям',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+            ),
+
+            // Products by category as  we do in our web (React)
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  if (beefCategory != null)
+                    CategorySection(
+                      title: "Beef Meats",
+                      icon: Icons.set_meal, // use any suitable icon
+                      products: _all_products,
+                      categoryId: beefCategory.id,
+                      backgroundColor: Colors.pink[50],
+                      onSeeAll: () => context.push('/filtered?category=${beefCategory.id}'),
+                    ),
+                  if (chickenCategory != null)
+                    CategorySection(
+                      title: "Chicken Meats",
+                      icon: Icons.egg,
+                      products: _all_products,
+                      categoryId: chickenCategory.id,
+                      backgroundColor: Colors.yellow[50],
+                      onSeeAll: () => context.push('/filtered?category=${chickenCategory.id}'),
+                    ),
+                  if (marbledBeef != null)
+                    CategorySection(
+                      title: "Marbled Beef",
+                      icon: Icons.restaurant,
+                      products: _all_products,
+                      categoryId: marbledBeef.id,
+                      backgroundColor: Colors.red[50],
+                      onSeeAll: () => context.push('/filtered?category=${marbledBeef.id}'),
+                    ),
+                  if (rabbitCategory != null)
+                    CategorySection(
+                      title: "Rabbit Meats",
+                      icon: Icons.pets,
+                      products: _all_products,
+                      categoryId: rabbitCategory.id,
+                      backgroundColor: Colors.grey[100],
+                      onSeeAll: () => context.push('/filtered?category=${rabbitCategory.id}'),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

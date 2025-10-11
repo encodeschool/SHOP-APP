@@ -133,7 +133,7 @@ class MyApp extends StatelessWidget {
       title: 'Gosht Go',
       theme: ThemeData(
           useMaterial3: true,
-          // scaffoldBackgroundColor: const Color(0xFFD7D7D7), // light grey example
+          scaffoldBackgroundColor: const Color(0xFFF6F6F6), // light grey example
       ),
       routerConfig: createRouter(initialRoute),
       debugShowCheckedModeBanner: false,

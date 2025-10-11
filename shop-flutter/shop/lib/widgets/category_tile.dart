@@ -23,7 +23,7 @@ class CategoryTile extends StatelessWidget {
         child: Column(
           children: [
             CircleAvatar(
-                radius: 40, backgroundColor: Colors.grey[300],
+                radius: 40, backgroundColor: Colors.white,
                 // child: Text(category.name[0])
                 child: category.icon != null ? Image.network(
                     'http://10.0.2.2:8080${category.icon}',

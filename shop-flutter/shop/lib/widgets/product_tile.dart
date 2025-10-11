@@ -11,7 +11,7 @@ class ProductTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(8),
       elevation: 0,
-      color: Colors.grey[300],
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Stack(
         children: [
