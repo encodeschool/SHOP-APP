@@ -29,8 +29,14 @@ class AuthService {
     }
   }
 
+  Future<void> saveAuthData(String token, String userId) async {
+    await storage.write(key: 'token', value: token);
+    await storage.write(key: 'userId', value: userId);
+  }
+
   Future<void> logout() async {
     await storage.delete(key: 'token');
+    await storage.delete(key: 'userId');
     dio.options.headers.remove('Authorization');
   }
 
@@ -73,5 +79,10 @@ class AuthService {
   Future<String?> getUserId() async {
     return await storage.read(key: 'userId');
   }
+
+  Future<String?> getToken() async {
+    return await storage.read(key: 'token');
+  }
+
 
 }

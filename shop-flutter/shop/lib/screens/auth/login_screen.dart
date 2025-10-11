@@ -34,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go('/profile'); // or wherever you want to go after login
       }
     } else {
+      await _authService.logout(); // clear storage
       setState(() => _error = 'Login failed. Check credentials.');
     }
   }

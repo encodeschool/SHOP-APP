@@ -5,6 +5,8 @@ import 'package:shop/services/favorite_service.dart';
 import '../../core/cart_provider.dart';
 import '../../models/product_model.dart';
 import '../../services/product_service.dart';
+import 'package:go_router/go_router.dart';
+
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -27,14 +29,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProduct();
     _init();
   }
 
   Future<void> _init() async {
     _userId = await authService.getUserId();
-    print("ID " + _userId.toString());
+    print("🪪 ID: $_userId");
     await _loadProduct();
+
     if (_userId != null) {
       await _checkIfFavorite();
     }
@@ -42,6 +44,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _checkIfFavorite() async {
     final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
+    if (!mounted) return;
     setState(() {
       _isFavorite = favoriteIds.contains(widget.productId);
     });
@@ -52,27 +55,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please log in to use favorites.")),
       );
+      if (context.mounted) {
+        context.go('/login'); // Use GoRouter
+      }
       return;
     }
 
-    if (_isFavorite) {
-      await favoriteService.removeFavorite(_userId!, widget.productId);
-    } else {
-      await favoriteService.addFavorite(_userId!, widget.productId);
+    try {
+      if (_isFavorite) {
+        await favoriteService.removeFavorite(_userId!, widget.productId);
+      } else {
+        await favoriteService.addFavorite(_userId!, widget.productId);
+      }
+      if (!mounted) return;
+      setState(() => _isFavorite = !_isFavorite);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_isFavorite ? "Added to favorites" : "Removed from favorites")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
-
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_isFavorite ? "Added to favorites" : "Removed from favorites")),
-    );
   }
 
   Future<void> _loadProduct() async {
     _product = await productService.fetchProductById(widget.productId);
+    if (!mounted) return;
     setState(() => _loading = false);
+    print("ID after loading " + _userId.toString());
   }
 
   @override

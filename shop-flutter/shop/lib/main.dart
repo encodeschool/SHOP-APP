@@ -43,6 +43,7 @@ Future<void> main() async {
   Stripe.publishableKey = stripeKey;
 
   final storage = FlutterSecureStorage();
+  await storage.deleteAll(); // <-- resets everything
   final token = await storage.read(key: 'token');
   final isLoggedIn = token != null;
 
