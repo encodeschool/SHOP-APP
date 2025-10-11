@@ -20,20 +20,24 @@ class CartProvider with ChangeNotifier {
   int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
 
   void addToCart(Product product, {int quantity = 1}) {
-    if (product.available && product.stock >= quantity) {
-      final existingItem = _items.firstWhere(
-            (item) => item.product.id == product.id,
-        orElse: () => CartItem(product: product, quantity: 0),
-      );
+    if (!product.available || product.stock < quantity) return;
 
-      if (existingItem.quantity == 0) {
-        _items.add(CartItem(product: product, quantity: quantity));
+    final index = _items.indexWhere((item) => item.product.id == product.id);
+    if (index == -1) {
+      // Product not in cart yet
+      _items.add(CartItem(product: product, quantity: quantity));
+    } else {
+      // Product already in cart, increase quantity
+      if (_items[index].quantity + quantity <= product.stock) {
+        _items[index].quantity += quantity;
       } else {
-        existingItem.quantity += quantity;
+        _items[index].quantity = product.stock; // cap at stock
       }
-      notifyListeners();
     }
+
+    notifyListeners();
   }
+
 
   void removeFromCart(String productId) {
     _items.removeWhere((item) => item.product.id == productId);
