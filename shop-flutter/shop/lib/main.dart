@@ -83,7 +83,7 @@ GoRouter createRouter(String initialRoute) => GoRouter(
           path: '/shop',
           builder: (_, __) => const CategoryScreen(
             categoryId: 'null',
-            categoryName: 'All Categories',
+            categoryName: 'Все категории',
           ),
         ),
         GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),

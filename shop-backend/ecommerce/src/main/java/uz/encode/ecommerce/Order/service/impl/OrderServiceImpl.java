@@ -25,8 +25,10 @@ import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
 import uz.encode.ecommerce.Order.entity.Order;
 import uz.encode.ecommerce.Order.entity.OrderItem;
 import uz.encode.ecommerce.Order.entity.OrderStatus;
+import uz.encode.ecommerce.Order.entity.PromoCode;
 import uz.encode.ecommerce.Order.repository.OrderItemRepository;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
+import uz.encode.ecommerce.Order.repository.PromoCodeRepository;
 import uz.encode.ecommerce.Order.service.OrderService;
 import uz.encode.ecommerce.Payment.entity.Payment;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
@@ -50,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private ProductRepository productRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private PromoCodeRepository promoCodeRepository;
 
     @Value("${stripe.secret-key}")
     private String stripeSecretKey;
@@ -211,5 +215,28 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(UUID orderId) {
         orderRepository.deleteById(orderId);
+    }
+
+    @Override
+    public BigDecimal applyPromo(String code, BigDecimal orderTotal) {
+        PromoCode promo = promoCodeRepository.findByCodeIgnoreCase(code)
+                .orElseThrow(() -> new RuntimeException("Invalid promo code"));
+
+        if (!promo.isValidNow()) {
+            throw new RuntimeException("Promo code expired or inactive");
+        }
+
+        BigDecimal discount = BigDecimal.ZERO;
+        if (promo.getDiscountAmount() != null) {
+            discount = promo.getDiscountAmount();
+        } else if (promo.getDiscountPercent() != null) {
+            discount = orderTotal.multiply(BigDecimal.valueOf(promo.getDiscountPercent())).divide(BigDecimal.valueOf(100));
+        }
+
+        // Update usage
+        promo.setTimesUsed(promo.getTimesUsed() + 1);
+        promoCodeRepository.save(promo);
+
+        return orderTotal.subtract(discount).max(BigDecimal.ZERO);
     }
 }

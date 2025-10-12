@@ -38,6 +38,23 @@ const Checkout = () => {
   const location = useLocation();
   const { t } = useTranslation();
 
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [promoError, setPromoError] = useState("");
+
+  const applyPromo = async () => {
+    try {
+      setPromoError("");
+      const response = await axios.post(`/promo/apply?code=${promoCode}&total=${totalPrice}`);
+      const newTotal = response.data.newTotal;
+      setDiscount(totalPrice - newTotal);
+    } catch (err) {
+      setPromoError(err.response?.data?.message || "Invalid or expired promo code");
+      setDiscount(0);
+    }
+  };
+
+
   const {
     register,
     handleSubmit,
@@ -372,9 +389,43 @@ const Checkout = () => {
               </td>
             </tr>
 
+            <tr className="border-t-2 border-red-800">
+              <td colSpan={2} className="pt-4 pb-2 font-semibold">{t("Promo Code")}</td>
+            </tr>
+            <tr>
+              <td colSpan={2}>
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    placeholder={t("Enter promo code")}
+                    className="border border-gray-300 px-3 py-2 rounded-md flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    className="bg-red-800 text-white px-4 rounded hover:bg-red-900"
+                  >
+                    {t("Apply")}
+                  </button>
+                </div>
+                {promoError && <p className="text-red-500 text-sm mt-1">{promoError}</p>}
+              </td>
+            </tr>
+
+            <br />
+
+            {discount > 0 && (
+              <tr className="text-green-700 font-medium">
+                <td>{t("Discount applied")}</td>
+                <td className="text-right">- ${discount.toFixed(2)}</td>
+              </tr>
+            )}
+
             <tr className="border-t-2 border-red-800 font-bold">
               <td className="py-4">{t("Total")}:</td>
-              <td className="text-right">${totalPrice.toFixed(2)}</td>
+              <td className="text-right">${(totalPrice - discount).toFixed(2)}</td>
             </tr>
 
             <tr>

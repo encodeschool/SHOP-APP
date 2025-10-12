@@ -1,5 +1,6 @@
 package uz.encode.ecommerce.Order.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,4 +15,5 @@ public interface OrderService {
     List<OrderResponseDTO> getAllOrders(int page, int size, String status);
     String createPaymentIntent(UUID orderId, String paymentMethod);
     void deleteOrder(UUID orderId);
+    BigDecimal applyPromo(String code, BigDecimal orderTotal);
 }
