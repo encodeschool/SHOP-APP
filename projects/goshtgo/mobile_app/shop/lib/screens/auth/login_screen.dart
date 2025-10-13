@@ -21,17 +21,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     setState(() => _loading = true);
+
     final success = await _authService.login(
       _emailController.text,
       _passwordController.text,
     );
+
     setState(() => _loading = false);
 
     if (success) {
-      if (context.mounted) {
-        context.go('/home');
-        context.read<AuthProvider>().login();
-        context.go('/profile'); // or wherever you want to go after login
+      final token = await _authService.getToken();
+      final userId = await _authService.getUserId();
+
+      if (token != null && userId != null) {
+        // Save globally
+        await context.read<AuthProvider>().login(token, userId);
+
+        if (context.mounted) {
+          context.go('/home'); // navigate
+        }
       }
     } else {
       await _authService.logout(); // clear storage

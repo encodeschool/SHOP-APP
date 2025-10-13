@@ -31,29 +31,23 @@ Future<void> main() async {
   const bool isProd = bool.fromEnvironment('dart.vm.product');
   final envFile = isProd ? ".env.production" : ".env.development";
 
-  try {
-    await dotenv.load(fileName: envFile);
-    print("Loaded $envFile successfully");
-  } catch (e) {
-    print("Failed to load $envFile: $e");
-  }
+  await dotenv.load(fileName: envFile);
 
-  // Now safe to use env variables
   final stripeKey = dotenv.env['STRIPE_KEY'] ?? "pk_test_fallback";
   Stripe.publishableKey = stripeKey;
 
-  final storage = FlutterSecureStorage();
-  await storage.deleteAll(); // <-- resets everything
-  final token = await storage.read(key: 'token');
-  final isLoggedIn = token != null;
+  final authProvider = AuthProvider();
+  await authProvider.loadAuthData(); // load token & userId
 
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
-      child: MyApp(initialRoute: isLoggedIn ? '/home' : '/login'),
+      child: MyApp(
+        initialRoute: authProvider.isLoggedIn ? '/home' : '/login',
+      ),
     ),
   );
 }

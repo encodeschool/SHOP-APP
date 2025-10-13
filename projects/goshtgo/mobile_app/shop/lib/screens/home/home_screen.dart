@@ -132,16 +132,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            SizedBox(height: 25),
-            // DrawerHeader(
-            //   decoration: BoxDecoration(
-            //     color: primaryColor,
-            //   ),
-            //   child: Text(
-            //     'Menu',
-            //     style: TextStyle(color: Colors.white, fontSize: 24),
-            //   ),
-            // ),
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: primaryColor,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
             SizedBox(height: 25),
             ListTile(
               leading: Icon(Icons.home),

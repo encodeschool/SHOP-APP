@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
 
@@ -104,16 +106,14 @@ class ProfileScreen extends StatelessWidget {
                 //     // TODO: Navigate to feedbacks
                 //   },
                 // ),
-                // const Spacer(),
-                // ElevatedButton.icon(
-                //   onPressed: () => _logout(context),
-                //   icon: const Icon(Icons.logout),
-                //   label: const Text("Logout"),
-                //   style: ElevatedButton.styleFrom(
-                //     foregroundColor: Colors.white,
-                //     backgroundColor: Colors.black,
-                //   ),
-                // ),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () async {
+                    await context.read<AuthProvider>().logout();
+                    context.go('/login');
+                  },
+                  child: const Text("Logout"),
+                ),
               ],
             ),
           );

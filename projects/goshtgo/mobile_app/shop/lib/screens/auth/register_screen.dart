@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../core/auth_provider.dart';
 import '../../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -44,6 +46,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (success) {
       if (context.mounted) context.go('/home');
+      final token = await _authService.getToken();
+      final userId = await _authService.getUserId();
+      if (token != null && userId != null) {
+        await context.read<AuthProvider>().login(token, userId);
+        context.go('/home');
+      }
     } else {
       setState(() => _error = 'Registration failed. Try again.');
     }

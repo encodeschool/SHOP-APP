@@ -64,6 +64,10 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (dto.getUserId() == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
         Order order = new Order();
         order.setUser(user);
         BigDecimal productTotal = dto.getItems().stream()
