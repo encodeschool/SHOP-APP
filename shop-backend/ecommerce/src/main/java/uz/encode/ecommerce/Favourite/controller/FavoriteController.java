@@ -22,7 +22,7 @@ import uz.encode.ecommerce.Favourite.service.FavoriteService;
 @RequestMapping("/api/favorites")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@PreAuthorize("isAuthenticated()")
+// @PreAuthorize("isAuthenticated()")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;

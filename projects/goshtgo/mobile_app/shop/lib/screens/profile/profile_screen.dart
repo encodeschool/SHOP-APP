@@ -112,7 +112,7 @@ class ProfileScreen extends StatelessWidget {
                     await context.read<AuthProvider>().logout();
                     context.go('/login');
                   },
-                  child: const Text("Logout"),
+                  child: const Text("Выйти"),
                 ),
               ],
             ),

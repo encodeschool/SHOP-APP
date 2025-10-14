@@ -8,8 +8,10 @@ class SuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: Text("✅ Payment Successful", style: TextStyle(fontSize: 22))),
+          Center(child: Text("Платеж успешно обработан", style: TextStyle(fontSize: 22))),
           ElevatedButton(
               onPressed: () => context.go('/home'),
               child: Text(

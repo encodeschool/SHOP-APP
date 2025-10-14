@@ -55,15 +55,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Главная',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: 'Shop',
+            label: 'Магазин',
           ),
           BottomNavigationBarItem(
             icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-            label: isLoggedIn ? 'Profile' : 'Login',
+            label: isLoggedIn ? 'Профиль' : 'Войти',
           ),
         ],
       ),

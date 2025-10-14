@@ -9,7 +9,7 @@ class FavoriteService {
 
   Future<Map<String, String>> _getHeaders() async {
     final token = await _storage.read(key: 'token');
-    print("🪪 Token: $token"); // debug log
+    print("🪪 Token: $token");
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
@@ -19,16 +19,23 @@ class FavoriteService {
   Future<List<String>> getFavoriteIds(String userId) async {
     final headers = await _getHeaders();
     final response = await _dio.get(
-      '$apiUrl/api/$userId',
+      '$apiUrl/favorites/user/$userId',
       options: Options(headers: headers),
     );
-    return List<String>.from(response.data);
+    // Assuming backend returns a list of Favorite objects
+    return List<String>.from(
+        (response.data as List).map((f) => f['product']['id'].toString())
+    );
   }
 
   Future<void> addFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
     await _dio.post(
-      '$apiUrl/api/$userId/$productId',
+      '$apiUrl/favorites',
+      queryParameters: {
+        'userId': userId,
+        'productId': productId,
+      },
       options: Options(headers: headers),
     );
   }
@@ -36,7 +43,11 @@ class FavoriteService {
   Future<void> removeFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
     await _dio.delete(
-      '$apiUrl/api/$userId/$productId',
+      '$apiUrl/favorites',
+      queryParameters: {
+        'userId': userId,
+        'productId': productId,
+      },
       options: Options(headers: headers),
     );
   }

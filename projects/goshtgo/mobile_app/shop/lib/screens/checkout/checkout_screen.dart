@@ -165,9 +165,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final totalBeforeDiscount = cart.totalPrice + shippingPrice;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Checkout")),
+      appBar: AppBar(title: const Text("Проверика")),
       body: cart.items.isEmpty
-          ? const Center(child: Text("Your cart is empty"))
+          ? const Center(child: Text("Ваша корзина пуста"))
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -175,110 +175,110 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Contact Information",
+              const Text("Контактная информация",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
 
               // Name, Email, Phone
               TextFormField(
                 initialValue: name,
-                decoration: const InputDecoration(labelText: "Full Name"),
+                decoration: const InputDecoration(labelText: "Полное имя"),
                 onSaved: (v) => name = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
                 initialValue: email,
-                decoration: const InputDecoration(labelText: "Email"),
+                decoration: const InputDecoration(labelText: "Электронная почта"),
                 keyboardType: TextInputType.emailAddress,
                 onSaved: (v) => email = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
                 initialValue: phone,
-                decoration: const InputDecoration(labelText: "Phone"),
+                decoration: const InputDecoration(labelText: "Телефон"),
                 keyboardType: TextInputType.phone,
                 onSaved: (v) => phone = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               const SizedBox(height: 10),
 
               // Legal Entity Checkbox
               CheckboxListTile(
-                title: const Text("I am a legal entity"),
+                title: const Text("Я являюсь юридическим лицом"),
                 value: isLegalEntity,
                 onChanged: (v) => setState(() => isLegalEntity = v!),
               ),
 
               if (isLegalEntity) ...[
                 const SizedBox(height: 8),
-                const Text("Company Information",
+                const Text("Информация о компании",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Company Name"),
+                  decoration: const InputDecoration(labelText: "Название компании"),
                   onSaved: (v) => companyName = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Required" : null,
+                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Registration Nr"),
+                  decoration: const InputDecoration(labelText: "Регистрационный номер"),
                   onSaved: (v) => registrationNr = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Required" : null,
+                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "VAT Number"),
+                  decoration: const InputDecoration(labelText: "Номер НДС"),
                   onSaved: (v) => vatNumber = v ?? '',
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Legal Address"),
+                  decoration: const InputDecoration(labelText: "Юридический адрес"),
                   onSaved: (v) => legalAddress = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Required" : null,
+                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
               ],
 
               const SizedBox(height: 20),
-              const Text("Shipping Address",
+              const Text("Адрес доставки",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Country"),
+                decoration: const InputDecoration(labelText: "Страна"),
                 onSaved: (v) => country = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Post Code / ZIP"),
+                decoration: const InputDecoration(labelText: "Почтовый индекс"),
                 onSaved: (v) => zip = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "City"),
+                decoration: const InputDecoration(labelText: "Город"),
                 onSaved: (v) => city = v ?? '',
-                validator: (v) => v!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Order Notes"),
+                decoration: const InputDecoration(labelText: "Примечания к заказу"),
                 onSaved: (v) => notes = v ?? '',
                 maxLines: 3,
               ),
 
               const SizedBox(height: 20),
-              const Text("Shipping Method",
+              const Text("Способ доставки",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               RadioListTile<String>(
-                title: const Text("Standard Shipping (\$5.00)"),
+                title: const Text("Стандартная доставка (\$5.00)"),
                 value: 'standard',
                 groupValue: shippingMethod,
                 onChanged: (v) => setState(() => shippingMethod = v!),
               ),
               RadioListTile<String>(
-                title: const Text("Express Shipping (\$15.00)"),
+                title: const Text("Экспресс-доставка (\$15.00)"),
                 value: 'express',
                 groupValue: shippingMethod,
                 onChanged: (v) => setState(() => shippingMethod = v!),
               ),
 
               const SizedBox(height: 16),
-              const Text("Payment Method",
+              const Text("Способ оплаты",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               RadioListTile<String>(
-                title: const Text("Credit / Debit Card"),
+                title: const Text("Кредитная/дебетовая карта"),
                 value: 'card',
                 groupValue: paymentMethod,
                 onChanged: (v) => setState(() => paymentMethod = v!),
@@ -290,21 +290,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onChanged: (v) => setState(() => paymentMethod = v!),
               ),
               RadioListTile<String>(
-                title: const Text("Cash on Delivery"),
+                title: const Text("Наложенный платеж"),
                 value: 'cod',
                 groupValue: paymentMethod,
                 onChanged: (v) => setState(() => paymentMethod = v!),
               ),
 
               const SizedBox(height: 16),
-              const Text("Promo Code", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text("Промо-код", style: TextStyle(fontWeight: FontWeight.bold)),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _promoController,
                       decoration: const InputDecoration(
-                        hintText: "Enter promo code",
+                        hintText: "Введите промокод",
                       ),
                     ),
                   ),
@@ -312,7 +312,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ElevatedButton(
                     onPressed: () => applyPromo(totalBeforeDiscount),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                    child: const Text("Apply", style: TextStyle(color: Colors.white)),
+                    child: const Text("Применять", style: TextStyle(color: Colors.white)),
                   )
                 ],
               ),
@@ -328,13 +328,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 value: agreeToTerms,
                 onChanged: (v) => setState(() => agreeToTerms = v!),
                 title: const Text(
-                    "I have read and agree to the website terms and conditions *"),
+                    "Я прочитал(а) и согласен(сна) с условиями использования сайта *"),
               ),
 
               const Divider(height: 30),
 
               // 🧾 Summary
-              const Text("Order Summary",
+              const Text("Сводка заказа",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               ...cart.items.map((item) => ListTile(
@@ -355,7 +355,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Shipping"),
+                  const Text("Перевозки"),
                   Text("\$${shippingPrice.toStringAsFixed(2)}"),
                 ],
               ),
@@ -363,7 +363,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Discount", style: TextStyle(color: Colors.green)),
+                    const Text("Скидка", style: TextStyle(color: Colors.green)),
                     Text("-\$${discount.toStringAsFixed(2)}",
                         style: const TextStyle(color: Colors.green)),
                   ],
@@ -372,7 +372,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Total", style: TextStyle(fontSize: 18)),
+                  const Text("Общий", style: TextStyle(fontSize: 18)),
                   Text(
                     "\$${(totalBeforeDiscount - discount).toStringAsFixed(2)}",
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -389,7 +389,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 child: loading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Confirm Order",
+                    : const Text("Подтвердить заказ",
                     style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ],

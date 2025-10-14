@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: primaryColor,
               ),
               child: Text(
-                'Menu',
+                '',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),

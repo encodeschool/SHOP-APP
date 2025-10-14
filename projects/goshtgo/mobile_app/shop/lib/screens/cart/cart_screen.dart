@@ -13,9 +13,9 @@ class CartScreen extends StatelessWidget {
     final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Your Cart")),
+      appBar: AppBar(title: const Text("Ваша корзина")),
       body: cart.items.isEmpty
-          ? const Center(child: Text("Cart is empty"))
+          ? const Center(child: Text("Корзина пуста"))
           : Column(
         children: [
           Expanded(
@@ -38,7 +38,7 @@ class CartScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("Quantity: ${item.quantity}"),
+                      Text("Количество: ${item.quantity}"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +68,7 @@ class CartScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Total:", style: TextStyle(fontSize: 18)),
+                    const Text("Общий:", style: TextStyle(fontSize: 18)),
                     Text("\$${cart.totalPrice.toStringAsFixed(2)}",
                         style: const TextStyle(fontSize: 18)),
                   ],
@@ -83,7 +83,7 @@ class CartScreen extends StatelessWidget {
                     );
                   },
                   child: const Text(
-                      "Proceed to Checkout",
+                      "Перейти к оформлению заказа",
                       style: TextStyle(
                         color: Colors.white
                       )
