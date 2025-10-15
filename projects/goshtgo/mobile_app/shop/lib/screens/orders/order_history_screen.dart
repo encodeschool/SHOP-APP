@@ -29,7 +29,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Мои заказы")),
+      appBar: AppBar(
+          title: const Text("Мои заказы"),
+          leading: IconButton(
+              onPressed: () => context.go('/profile'),
+              icon: Icon(Icons.arrow_back)
+          ),
+      ),
       body: FutureBuilder<List<OrderModel>>(
         future: _orders,
         builder: (context, snapshot) {

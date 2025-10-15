@@ -130,16 +130,62 @@
         //   ],
         // ),
         drawer: Drawer(
+          backgroundColor: Colors.white, // White background
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.zero,
+              bottomRight: Radius.zero,
+            ),
+          ),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(
-                  color: primaryColor,
-                ),
-                child: Text(
-                  '',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+                padding: EdgeInsets.zero, // removes default padding
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Background image
+                    Image.network(
+                      'https://picsum.photos/800/400?img=1',
+                      fit: BoxFit.cover,
+                    ),
+
+                    // Red transparent mask overlay
+                    Container(
+                      color: Colors.red[900]!.withOpacity(0.7),
+                    ),
+
+                    // Text content on top of the overlay
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'GoshtGo',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'Мясо нового поколения',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               ListTile(
