@@ -1,31 +1,55 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Banner;
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:shop/models/banner_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop/services/banner_service.dart';
 
-class CarouselSection extends StatelessWidget {
-  final List<Map<String, String>> slides = [
-    {
-      'image': 'https://picsum.photos/800/400?img=1',
-      'title': 'Лучшее мясо',
-      'description': 'Свежие продукты прямо от фермеров',
-      'button': 'Заказать сейчас',
-    },
-    {
-      'image': 'https://picsum.photos/800/400?img=2',
-      'title': 'Натуральные ингредиенты',
-      'description': 'Без добавок и консервантов',
-      'button': 'Подробнее',
-    },
-    {
-      'image': 'https://picsum.photos/800/400?img=3',
-      'title': 'Доставка по городу',
-      'description': 'Получите заказ за 2 часа',
-      'button': 'Смотреть каталог',
-    },
-  ];
+class CarouselSection extends StatefulWidget {
+  const CarouselSection({super.key});
+
+  @override
+  State<CarouselSection> createState() => _CarouselSectionState();
+}
+
+class _CarouselSectionState extends State<CarouselSection> {
+  final _bannerService = BannerService();
+  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
+  List<Banner> _banners = [];
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _loading = true);
+    try {
+      final data = await _bannerService.fetchAllBanner();
+      setState(() => _banners = data);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load banners: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = Colors.red[900]!;
+
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_banners.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -38,7 +62,7 @@ class CarouselSection extends StatelessWidget {
           aspectRatio: 16 / 9,
           autoPlayInterval: const Duration(seconds: 4),
         ),
-        items: slides.map((slide) {
+        items: _banners.map((banner) {
           return Builder(
             builder: (BuildContext context) {
               return ClipRRect(
@@ -48,8 +72,16 @@ class CarouselSection extends StatelessWidget {
                   children: [
                     // Background image
                     Image.network(
-                      slide['image']!,
+                      '$apiUrl${banner.image}',
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.broken_image, size: 60),
+                      ),
                     ),
 
                     // Red transparent overlay
@@ -71,47 +103,64 @@ class CarouselSection extends StatelessWidget {
                       padding: const EdgeInsets.all(20),
                       child: Align(
                         alignment: Alignment.bottomLeft,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              slide['title']!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              slide['description']!,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Clicked: ${slide['button']}')),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 10,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxHeight: 150, // limit the height of the overlay
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                banner.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              child: Text(slide['button']!),
-                            ),
-                          ],
+                              const SizedBox(height: 5),
+                              Text(
+                                banner.description,
+                                maxLines: 2, // allow 2 lines max
+                                overflow: TextOverflow.ellipsis, // truncate with "..."
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Flexible(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (banner.buttonLink.isNotEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Opening: ${banner.buttonLink}')),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    banner.buttonText,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
