@@ -27,6 +27,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool _isFavorite = false;
   String? _userId;
   final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
+  bool _favoriteLoading = true;
 
 
   @override
@@ -46,11 +47,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _checkIfFavorite() async {
-    final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
-    if (!mounted) return;
-    setState(() {
-      _isFavorite = favoriteIds.contains(widget.productId);
-    });
+    try {
+      final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
+      if (!mounted) return;
+
+      setState(() {
+        _isFavorite = favoriteIds.contains(widget.productId.trim());
+        _favoriteLoading = false;
+      });
+
+      print("Favorite IDs: $favoriteIds, current product: ${widget.productId}");
+    } catch (e) {
+      print("Error checking favorites: $e");
+    }
   }
 
   Future<void> _toggleFavorite() async {
@@ -98,12 +107,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: const Text("Product Detail"),
         actions: [
           IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.red,
-            ),
+            icon: _favoriteLoading
+                ? const CircularProgressIndicator(color: Colors.red)
+                : Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: Colors.red),
             onPressed: _toggleFavorite,
-          ),
+          )
         ],
       ),
       body: _loading

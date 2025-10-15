@@ -19,19 +19,26 @@ class FavoriteService {
   Future<List<String>> getFavoriteIds(String userId) async {
     final headers = await _getHeaders();
     final response = await _dio.get(
-      '$apiUrl/favorites/user/$userId',
+      '$apiUrl/api/favorites/user/$userId',
       options: Options(headers: headers),
     );
-    // Assuming backend returns a list of Favorite objects
-    return List<String>.from(
-        (response.data as List).map((f) => f['product']['id'].toString())
-    );
+
+    if (response.data == null) return [];
+
+    final ids = (response.data as List)
+        .where((f) => f != null && f['product'] != null && f['product']['id'] != null)
+        .map((f) => f['product']['id'].toString().trim()) // trim whitespace
+        .toSet()
+        .toList();
+
+    return ids;
   }
+
 
   Future<void> addFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
     await _dio.post(
-      '$apiUrl/favorites',
+      '$apiUrl/api/favorites',
       queryParameters: {
         'userId': userId,
         'productId': productId,
@@ -43,7 +50,7 @@ class FavoriteService {
   Future<void> removeFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
     await _dio.delete(
-      '$apiUrl/favorites',
+      '$apiUrl/api/favorites',
       queryParameters: {
         'userId': userId,
         'productId': productId,
