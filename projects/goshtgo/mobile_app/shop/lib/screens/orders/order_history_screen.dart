@@ -29,7 +29,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Orders")),
+      appBar: AppBar(title: const Text("Мои заказы")),
       body: FutureBuilder<List<OrderModel>>(
         future: _orders,
         builder: (context, snapshot) {
@@ -42,7 +42,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
           final orders = snapshot.data!;
           if (orders.isEmpty) {
-            return const Center(child: Text("No orders yet."));
+            return const Center(child: Text("Заказов еще нет."));
           }
 
           return ListView.builder(
@@ -50,7 +50,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             itemBuilder: (context, index) {
               final order = orders[index];
               return ExpansionTile(
-                title: Text("Order: ${order.id.substring(0, 8)} • \$${order.total.toStringAsFixed(2)}"),
+                title: Text("Номер Заказа: ${order.id.substring(0, 8)} • \$${order.total.toStringAsFixed(2)}"),
                 subtitle: Text("${order.status} • ${DateFormat.yMd().add_jm().format(order.createdAt.toLocal())}"),
                 children: order.items.map((item) {
                   return ListTile(
