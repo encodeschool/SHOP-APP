@@ -3,8 +3,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../core/cart_provider.dart';
+import '../../models/user_model.dart';
 import '../../services/order_service.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/user_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -18,6 +20,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _promoController = TextEditingController();
   final storage = const FlutterSecureStorage();
 
+  // Controllers for dynamic user data
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _zipController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _notesController = TextEditingController();
+
   bool isLegalEntity = false;
   String shippingMethod = 'standard';
   String paymentMethod = 'card';
@@ -30,18 +41,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool isLoggedIn = false;
   String? userId;
 
-  // Form fields
-  String name = '', email = '', phone = '';
-  String country = '', zip = '', city = '', notes = '';
+  // Legal entity fields
   String companyName = '', registrationNr = '', vatNumber = '', legalAddress = '';
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _checkLoginAndLoadUser();
   }
 
-  Future<void> _checkLoginStatus() async {
+  Future<User?> _loadUser() async {
+    final userService = UserService();
+    return await userService.getUserDetails();
+  }
+
+  Future<void> _checkLoginAndLoadUser() async {
     final token = await storage.read(key: 'token');
     userId = await storage.read(key: 'userId');
 
@@ -52,21 +66,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
         context.go('/login?redirect=/checkout');
       }
-    } else {
-      setState(() {
-        isLoggedIn = true;
-      });
+      return;
+    }
 
-      // Load saved user info
-      final storedName = await storage.read(key: 'name');
-      final storedEmail = await storage.read(key: 'email');
-      final storedPhone = await storage.read(key: 'phone');
+    setState(() => isLoggedIn = true);
 
-      setState(() {
-        name = storedName ?? '';
-        email = storedEmail ?? '';
-        phone = storedPhone ?? '';
-      });
+    final user = await _loadUser();
+    if (user != null && mounted) {
+      // Fill controllers with user data
+      _nameController.text = user.name;
+      _emailController.text = user.email;
+      // _phoneController.text = user.phone ?? '';
+      // _countryController.text = user.country ?? '';
+      // _zipController.text = user.zip ?? '';
+      // _cityController.text = user.city ?? '';
+      // _notesController.text = user.notes ?? '';
+      //
+      // if (user.isLegalEntity ?? false) {
+      //   setState(() {
+      //     isLegalEntity = true;
+      //     companyName = user.companyName ?? '';
+      //     registrationNr = user.registrationNr ?? '';
+      //     vatNumber = user.vatNumber ?? '';
+      //     legalAddress = user.legalAddress ?? '';
+      //   });
+      // }
     }
   }
 
@@ -75,7 +99,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final orderService = OrderService();
       final response = await orderService.applyPromo(_promoController.text, totalPrice);
-      // Assume backend returns { "newTotal": X }
       final newTotal = response['newTotal'];
       setState(() {
         discount = totalPrice - newTotal;
@@ -111,7 +134,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final totalPrice = cart.totalPrice + shippingPrice - discount;
 
     final checkoutPayload = {
-      "userId": userId, // ✅ Add userId
+      "userId": userId,
       "items": cart.items
           .map((item) => {
         "productId": item.product.id,
@@ -124,13 +147,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       "shippingPrice": shippingPrice,
       "totalPrice": totalPrice,
       "shippingAddress": {
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "country": country,
-        "zip": zip,
-        "city": city,
-        "notes": notes,
+        "name": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text,
+        "country": _countryController.text,
+        "zip": _zipController.text,
+        "city": _cityController.text,
+        "notes": _notesController.text,
       },
       "paymentInfo": {
         "isLegalEntity": isLegalEntity,
@@ -181,28 +204,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               // Name, Email, Phone
               TextFormField(
-                initialValue: name,
+                controller: _nameController,
                 decoration: const InputDecoration(labelText: "Полное имя"),
-                onSaved: (v) => name = v ?? '',
+                onSaved: (v) {},
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
-                initialValue: email,
+                controller: _emailController,
                 decoration: const InputDecoration(labelText: "Электронная почта"),
                 keyboardType: TextInputType.emailAddress,
-                onSaved: (v) => email = v ?? '',
+                onSaved: (v) {},
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
-                initialValue: phone,
+                controller: _phoneController,
                 decoration: const InputDecoration(labelText: "Телефон"),
                 keyboardType: TextInputType.phone,
-                onSaved: (v) => phone = v ?? '',
+                onSaved: (v) {},
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               const SizedBox(height: 10),
 
-              // Legal Entity Checkbox
+              // Legal Entity
               CheckboxListTile(
                 title: const Text("Я являюсь юридическим лицом"),
                 value: isLegalEntity,
@@ -215,20 +238,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextFormField(
                   decoration: const InputDecoration(labelText: "Название компании"),
+                  initialValue: companyName,
                   onSaved: (v) => companyName = v ?? '',
                   validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: "Регистрационный номер"),
+                  initialValue: registrationNr,
                   onSaved: (v) => registrationNr = v ?? '',
                   validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: "Номер НДС"),
+                  initialValue: vatNumber,
                   onSaved: (v) => vatNumber = v ?? '',
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: "Юридический адрес"),
+                  initialValue: legalAddress,
                   onSaved: (v) => legalAddress = v ?? '',
                   validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
                 ),
@@ -238,29 +265,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               const Text("Адрес доставки",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               TextFormField(
+                controller: _countryController,
                 decoration: const InputDecoration(labelText: "Страна"),
-                onSaved: (v) => country = v ?? '',
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
+                controller: _zipController,
                 decoration: const InputDecoration(labelText: "Почтовый индекс"),
-                onSaved: (v) => zip = v ?? '',
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
+                controller: _cityController,
                 decoration: const InputDecoration(labelText: "Город"),
-                onSaved: (v) => city = v ?? '',
                 validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
               ),
               TextFormField(
+                controller: _notesController,
                 decoration: const InputDecoration(labelText: "Примечания к заказу"),
-                onSaved: (v) => notes = v ?? '',
                 maxLines: 3,
               ),
 
               const SizedBox(height: 20),
-              const Text("Способ доставки",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text("Способ доставки", style: TextStyle(fontWeight: FontWeight.bold)),
               RadioListTile<String>(
                 title: const Text("Стандартная доставка (\$5.00)"),
                 value: 'standard',
@@ -275,8 +301,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
 
               const SizedBox(height: 16),
-              const Text("Способ оплаты",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text("Способ оплаты", style: TextStyle(fontWeight: FontWeight.bold)),
               RadioListTile<String>(
                 title: const Text("Кредитная/дебетовая карта"),
                 value: 'card',
@@ -303,16 +328,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   Expanded(
                     child: TextField(
                       controller: _promoController,
-                      decoration: const InputDecoration(
-                        hintText: "Введите промокод",
-                      ),
+                      decoration: const InputDecoration(hintText: "Введите промокод"),
                     ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () => applyPromo(totalBeforeDiscount),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                    child: const Text("Применять", style: TextStyle(color: Colors.white)),
+                    child: const Text("Применять",
+                        style: TextStyle(color: Colors.white)),
                   )
                 ],
               ),
@@ -333,7 +357,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               const Divider(height: 30),
 
-              // 🧾 Summary
+              // Summary
               const Text("Сводка заказа",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
@@ -375,14 +399,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const Text("Общий", style: TextStyle(fontSize: 18)),
                   Text(
                     "\$${(totalBeforeDiscount - discount).toStringAsFixed(2)}",
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
 
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: loading || !isLoggedIn ? null : () => submitOrder(context, cart),
+                onPressed: loading || !isLoggedIn
+                    ? null
+                    : () => submitOrder(context, cart),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),

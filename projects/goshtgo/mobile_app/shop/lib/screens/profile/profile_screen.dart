@@ -30,7 +30,7 @@ class ProfileScreen extends StatelessWidget {
             icon: const Icon(Icons.support_agent),
             tooltip: 'Support',
             onPressed: () {
-              // TODO: Navigate to support
+              context.go('/contact');
             },
           ),
           IconButton(
@@ -68,12 +68,21 @@ class ProfileScreen extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                     const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user.name, style: const TextStyle(fontSize: 18)),
-                        Text(user.email, style: const TextStyle(color: Colors.grey)),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
+                            maxLines: 1, // allows up to 2 lines
+                            overflow: TextOverflow.ellipsis, // "..." if text exceeds 2 lines
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(user.email, style: const TextStyle(color: Colors.grey)),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -108,11 +117,21 @@ class ProfileScreen extends StatelessWidget {
                 // ),
                 const Spacer(),
                 ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(
+                      Colors.red[900]
+                    ),
+                  ),
                   onPressed: () async {
                     await context.read<AuthProvider>().logout();
                     context.go('/login');
                   },
-                  child: const Text("Выйти"),
+                  child: const Text(
+                      "Выйти",
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
+                  ),
                 ),
               ],
             ),
