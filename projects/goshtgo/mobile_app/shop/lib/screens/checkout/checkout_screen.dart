@@ -76,6 +76,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       // Fill controllers with user data
       _nameController.text = user.name;
       _emailController.text = user.email;
+      _phoneController.text = user.phone;
       // _phoneController.text = user.phone ?? '';
       // _countryController.text = user.country ?? '';
       // _zipController.text = user.zip ?? '';

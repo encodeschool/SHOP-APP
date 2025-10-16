@@ -2,12 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/auth_provider.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _selectedLang = 'en'; // default
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedLanguage();
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedLang = prefs.getString('locale') ?? 'en';
+    });
+  }
+
+  Future<void> _changeLanguage(String lang) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('locale', lang);
+    setState(() {
+      _selectedLang = lang;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          lang == 'uz'
+              ? "Til o'zgartirildi 🇺🇿"
+              : lang == 'ru'
+              ? "Язык изменён 🇷🇺"
+              : "Language changed 🇬🇧",
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   Future<void> _logout(BuildContext context) async {
     const storage = FlutterSecureStorage();
@@ -23,9 +65,54 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(
-        title: Text('Profile'),
+      appBar: AppBar(
+        title: const Text('Profile'),
         actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Select language',
+            initialValue: _selectedLang,
+            onSelected: _changeLanguage,
+            icon: Text(
+              _selectedLang == 'uz'
+                  ? '🇺🇿'
+                  : _selectedLang == 'ru'
+                  ? '🇷🇺'
+                  : '🇬🇧',
+              style: const TextStyle(fontSize: 22),
+            ),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'en',
+                child: Row(
+                  children: [
+                    Text('🇬🇧 ', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('English'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'ru',
+                child: Row(
+                  children: [
+                    Text('🇷🇺 ', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('Русский'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'uz',
+                child: Row(
+                  children: [
+                    Text('🇺🇿 ', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text("Oʻzbekcha"),
+                  ],
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.support_agent),
             tooltip: 'Support',
@@ -54,7 +141,8 @@ class ProfileScreen extends StatelessWidget {
           }
 
           final user = snapshot.data!;
-          final firstLetter = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+          final firstLetter =
+          user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
 
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -74,63 +162,41 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             user.name,
-                            maxLines: 1, // allows up to 2 lines
-                            overflow: TextOverflow.ellipsis, // "..." if text exceeds 2 lines
-                            style: const TextStyle(
-                              fontSize: 18,
-                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 18),
                           ),
-                          Text(user.email, style: const TextStyle(color: Colors.grey)),
+                          Text(
+                            user.email,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
                         ],
                       ),
                     )
                   ],
                 ),
                 const SizedBox(height: 24),
-                // ListTile(
-                //   leading: const Icon(Icons.add),
-                //   title: const Text("Add Product"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () => context.go('/add-product'),
-                // ),
+
                 ListTile(
                   leading: const Icon(Icons.history),
                   title: const Text("Order History"),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => context.go('/orders'),
                 ),
-                // ListTile(
-                //   leading: const Icon(Icons.message),
-                //   title: const Text("Messages"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () {
-                //     // TODO: Navigate to messages
-                //   },
-                // ),
-                // ListTile(
-                //   leading: const Icon(Icons.feedback),
-                //   title: const Text("Feedbacks"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () {
-                //     // TODO: Navigate to feedbacks
-                //   },
-                // ),
+
                 const Spacer(),
                 ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
-                      Colors.red[900]
-                    ),
+                    backgroundColor:
+                    MaterialStatePropertyAll(Colors.red[900]),
                   ),
                   onPressed: () async {
                     await context.read<AuthProvider>().logout();
                     context.go('/login');
                   },
                   child: const Text(
-                      "Выйти",
-                      style: TextStyle(
-                        color: Colors.white
-                      ),
+                    "Выйти",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
