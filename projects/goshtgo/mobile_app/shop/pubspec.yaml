@@ -42,7 +42,6 @@ dependencies:
   go_router:                        # For navigation
   cached_network_image:
   #  stripe_payment:                   # For Stripe integration (or latest plugin)
-  intl:                             # Date formatting
   file_picker:                      # Image upload
   provider:
   flutter_stripe:
@@ -55,6 +54,10 @@ dependencies:
   url_launcher:
   flutter_map:
   latlong2:
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +81,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

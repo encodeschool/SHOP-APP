@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/auth_provider.dart';
+import '../../core/locale_provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
 
@@ -31,8 +33,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _changeLanguage(String lang) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('locale', lang);
+    // Update locale provider
+    await context.read<LocaleProvider>().setLocale(lang);
+
     setState(() {
       _selectedLang = lang;
     });
@@ -64,9 +67,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(loc.profileTitle),
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Select language',
@@ -179,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text("Order History"),
+                  title: Text(loc.orderHistory),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => context.go('/orders'),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/screens/about/about_screen.dart';
 import 'package:shop/screens/auth/login_screen.dart';
 import 'package:shop/screens/auth/register_screen.dart';
@@ -24,6 +25,10 @@ import 'package:shop/screens/settings/settings_screen.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'core/locale_provider.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +49,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()..loadLocale()),
       ],
       child: MyApp(
         initialRoute: authProvider.isLoggedIn ? '/home' : '/login',
@@ -121,16 +127,28 @@ GoRouter createRouter(String initialRoute) => GoRouter(
 class MyApp extends StatelessWidget {
   final String initialRoute;
   const MyApp({super.key, required this.initialRoute});
+
   @override
   Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+
     return MaterialApp.router(
       title: 'Gosht Go',
-      theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF6F6F6), // light grey example
-      ),
+      theme: ThemeData(useMaterial3: true),
       routerConfig: createRouter(initialRoute),
       debugShowCheckedModeBanner: false,
+      locale: localeProvider.locale,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+        Locale('uz'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }
