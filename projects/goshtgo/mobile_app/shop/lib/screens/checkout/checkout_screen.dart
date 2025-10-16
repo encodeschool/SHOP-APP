@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import '../../core/cart_provider.dart';
 import '../../models/user_model.dart';
 import '../../services/order_service.dart';
@@ -20,7 +21,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _promoController = TextEditingController();
   final storage = const FlutterSecureStorage();
 
-  // Controllers for dynamic user data
+  // Controllers for user data
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -62,7 +63,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (token == null || userId == null) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login to proceed with checkout")),
+          SnackBar(content: Text(AppLocalizations.of(context)!.loginRequired)),
         );
         context.go('/login?redirect=/checkout');
       }
@@ -73,25 +74,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final user = await _loadUser();
     if (user != null && mounted) {
-      // Fill controllers with user data
       _nameController.text = user.name;
       _emailController.text = user.email;
-      _phoneController.text = user.phone;
-      // _phoneController.text = user.phone ?? '';
-      // _countryController.text = user.country ?? '';
-      // _zipController.text = user.zip ?? '';
-      // _cityController.text = user.city ?? '';
-      // _notesController.text = user.notes ?? '';
-      //
-      // if (user.isLegalEntity ?? false) {
-      //   setState(() {
-      //     isLegalEntity = true;
-      //     companyName = user.companyName ?? '';
-      //     registrationNr = user.registrationNr ?? '';
-      //     vatNumber = user.vatNumber ?? '';
-      //     legalAddress = user.legalAddress ?? '';
-      //   });
-      // }
+      _phoneController.text = user.phone ?? '';
     }
   }
 
@@ -106,7 +91,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
     } catch (e) {
       setState(() {
-        promoError = "Invalid or expired promo code";
+        promoError = AppLocalizations.of(context)!.invalidPromo;
         discount = 0;
       });
     }
@@ -116,14 +101,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You must accept the terms")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.termsRequired)),
       );
       return;
     }
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not found. Please login again.")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.userNotFound)),
       );
       return;
     }
@@ -171,27 +156,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Order placed successfully")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.orderSuccess)),
       );
       context.go('/success');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Order failed")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.orderFailed)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final cart = context.watch<CartProvider>();
     final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
     final shippingPrice = shippingMethod == 'express' ? 15.0 : 5.0;
     final totalBeforeDiscount = cart.totalPrice + shippingPrice;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Проверика")),
+      appBar: AppBar(title: Text(loc.checkoutTitle)),
       body: cart.items.isEmpty
-          ? const Center(child: Text("Ваша корзина пуста"))
+          ? Center(child: Text(loc.cartEmpty))
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -199,227 +185,100 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Контактная информация",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(loc.contactInfo, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-
-              // Name, Email, Phone
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Полное имя"),
-                onSaved: (v) {},
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                decoration: InputDecoration(labelText: loc.fullName),
+                validator: (v) => v!.isEmpty ? loc.fullName : null,
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: "Электронная почта"),
+                decoration: InputDecoration(labelText: loc.email),
                 keyboardType: TextInputType.emailAddress,
-                onSaved: (v) {},
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                validator: (v) => v!.isEmpty ? loc.email : null,
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(labelText: "Телефон"),
+                decoration: InputDecoration(labelText: loc.phone),
                 keyboardType: TextInputType.phone,
-                onSaved: (v) {},
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                validator: (v) => v!.isEmpty ? loc.phone : null,
               ),
               const SizedBox(height: 10),
-
-              // Legal Entity
               CheckboxListTile(
-                title: const Text("Я являюсь юридическим лицом"),
+                title: Text(loc.legalEntity),
                 value: isLegalEntity,
                 onChanged: (v) => setState(() => isLegalEntity = v!),
               ),
-
               if (isLegalEntity) ...[
                 const SizedBox(height: 8),
-                const Text("Информация о компании",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(loc.companyInfo, style: const TextStyle(fontWeight: FontWeight.bold)),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Название компании"),
+                  decoration: InputDecoration(labelText: loc.companyName),
                   initialValue: companyName,
                   onSaved: (v) => companyName = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                  validator: (v) => v!.isEmpty ? loc.companyName : null,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Регистрационный номер"),
+                  decoration: InputDecoration(labelText: loc.registrationNr),
                   initialValue: registrationNr,
                   onSaved: (v) => registrationNr = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                  validator: (v) => v!.isEmpty ? loc.registrationNr : null,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Номер НДС"),
+                  decoration: InputDecoration(labelText: loc.vatNumber),
                   initialValue: vatNumber,
                   onSaved: (v) => vatNumber = v ?? '',
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: "Юридический адрес"),
+                  decoration: InputDecoration(labelText: loc.legalAddress),
                   initialValue: legalAddress,
                   onSaved: (v) => legalAddress = v ?? '',
-                  validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
+                  validator: (v) => v!.isEmpty ? loc.legalAddress : null,
                 ),
               ],
-
               const SizedBox(height: 20),
-              const Text("Адрес доставки",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextFormField(
-                controller: _countryController,
-                decoration: const InputDecoration(labelText: "Страна"),
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
-              ),
-              TextFormField(
-                controller: _zipController,
-                decoration: const InputDecoration(labelText: "Почтовый индекс"),
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
-              ),
-              TextFormField(
-                controller: _cityController,
-                decoration: const InputDecoration(labelText: "Город"),
-                validator: (v) => v!.isEmpty ? "Требуется для заполнения" : null,
-              ),
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(labelText: "Примечания к заказу"),
-                maxLines: 3,
-              ),
-
+              Text(loc.shippingAddress, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              TextFormField(controller: _countryController, decoration: InputDecoration(labelText: loc.country), validator: (v) => v!.isEmpty ? loc.country : null),
+              TextFormField(controller: _zipController, decoration: InputDecoration(labelText: loc.zipCode), validator: (v) => v!.isEmpty ? loc.zipCode : null),
+              TextFormField(controller: _cityController, decoration: InputDecoration(labelText: loc.city), validator: (v) => v!.isEmpty ? loc.city : null),
+              TextFormField(controller: _notesController, decoration: InputDecoration(labelText: loc.notes), maxLines: 3),
               const SizedBox(height: 20),
-              const Text("Способ доставки", style: TextStyle(fontWeight: FontWeight.bold)),
-              RadioListTile<String>(
-                title: const Text("Стандартная доставка (\$5.00)"),
-                value: 'standard',
-                groupValue: shippingMethod,
-                onChanged: (v) => setState(() => shippingMethod = v!),
-              ),
-              RadioListTile<String>(
-                title: const Text("Экспресс-доставка (\$15.00)"),
-                value: 'express',
-                groupValue: shippingMethod,
-                onChanged: (v) => setState(() => shippingMethod = v!),
-              ),
-
+              Text(loc.shippingMethod, style: const TextStyle(fontWeight: FontWeight.bold)),
+              RadioListTile<String>(title: Text(loc.standardShipping), value: 'standard', groupValue: shippingMethod, onChanged: (v) => setState(() => shippingMethod = v!)),
+              RadioListTile<String>(title: Text(loc.expressShipping), value: 'express', groupValue: shippingMethod, onChanged: (v) => setState(() => shippingMethod = v!)),
               const SizedBox(height: 16),
-              const Text("Способ оплаты", style: TextStyle(fontWeight: FontWeight.bold)),
-              RadioListTile<String>(
-                title: const Text("Кредитная/дебетовая карта"),
-                value: 'card',
-                groupValue: paymentMethod,
-                onChanged: (v) => setState(() => paymentMethod = v!),
-              ),
-              RadioListTile<String>(
-                title: const Text("PayPal"),
-                value: 'paypal',
-                groupValue: paymentMethod,
-                onChanged: (v) => setState(() => paymentMethod = v!),
-              ),
-              RadioListTile<String>(
-                title: const Text("Наложенный платеж"),
-                value: 'cod',
-                groupValue: paymentMethod,
-                onChanged: (v) => setState(() => paymentMethod = v!),
-              ),
-
+              Text(loc.paymentMethod, style: const TextStyle(fontWeight: FontWeight.bold)),
+              RadioListTile<String>(title: Text(loc.cardPayment), value: 'card', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
+              RadioListTile<String>(title: Text(loc.paypalPayment), value: 'paypal', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
+              RadioListTile<String>(title: Text(loc.codPayment), value: 'cod', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
               const SizedBox(height: 16),
-              const Text("Промо-код", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(loc.promoCode, style: const TextStyle(fontWeight: FontWeight.bold)),
               Row(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _promoController,
-                      decoration: const InputDecoration(hintText: "Введите промокод"),
-                    ),
-                  ),
+                  Expanded(child: TextField(controller: _promoController, decoration: InputDecoration(hintText: loc.promoCode))),
                   const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () => applyPromo(totalBeforeDiscount),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                    child: const Text("Применять",
-                        style: TextStyle(color: Colors.white)),
-                  )
+                  ElevatedButton(onPressed: () => applyPromo(totalBeforeDiscount), style: ElevatedButton.styleFrom(backgroundColor: Colors.black), child: Text(loc.apply, style: const TextStyle(color: Colors.white))),
                 ],
               ),
-              if (promoError != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(promoError!,
-                      style: const TextStyle(color: Colors.red, fontSize: 13)),
-                ),
-
+              if (promoError != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(promoError!, style: const TextStyle(color: Colors.red, fontSize: 13))),
               const SizedBox(height: 16),
-              CheckboxListTile(
-                value: agreeToTerms,
-                onChanged: (v) => setState(() => agreeToTerms = v!),
-                title: const Text(
-                    "Я прочитал(а) и согласен(сна) с условиями использования сайта *"),
-              ),
-
+              CheckboxListTile(value: agreeToTerms, onChanged: (v) => setState(() => agreeToTerms = v!), title: Text(loc.acceptTerms)),
               const Divider(height: 30),
-
-              // Summary
-              const Text("Сводка заказа",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(loc.orderSummary, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               ...cart.items.map((item) => ListTile(
-                leading: item.product.images.isNotEmpty
-                    ? Image.network(
-                  '$apiUrl${item.product.images[0]}',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image),
-                )
-                    : const Icon(Icons.image, size: 50),
+                leading: item.product.images.isNotEmpty ? Image.network('$apiUrl${item.product.images[0]}', width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image)) : const Icon(Icons.image, size: 50),
                 title: Text("${item.product.title} x${item.quantity}"),
                 trailing: Text("\$${item.totalPrice.toStringAsFixed(2)}"),
               )),
               const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Перевозки"),
-                  Text("\$${shippingPrice.toStringAsFixed(2)}"),
-                ],
-              ),
-              if (discount > 0)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Скидка", style: TextStyle(color: Colors.green)),
-                    Text("-\$${discount.toStringAsFixed(2)}",
-                        style: const TextStyle(color: Colors.green)),
-                  ],
-                ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.shipping), Text("\$${shippingPrice.toStringAsFixed(2)}")]),
+              if (discount > 0) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.discount, style: const TextStyle(color: Colors.green)), Text("-\$${discount.toStringAsFixed(2)}", style: const TextStyle(color: Colors.green))]),
               const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Общий", style: TextStyle(fontSize: 18)),
-                  Text(
-                    "\$${(totalBeforeDiscount - discount).toStringAsFixed(2)}",
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.total, style: const TextStyle(fontSize: 18)), Text("\$${(totalBeforeDiscount - discount).toStringAsFixed(2)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: loading || !isLoggedIn
-                    ? null
-                    : () => submitOrder(context, cart),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Подтвердить заказ",
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-              ),
+              ElevatedButton(onPressed: loading || !isLoggedIn ? null : () => submitOrder(context, cart), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, minimumSize: const Size(double.infinity, 50)), child: loading ? const CircularProgressIndicator(color: Colors.white) : Text(loc.placeOrder, style: const TextStyle(color: Colors.white, fontSize: 16))),
             ],
           ),
         ),

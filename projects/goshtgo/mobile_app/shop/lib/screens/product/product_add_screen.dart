@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shop/l10n/app_localizations.dart';
 
 import '../../services/category_service.dart';
 import '../../services/product_service.dart';
-
 
 class ProductAddScreen extends StatefulWidget {
   const ProductAddScreen({super.key});
@@ -33,6 +33,8 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
   String? _selectedCategoryId;
   String? _userId;
 
+  bool _loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +44,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
   Future<void> _loadUserAndCategories() async {
     try {
       final userId = await _storage.read(key: 'userId');
-      final fetchedCategories = await CategoryService().fetchCategories(); // see below
+      final fetchedCategories = await CategoryService().fetchCategories();
 
       setState(() {
         _userId = userId;
@@ -56,13 +58,9 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
     }
   }
 
-  bool _loading = false;
-
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
-      setState(() => _images = pickedFiles);
-    }
+    if (pickedFiles.isNotEmpty) setState(() => _images = pickedFiles);
   }
 
   Future<void> _submit() async {
@@ -70,6 +68,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
     _formKey.currentState!.save();
 
     setState(() => _loading = true);
+    final loc = AppLocalizations.of(context)!;
 
     final productJson = {
       "title": _title,
@@ -90,22 +89,20 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
         images: _images,
       );
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile added successfully")),
+        SnackBar(content: Text(loc.productCreated)),
       );
 
-      // Avoid popping too early and check if it's possible
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted && context.canPop()) {
-          Navigator.pop(context); // or GoRouter.of(context).pop();
-        } else {
-          debugPrint("Cannot pop - already at root");
+          Navigator.pop(context);
         }
       });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error creating product: $e")),
+        SnackBar(content: Text("${loc.productCreateError}: $e")),
       );
     } finally {
       setState(() => _loading = false);
@@ -114,8 +111,10 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Add Product")),
+      appBar: AppBar(title: Text(loc.addProductTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -125,66 +124,71 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
           child: ListView(
             children: [
               TextFormField(
-                decoration: const InputDecoration(labelText: "Title"),
-                onSaved: (value) => _title = value ?? '',
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+                decoration: InputDecoration(labelText: loc.titleLabel),
+                onSaved: (val) => _title = val ?? '',
+                validator: (val) =>
+                val == null || val.isEmpty ? loc.requiredField : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Price"),
+                decoration: InputDecoration(labelText: loc.priceLabel),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => _price = double.tryParse(value ?? '0') ?? 0,
+                onSaved: (val) =>
+                _price = double.tryParse(val ?? '0') ?? 0,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Stock"),
+                decoration: InputDecoration(labelText: loc.stockLabel),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => _stock = int.tryParse(value ?? '0') ?? 0,
+                onSaved: (val) => _stock = int.tryParse(val ?? '0') ?? 0,
               ),
               DropdownButtonFormField<String>(
                 value: _condition,
-                decoration: const InputDecoration(labelText: "Condition"),
-                items: const [
-                  DropdownMenuItem(value: 'NEW', child: Text('New')),
-                  DropdownMenuItem(value: 'USED', child: Text('Used')),
+                decoration: InputDecoration(labelText: loc.conditionLabel),
+                items: [
+                  DropdownMenuItem(
+                      value: 'NEW', child: Text(loc.conditionNew)),
+                  DropdownMenuItem(
+                      value: 'USED', child: Text(loc.conditionUsed)),
                 ],
                 onChanged: (val) => setState(() => _condition = val ?? 'NEW'),
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCategoryId,
-                decoration: const InputDecoration(labelText: "Category"),
-                items: _categories.map((category) {
-                  return DropdownMenuItem<String>(
-                    value: category['id'],
-                    child: Text(category['name']),
-                  );
-                }).toList(),
+                decoration: InputDecoration(labelText: loc.categoryLabel),
+                items: _categories
+                    .map((cat) => DropdownMenuItem<String>(
+                  value: cat['id'],
+                  child: Text(cat['name']),
+                ))
+                    .toList(),
                 onChanged: (val) => setState(() => _selectedCategoryId = val),
-                validator: (value) => value == null ? 'Category required' : null,
+                validator: (val) =>
+                val == null ? loc.categoryRequired : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: "Description"),
+                decoration: InputDecoration(labelText: loc.descriptionLabel),
                 maxLines: 3,
-                onSaved: (value) => _description = value ?? '',
+                onSaved: (val) => _description = val ?? '',
               ),
               SwitchListTile(
                 value: _featured,
                 onChanged: (val) => setState(() => _featured = val),
-                title: const Text("Featured"),
+                title: Text(loc.featuredLabel),
               ),
               SwitchListTile(
                 value: _available,
                 onChanged: (val) => setState(() => _available = val),
-                title: const Text("Available"),
+                title: Text(loc.availableLabel),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _pickImages,
                 icon: const Icon(Icons.image),
-                label: Text("Select Images (${_images.length})"),
+                label: Text(loc.selectImages(_images.length)),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _submit,
-                child: const Text("Create Product"),
+                child: Text(loc.createProduct),
               ),
             ],
           ),

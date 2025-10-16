@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/auth_provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import '../../core/locale_provider.dart';
-import '../../l10n/app_localizations.dart';
+import '../../core/auth_provider.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,47 +15,32 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _selectedLang = 'en'; // default
+  String _selectedLang = 'en';
 
   @override
   void initState() {
     super.initState();
-    _loadSelectedLanguage();
-  }
-
-  Future<void> _loadSelectedLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _selectedLang = prefs.getString('locale') ?? 'en';
-    });
+    final localeProvider = context.read<LocaleProvider>();
+    _selectedLang = localeProvider.locale.languageCode;
   }
 
   Future<void> _changeLanguage(String lang) async {
-    // Update locale provider
-    await context.read<LocaleProvider>().setLocale(lang);
+    final localeProvider = context.read<LocaleProvider>();
+    await localeProvider.setLocale(lang);
 
-    setState(() {
-      _selectedLang = lang;
-    });
+    setState(() => _selectedLang = lang);
 
+    final loc = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          lang == 'uz'
-              ? "Til o'zgartirildi 🇺🇿"
-              : lang == 'ru'
-              ? "Язык изменён 🇷🇺"
-              : "Language changed 🇬🇧",
-        ),
+        content: Text(lang == 'uz'
+            ? loc.languageChanged
+            : lang == 'ru'
+            ? loc.languageChanged
+            : loc.languageChanged),
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    const storage = FlutterSecureStorage();
-    await storage.deleteAll(); // Clear token and userId
-    context.go('/home');
   }
 
   Future<User?> _loadUser() async {
@@ -88,33 +71,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'en',
-                child: Row(
-                  children: [
-                    Text('🇬🇧 ', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('English'),
-                  ],
-                ),
+                child: Row(children: [Text('🇬🇧 '), SizedBox(width: 8), Text('English')]),
               ),
               const PopupMenuItem(
                 value: 'ru',
-                child: Row(
-                  children: [
-                    Text('🇷🇺 ', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('Русский'),
-                  ],
-                ),
+                child: Row(children: [Text('🇷🇺 '), SizedBox(width: 8), Text('Русский')]),
               ),
               const PopupMenuItem(
                 value: 'uz',
-                child: Row(
-                  children: [
-                    Text('🇺🇿 ', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text("Oʻzbekcha"),
-                  ],
-                ),
+                child: Row(children: [Text('🇺🇿 '), SizedBox(width: 8), Text("Oʻzbekcha")]),
               ),
             ],
           ),
@@ -142,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text("Failed to load user info"));
+            return Center(child: Text(loc.failedLoadUser));
           }
 
           final user = snapshot.data!;
@@ -165,44 +130,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            user.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          Text(
-                            user.email,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
+                          Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18)),
+                          Text(user.email, style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
                     )
                   ],
                 ),
                 const SizedBox(height: 24),
-
                 ListTile(
                   leading: const Icon(Icons.history),
                   title: Text(loc.orderHistory),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => context.go('/orders'),
                 ),
-
                 const Spacer(),
                 ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStatePropertyAll(Colors.red[900]),
-                  ),
+                      backgroundColor: MaterialStatePropertyAll(Colors.red[900])),
                   onPressed: () async {
                     await context.read<AuthProvider>().logout();
                     context.go('/login');
                   },
-                  child: Text(
-                    loc.logout,
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: Text(loc.logout, style: const TextStyle(color: Colors.white)),
                 ),
               ],
             ),

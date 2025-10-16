@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -20,14 +21,15 @@ class _ContactScreenState extends State<ContactScreen> {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Colors.red[900]!;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
         centerTitle: true,
         elevation: 0,
-        title: const Text(
-          "Контакты",
+        title: Text(
+          loc.contactTitle,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -55,7 +57,7 @@ class _ContactScreenState extends State<ContactScreen> {
           children: [
             // 🌟 Title
             Text(
-              'Свяжитесь с нами',
+              loc.contactUs,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -64,9 +66,8 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             const SizedBox(height: 10),
 
-            const Text(
-              'Мы всегда рады вашим вопросам, предложениям и отзывам. '
-                  'Свяжитесь с нами любым удобным способом — мы ответим как можно скорее.',
+            Text(
+              loc.contactSubtitle,
               style: TextStyle(fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 30),
@@ -74,19 +75,19 @@ class _ContactScreenState extends State<ContactScreen> {
             // 📞 Contact info
             _contactRow(
               icon: Icons.phone,
-              label: 'Телефон',
+              label: loc.phoneLabel,
               value: '+998 (90) 123-45-67',
               onTap: () => launchUrl(Uri.parse('tel:+998901234567')),
             ),
             _contactRow(
               icon: Icons.email,
-              label: 'Email',
+              label: loc.emailLabel,
               value: 'info@goshtgo.uz',
               onTap: () => launchUrl(Uri.parse('mailto:info@goshtgo.uz')),
             ),
             _contactRow(
               icon: Icons.location_on,
-              label: 'Адрес',
+              label: loc.addressLabel,
               value: 'г. Ташкент, ул. Мирзо-Улугбека, 45',
               onTap: () => launchUrl(
                 Uri.parse('https://goo.gl/maps/tashkent'),
@@ -115,7 +116,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
             // 📋 Form
             Text(
-              'Оставьте заявку — мы вам перезвоним',
+              loc.formTitle,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -130,32 +131,29 @@ class _ContactScreenState extends State<ContactScreen> {
                 children: [
                   _buildTextField(
                     controller: _nameController,
-                    label: 'Ваше имя',
+                    label: loc.nameField,
                     icon: Icons.person,
-                    validator: (value) =>
-                    value!.isEmpty ? 'Введите имя' : null,
+                    validator: (value) => value!.isEmpty ? loc.nameField : null,
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _phoneController,
-                    label: 'Телефон',
+                    label: loc.phoneField,
                     icon: Icons.phone,
                     keyboardType: TextInputType.phone,
-                    validator: (value) =>
-                    value!.isEmpty ? 'Введите номер телефона' : null,
+                    validator: (value) => value!.isEmpty ? loc.phoneField : null,
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _messageController,
-                    label: 'Сообщение',
+                    label: loc.messageField,
                     icon: Icons.message,
                     maxLines: 4,
-                    validator: (value) =>
-                    value!.isEmpty ? 'Введите сообщение' : null,
+                    validator: (value) => value!.isEmpty ? loc.messageField : null,
                   ),
                   const SizedBox(height: 20),
 
-                  // 📩 Submit button
+                  // Submit button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -167,9 +165,9 @@ class _ContactScreenState extends State<ContactScreen> {
                         ),
                       ),
                       icon: const Icon(Icons.send, color: Colors.white),
-                      label: const Text(
-                        'Отправить',
-                        style: TextStyle(
+                      label: Text(
+                        loc.sendButton,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -178,8 +176,8 @@ class _ContactScreenState extends State<ContactScreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Ваше сообщение отправлено!'),
+                            SnackBar(
+                              content: Text(loc.messageSent),
                               backgroundColor: Colors.green,
                             ),
                           );

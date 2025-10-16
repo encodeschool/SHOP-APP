@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop/l10n/app_localizations.dart';
 
 import '../../models/category_model.dart';
 import '../../models/product_model.dart';
@@ -7,15 +8,14 @@ import '../../services/category_service.dart';
 import '../../services/product_service.dart';
 import '../../widgets/product_card.dart';
 
-
 class CategoryScreen extends StatefulWidget {
   final String categoryId;
   final String categoryName;
 
   const CategoryScreen({
-  super.key,
-  required this.categoryId,
-  required this.categoryName,
+    super.key,
+    required this.categoryId,
+    required this.categoryName,
   });
 
   @override
@@ -62,6 +62,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!; // <- localization
     final redColor = Colors.red[900];
 
     return Scaffold(
@@ -91,9 +92,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text("Под категории", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    loc.subcategoriesTitle,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -107,12 +111,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         .toList(),
                   ),
                 ),
-                // const Divider(),
               ],
             ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text("Продукции", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              loc.productsTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           ..._products.map((product) => ProductCard(product: product)).toList(),
         ],
