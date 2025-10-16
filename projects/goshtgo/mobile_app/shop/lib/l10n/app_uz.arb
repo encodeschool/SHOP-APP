@@ -3,5 +3,17 @@
   "profileTitle": "Profil",
   "orderHistory": "Buyurtmalar tarixi",
   "logout": "Chiqish",
-  "languageChanged": "Til o'zgartirildi 🇺🇿"
+  "languageChanged": "Til o'zgartirildi 🇺🇿",
+  "editProfile": "Profilni tahrirlash",
+    "name": "Ism",
+    "username": "Foydalanuvchi nomi",
+    "email": "Elektron pochta",
+    "phone": "Telefon",
+    "password": "Parol",
+    "role": "Rol",
+    "pleaseSelectRole": "Iltimos, rolni tanlang",
+    "saveChanges": "O‘zgartirishlarni saqlash",
+    "profileUpdated": "Profil yangilandi",
+    "failedToLoadProfile": "Profilni yuklab bo‘lmadi",
+    "failedToUpdateProfile": "Profilni yangilab bo‘lmadi"
 }

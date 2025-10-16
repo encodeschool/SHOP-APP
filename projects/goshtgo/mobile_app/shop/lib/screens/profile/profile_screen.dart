@@ -199,8 +199,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     await context.read<AuthProvider>().logout();
                     context.go('/login');
                   },
-                  child: const Text(
-                    "Выйти",
+                  child: Text(
+                    loc.logout,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

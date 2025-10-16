@@ -120,6 +120,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language changed 🇬🇧'**
   String get languageChanged;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get role;
+
+  /// No description provided for @pleaseSelectRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a role'**
+  String get pleaseSelectRole;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @failedToLoadProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load profile'**
+  String get failedToLoadProfile;
+
+  /// No description provided for @failedToUpdateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile'**
+  String get failedToUpdateProfile;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

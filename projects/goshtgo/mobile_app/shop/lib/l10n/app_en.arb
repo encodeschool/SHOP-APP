@@ -3,5 +3,17 @@
   "profileTitle": "Profile",
   "orderHistory": "Order History",
   "logout": "Logout",
-  "languageChanged": "Language changed 🇬🇧"
+  "languageChanged": "Language changed 🇬🇧",
+  "editProfile": "Edit Profile",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "role": "Role",
+    "pleaseSelectRole": "Please select a role",
+    "saveChanges": "Save Changes",
+    "profileUpdated": "Profile updated",
+    "failedToLoadProfile": "Failed to load profile",
+    "failedToUpdateProfile": "Failed to update profile"
 }
