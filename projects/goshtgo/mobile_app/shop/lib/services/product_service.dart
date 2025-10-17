@@ -41,6 +41,11 @@ class ProductService {
     return List<String>.from(response.data);
   }
 
+  Future<List<Product>> searchProducts(String query) async {
+    final response = await dio.get('/products/search', queryParameters: {'q': query});
+    return (response.data as List).map((e) => Product.fromJson(e)).toList();
+  }
+
   Future<void> createProduct({
     required Map<String, dynamic> productData,
     required List<XFile> images,

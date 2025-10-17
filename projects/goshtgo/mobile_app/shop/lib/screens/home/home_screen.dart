@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -28,15 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final productService = ProductService();
   final userService = UserService();
 
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
   List<Category> _categories = [];
   List<Product> _products = [];
   List<Product> _allProducts = [];
-  Product? searchedProduct;
+  List<Product> _searchResults = [];
+
   User? _user;
   bool _loading = true;
+  bool _searching = false;
 
   int _visibleTopCount = 4;
   int _visibleAllCount = 6;
+
   Map<String, List<Product>> _productsByCategory = {};
 
   @override
@@ -59,12 +66,39 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to load data: $e')));
       }
     }
     setState(() => _loading = false);
+  }
+
+  // 🔍 Debounced search
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (query.isEmpty) {
+        setState(() => _searchResults.clear());
+        return;
+      }
+
+      setState(() => _searching = true);
+      try {
+        final results = await productService.searchProducts(query);
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _searching = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Search failed: $e')));
+          setState(() => _searching = false);
+        }
+      }
+    });
   }
 
   Category? findSubcategoryByCode(String code) {
@@ -73,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Category? searchNode(Category? node) {
       if (node == null) return null;
-      if (node.categoryCode != null && node.categoryCode!.toLowerCase().contains(lower)) {
+      if (node.categoryCode != null &&
+          node.categoryCode!.toLowerCase().contains(lower)) {
         return node;
       }
       if (node.subcategories != null && node.subcategories!.isNotEmpty) {
@@ -105,6 +140,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final primaryColor = Colors.red[900];
@@ -123,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network('https://picsum.photos/800/400?img=1', fit: BoxFit.cover),
+                  Image.network('https://picsum.photos/800/400?img=1',
+                      fit: BoxFit.cover),
                   Container(color: Colors.red[900]!.withOpacity(0.7)),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -133,9 +176,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(loc.appTitle, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                          Text(loc.appTitle,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold)),
                           const SizedBox(height: 6),
-                          Text(loc.appSlogan, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                          Text(loc.appSlogan,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 14)),
                         ],
                       ),
                     ),
@@ -146,22 +195,34 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.home),
               title: Text(loc.about),
-              onTap: () { Navigator.pop(context); context.go('/about'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/about');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.delivery_dining),
               title: Text(loc.delivery),
-              onTap: () { Navigator.pop(context); context.go('/delivery'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/delivery');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.high_quality),
               title: Text(loc.quality),
-              onTap: () { Navigator.pop(context); context.go('/quality'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/quality');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.support),
               title: Text(loc.contact),
-              onTap: () { Navigator.pop(context); context.go('/contact'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/contact');
+              },
             ),
           ],
         ),
@@ -173,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: primaryColor,
         child: CustomScrollView(
           slivers: [
+            // 🔝 Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -183,29 +245,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SvgPicture.asset('assets/logo/logo.svg', width: 50, height: 50),
+                        SvgPicture.asset('assets/logo/logo.svg',
+                            width: 50, height: 50),
                         Builder(
                           builder: (context) => IconButton(
                             icon: const Icon(Icons.menu, size: 32),
-                            onPressed: () => Scaffold.of(context).openDrawer(),
+                            onPressed: () =>
+                                Scaffold.of(context).openDrawer(),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 15),
-                    Text(loc.appSlogan, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: primaryColor)),
-                    Text(loc.appSubtitle, style: TextStyle(color: primaryColor?.withOpacity(0.6))),
+                    Text(loc.appSlogan,
+                        style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor)),
+                    Text(loc.appSubtitle,
+                        style: TextStyle(
+                            color: primaryColor?.withOpacity(0.6))),
                   ],
                 ),
               ),
             ),
+
+            // 🔍 Search Bar
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: primaryColor!, width: 2),
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border:
+                    Border.all(color: primaryColor!, width: 2),
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
                   ),
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -214,32 +288,76 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
+                          controller: _searchController,
                           decoration: InputDecoration(
                             hintText: loc.searchHint,
                             border: InputBorder.none,
                             isDense: true,
                           ),
-                          onChanged: (value) {},
+                          onChanged: _onSearchChanged,
                         ),
                       ),
-                      if (_loading) CircularProgressIndicator(color: primaryColor),
+                      if (_searching)
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: primaryColor),
+                        ),
+                      if (_searchController.text.isNotEmpty &&
+                          !_searching)
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          color: primaryColor,
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchResults.clear());
+                          },
+                        ),
                     ],
                   ),
                 ),
               ),
             ),
-            SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.all(16), child: Text('Категории', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)))),
+
+            // 🔎 Search Results
+            if (_searchResults.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.all(8),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                        ProductCard(product: _searchResults[index]),
+                    childCount: _searchResults.length,
+                  ),
+                ),
+              ),
+
+            // 🏷 Categories
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(loc.categoryLabel,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor)),
+              ),
+            ),
             SliverToBoxAdapter(
               child: SizedBox(
                 height: 140,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _categories.length,
-                  itemBuilder: (context, index) => CategoryTile(category: _categories[index]),
+                  itemBuilder: (context, index) =>
+                      CategoryTile(category: _categories[index]),
                 ),
               ),
             ),
+
             SliverToBoxAdapter(child: CarouselSection()),
+
             if (beefCategory != null)
               SliverToBoxAdapter(
                 child: CategorySection(
@@ -247,18 +365,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.set_meal,
                   products: _allProducts,
                   categoryId: beefCategory.id,
-                  onSeeAll: () => context.push('/filtered?category=${beefCategory.id}'),
+                  onSeeAll: () => context.push(
+                      '/filtered?category=${beefCategory.id}'),
                 ),
               ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(loc.showMore, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)),
-              ),
-            ),
+
+            // 🔥 Featured products
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) => ProductCard(product: _products[index]),
+                    (context, index) =>
+                    ProductCard(product: _products[index]),
                 childCount: _visibleTopCount.clamp(0, _products.length),
               ),
             ),
@@ -266,12 +382,17 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Center(
                   child: TextButton(
-                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(primaryColor)),
+                    style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all(primaryColor)),
                     onPressed: _loadMoreTop,
-                    child: Text(loc.showMore, style: const TextStyle(color: Colors.white)),
+                    child: Text(loc.showMore,
+                        style:
+                        const TextStyle(color: Colors.white)),
                   ),
                 ),
               ),
+
             if (chickenCategory != null)
               SliverToBoxAdapter(
                 child: CategorySection(
@@ -279,7 +400,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.egg,
                   products: _allProducts,
                   categoryId: chickenCategory.id,
-                  onSeeAll: () => context.push('/filtered?category=${chickenCategory.id}'),
+                  onSeeAll: () => context.push(
+                      '/filtered?category=${chickenCategory.id}'),
                 ),
               ),
             if (marbledBeef != null)
@@ -289,23 +411,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.restaurant,
                   products: _allProducts,
                   categoryId: marbledBeef.id,
-                  onSeeAll: () => context.push('/filtered?category=${marbledBeef.id}'),
+                  onSeeAll: () => context.push(
+                      '/filtered?category=${marbledBeef.id}'),
                 ),
               ),
+
+            // 🛒 All products grid
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(top: 16, left: 16),
-                child: Text(loc.allProductsSection, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)),
+                padding:
+                const EdgeInsets.only(top: 16, left: 16, bottom: 8),
+                child: Text(loc.allProductsSection,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor)),
               ),
             ),
             SliverPadding(
               padding: const EdgeInsets.all(8),
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) => ProductTile(product: _allProducts[index]),
-                  childCount: _visibleAllCount.clamp(0, _allProducts.length),
+                      (context, index) =>
+                      ProductTile(product: _allProducts[index]),
+                  childCount:
+                  _visibleAllCount.clamp(0, _allProducts.length),
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
@@ -317,9 +450,13 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Center(
                   child: TextButton(
-                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(primaryColor)),
+                    style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all(primaryColor)),
                     onPressed: _loadMoreAll,
-                    child: Text(loc.showMore, style: const TextStyle(color: Colors.white)),
+                    child: Text(loc.showMore,
+                        style:
+                        const TextStyle(color: Colors.white)),
                   ),
                 ),
               ),
@@ -332,10 +469,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             FloatingActionButton(
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
               onPressed: () => context.push('/cart'),
               backgroundColor: Colors.red[900],
-              child: const Icon(Icons.shopping_cart, color: Colors.white, size: 24),
+              child:
+              const Icon(Icons.shopping_cart, color: Colors.white, size: 24),
             ),
             if (cart.totalItems > 0)
               Positioned(
@@ -343,11 +482,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 top: -4,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  constraints:
+                  const BoxConstraints(minWidth: 20, minHeight: 20),
                   child: Text(
                     '${cart.totalItems}',
-                    style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),

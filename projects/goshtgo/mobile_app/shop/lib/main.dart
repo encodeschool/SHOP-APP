@@ -14,6 +14,7 @@ import 'package:shop/screens/contact/contact_screen.dart';
 import 'package:shop/screens/delivery/delivery_screen.dart';
 import 'package:shop/screens/home/home_screen.dart';
 import 'package:shop/screens/navigation/main_navigation_screen.dart';
+import 'package:shop/screens/onboarding/onboarding_screen.dart';
 import 'package:shop/screens/orders/order_history_screen.dart';
 import 'package:shop/screens/product/product_add_screen.dart';
 import 'package:shop/screens/product/product_detail_screen.dart';
@@ -35,14 +36,26 @@ Future<void> main() async {
 
   const bool isProd = bool.fromEnvironment('dart.vm.product');
   final envFile = isProd ? ".env.production" : ".env.development";
-
   await dotenv.load(fileName: envFile);
 
   final stripeKey = dotenv.env['STRIPE_KEY'] ?? "pk_test_fallback";
   Stripe.publishableKey = stripeKey;
 
   final authProvider = AuthProvider();
-  await authProvider.loadAuthData(); // load token & userId
+  await authProvider.loadAuthData();
+
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingShown = prefs.getBool('onboarding_shown') ?? false;
+
+  // Determine the first screen
+  String initialRoute;
+  if (!onboardingShown) {
+    initialRoute = '/onboarding';
+  } else if (authProvider.isLoggedIn) {
+    initialRoute = '/home';
+  } else {
+    initialRoute = '/login';
+  }
 
   runApp(
     MultiProvider(
@@ -51,17 +64,19 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()..loadLocale()),
       ],
-      child: MyApp(
-        initialRoute: authProvider.isLoggedIn ? '/home' : '/login',
-      ),
+      child: MyApp(initialRoute: initialRoute),
     ),
   );
 }
 
 GoRouter createRouter(String initialRoute) => GoRouter(
-  initialLocation: '/home',
+  initialLocation: initialRoute, // ✅ Use dynamic initial route
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),

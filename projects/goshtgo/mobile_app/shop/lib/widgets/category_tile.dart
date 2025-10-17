@@ -26,13 +26,21 @@ class CategoryTile extends StatelessWidget {
         child: Column(
           children: [
             CircleAvatar(
-                radius: 40, backgroundColor: Colors.white,
+                radius: 40, backgroundColor: Colors.red[900],
                 // child: Text(category.name[0])
-                child: category.icon != null ? Image.network(
+                child: category.icon != null ? ColorFiltered(
+                  colorFilter: const ColorFilter.matrix([
+                    -1,  0,  0,  0, 255, // Red
+                    0, -1,  0,  0, 255, // Green
+                    0,  0, -1,  0, 255, // Blue
+                    0,  0,  0,  1,   0, // Alpha
+                  ]),
+                  child: Image.network(
                     '$apiUrl${category.icon}',
                     fit: BoxFit.contain,
                     width: 50,
-                    height: 50
+                    height: 50,
+                  ),
                 ) : Icon(Icons.image)
             ),
             const SizedBox(height: 8),
