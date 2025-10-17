@@ -3,11 +3,13 @@ class Category {
   final String name;
   final String? icon;
   final String? categoryCode;
+  final String? parentId;
   final List<Category>? subcategories;
 
   Category({
     required this.id,
     required this.name,
+    required this.parentId,
     this.icon,
     this.categoryCode,
     this.subcategories,
@@ -18,6 +20,7 @@ class Category {
     name: json['name'],
     icon: json['icon'],
     categoryCode: json['categoryCode'],
+    parentId: json['parentId'],
     subcategories: json['subcategories'] != null
         ? List<Category>.from(
         (json['subcategories'] as List)
