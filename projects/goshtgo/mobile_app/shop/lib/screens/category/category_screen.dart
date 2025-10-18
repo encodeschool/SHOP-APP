@@ -28,10 +28,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   List<Category> _subcategories = [];
   List<Product> _products = [];
+  List<Product> _filteredProducts = [];
+
   bool _loading = true;
+  bool _scrolled = false;
 
   final ScrollController _scrollController = ScrollController();
-  bool _scrolled = false;
+
+  // --- Filter parameters ---
+  RangeValues _priceRange = const RangeValues(0, 500000);
+  bool _inStockOnly = false;
 
   @override
   void initState() {
@@ -49,9 +55,41 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Future<void> _load() async {
-    _subcategories = await categoryService.fetchSubcategories(widget.categoryId);
-    _products = await productService.fetchProductsByCategory(widget.categoryId);
-    setState(() => _loading = false);
+    setState(() => _loading = true);
+
+    try {
+      _subcategories = await categoryService.fetchSubcategories(widget.categoryId);
+      _products = await productService.fetchProductsByCategory(widget.categoryId);
+      _filteredProducts = List.from(_products);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load data: $e')),
+        );
+      }
+    }
+
+    if (mounted) setState(() => _loading = false);
+  }
+
+  void _applyFilters() {
+    setState(() {
+      _filteredProducts = _products.where((p) {
+        final priceOk = (p.price ?? 0) >= _priceRange.start && (p.price ?? 0) <= _priceRange.end;
+        final stockOk = !_inStockOnly || (p.stock > 0);
+        return priceOk && stockOk;
+      }).toList();
+    });
+    Navigator.pop(context); // Close drawer after applying
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _priceRange = const RangeValues(0, 500000);
+      _inStockOnly = false;
+      _filteredProducts = List.from(_products);
+    });
+    Navigator.pop(context);
   }
 
   @override
@@ -62,7 +100,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!; // <- localization
+    final loc = AppLocalizations.of(context)!;
     final redColor = Colors.red[900];
 
     return Scaffold(
@@ -83,6 +121,80 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
         centerTitle: false,
       ),
+
+      // 🧭 Filter Drawer
+      endDrawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const Text(
+                'Filters',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+
+              // Price Range Filter
+              const Text('Price Range'),
+              RangeSlider(
+                values: _priceRange,
+                min: 0,
+                max: 500000,
+                divisions: 10,
+                labels: RangeLabels(
+                  _priceRange.start.toInt().toString(),
+                  _priceRange.end.toInt().toString(),
+                ),
+                onChanged: (values) => setState(() => _priceRange = values),
+              ),
+
+              const Divider(),
+
+              // In Stock Filter
+              SwitchListTile(
+                title: const Text('In Stock Only'),
+                value: _inStockOnly,
+                onChanged: (v) => setState(() => _inStockOnly = v),
+              ),
+
+              const Divider(),
+
+              // Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _applyFilters,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[900]
+                      ),
+                      child: const Text(
+                          'Apply',
+                          style: TextStyle(
+                            color: Colors.white
+                          ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _resetFilters,
+                      child: Text(
+                          'Reset',
+                          style: TextStyle(
+                            color: Colors.red[900]
+                          ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -96,7 +208,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     loc.subcategoriesTitle,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 Padding(
@@ -106,7 +219,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     children: _subcategories
                         .map((sub) => ActionChip(
                       label: Text(sub.name),
-                      onPressed: () => context.push('/category/${sub.id}', extra: sub.name),
+                      onPressed: () => context.push(
+                          '/category/${sub.id}',
+                          extra: sub.name),
                     ))
                         .toList(),
                   ),
@@ -115,12 +230,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
-              loc.productsTitle,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  loc.productsTitle,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.filter_alt_rounded),
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
+                ),
+              ],
             ),
           ),
-          ..._products.map((product) => ProductCard(product: product)).toList(),
+          ..._filteredProducts
+              .map((product) => ProductCard(product: product))
+              .toList(),
         ],
       ),
     );
