@@ -3,12 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/api_client.dart';
 import '../models/product_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ProductService {
-  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
-  late final dio = Dio(BaseOptions(baseUrl: '$apiUrl/api'));
+  final Dio dio = ApiClient().dio;
 
   /// Get the current language code from SharedPreferences
   Future<String> _getLangCode() async {

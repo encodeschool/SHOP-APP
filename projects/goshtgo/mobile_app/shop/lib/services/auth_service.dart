@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop/core/api_client.dart';
 
 class AuthService {
-  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
-  late final Dio dio = Dio(BaseOptions(baseUrl: '$apiUrl/api'));
+  final Dio dio = ApiClient().dio;
   final storage = const FlutterSecureStorage();
 
   Future<bool> login(String email, String password) async {

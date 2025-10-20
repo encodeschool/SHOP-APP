@@ -8,6 +8,8 @@ import '../../models/user_model.dart';
 import '../../services/order_service.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/user_service.dart';
+import 'package:country_picker/country_picker.dart';
+import 'dart:ui' as ui; // Add this at top
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -59,6 +61,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _checkLoginAndLoadUser() async {
     final token = await storage.read(key: 'token');
     userId = await storage.read(key: 'userId');
+
+    _countryController.text = _countryController.text.isNotEmpty
+        ? _countryController.text
+        : ui.window.locale.countryCode ?? '';
 
     if (token == null || userId == null) {
       if (context.mounted) {
@@ -239,7 +245,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
               const SizedBox(height: 20),
               Text(loc.shippingAddress, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextFormField(controller: _countryController, decoration: InputDecoration(labelText: loc.country), validator: (v) => v!.isEmpty ? loc.country : null),
+              GestureDetector(
+                onTap: () {
+                  showCountryPicker(
+                    context: context,
+                    showPhoneCode: false, // set to true if you want to show calling codes
+                    onSelect: (Country country) {
+                      setState(() {
+                        _countryController.text = country.name;
+                      });
+                    },
+                  );
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _countryController,
+                    decoration: InputDecoration(
+                      labelText: loc.country,
+                      suffixIcon: const Icon(Icons.arrow_drop_down),
+                    ),
+                    validator: (v) => v!.isEmpty ? loc.country : null,
+                  ),
+                ),
+              ),
               TextFormField(controller: _zipController, decoration: InputDecoration(labelText: loc.zipCode), validator: (v) => v!.isEmpty ? loc.zipCode : null),
               TextFormField(controller: _cityController, decoration: InputDecoration(labelText: loc.city), validator: (v) => v!.isEmpty ? loc.city : null),
               TextFormField(controller: _notesController, decoration: InputDecoration(labelText: loc.notes), maxLines: 3),

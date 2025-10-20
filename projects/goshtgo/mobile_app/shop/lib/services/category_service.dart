@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/api_client.dart';
 import '../models/category_model.dart';
 
 
-final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
 final appName = dotenv.env['APP_NAME'] ?? 'GoshtGo';
 
 class CategoryService {
-  final dio = Dio(BaseOptions(baseUrl: '$apiUrl/api'));
+  final Dio dio = ApiClient().dio;
 
   Future<String> _getLangCode() async {
     final prefs = await SharedPreferences.getInstance();

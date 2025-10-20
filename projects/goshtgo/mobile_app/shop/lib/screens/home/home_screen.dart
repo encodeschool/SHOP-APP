@@ -393,28 +393,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-            if (chickenCategory != null)
-              SliverToBoxAdapter(
-                child: CategorySection(
-                  title: loc.chickenSection,
-                  icon: Icons.egg,
-                  products: _allProducts,
-                  categoryId: chickenCategory.id,
-                  onSeeAll: () => context.push(
-                      '/filtered?category=${chickenCategory.id}'),
-                ),
-              ),
-            if (marbledBeef != null)
-              SliverToBoxAdapter(
-                child: CategorySection(
-                  title: loc.marbledSection,
-                  icon: Icons.restaurant,
-                  products: _allProducts,
-                  categoryId: marbledBeef.id,
-                  onSeeAll: () => context.push(
-                      '/filtered?category=${marbledBeef.id}'),
-                ),
-              ),
+            // if (chickenCategory != null)
+            //   SliverToBoxAdapter(
+            //     child: CategorySection(
+            //       title: loc.chickenSection,
+            //       icon: Icons.egg,
+            //       products: _allProducts,
+            //       categoryId: chickenCategory.id,
+            //       onSeeAll: () => context.push(
+            //           '/filtered?category=${chickenCategory.id}'),
+            //     ),
+            //   ),
+            // if (marbledBeef != null)
+            //   SliverToBoxAdapter(
+            //     child: CategorySection(
+            //       title: loc.marbledSection,
+            //       icon: Icons.restaurant,
+            //       products: _allProducts,
+            //       categoryId: marbledBeef.id,
+            //       onSeeAll: () => context.push(
+            //           '/filtered?category=${marbledBeef.id}'),
+            //     ),
+            //   ),
 
             // 🛒 All products grid
             SliverToBoxAdapter(

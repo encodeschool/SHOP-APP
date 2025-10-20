@@ -14,6 +14,7 @@ import 'package:shop/screens/contact/contact_screen.dart';
 import 'package:shop/screens/delivery/delivery_screen.dart';
 import 'package:shop/screens/home/home_screen.dart';
 import 'package:shop/screens/navigation/main_navigation_screen.dart';
+import 'package:shop/screens/noInternet/no_internet_screen.dart';
 import 'package:shop/screens/onboarding/onboarding_screen.dart';
 import 'package:shop/screens/orders/order_history_screen.dart';
 import 'package:shop/screens/product/product_add_screen.dart';
@@ -23,13 +24,18 @@ import 'package:shop/screens/profile/profile_edit_screen.dart';
 import 'package:shop/screens/profile/profile_screen.dart';
 import 'package:shop/screens/quality/quality_screen.dart';
 import 'package:shop/screens/settings/settings_screen.dart';
+import 'core/api_client.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/locale_provider.dart';
+import 'core/network_manager.dart';
 import 'l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +43,9 @@ Future<void> main() async {
   const bool isProd = bool.fromEnvironment('dart.vm.product');
   final envFile = isProd ? ".env.production" : ".env.development";
   await dotenv.load(fileName: envFile);
+
+  ApiClient().initialize();
+  NetworkManager().initialize();
 
   final stripeKey = dotenv.env['STRIPE_KEY'] ?? "pk_test_fallback";
   Stripe.publishableKey = stripeKey;
@@ -70,7 +79,8 @@ Future<void> main() async {
 }
 
 GoRouter createRouter(String initialRoute) => GoRouter(
-  initialLocation: initialRoute, // ✅ Use dynamic initial route
+  initialLocation: initialRoute,
+  navigatorKey: navigatorKey,
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
@@ -147,23 +157,39 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
 
-    return MaterialApp.router(
-      title: 'Gosht Go',
-      theme: ThemeData(useMaterial3: true),
-      routerConfig: createRouter(initialRoute),
-      debugShowCheckedModeBanner: false,
-      locale: localeProvider.locale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ru'),
-        Locale('uz'),
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+    return StreamBuilder<bool>(
+      stream: NetworkManager().connectionStream,
+      initialData: true,
+      builder: (context, snapshot) {
+        final hasInternet = snapshot.data ?? true;
+
+        return MaterialApp.router(
+          title: 'Gosht Go',
+          theme: ThemeData(useMaterial3: true),
+          routerConfig: createRouter(initialRoute),
+          debugShowCheckedModeBanner: false,
+          locale: localeProvider.locale,
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ru'),
+            Locale('uz'),
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child ?? const SizedBox(),
+                if (!hasInternet) NoInternetOverlay(),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -4,12 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import '../../core/cart_provider.dart';
+import '../core/api_client.dart';
 import '../models/order_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OrderService {
-  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
-  late final dio = Dio(BaseOptions(baseUrl: '$apiUrl/api'));
+  final Dio dio = ApiClient().dio;
   final storage = const FlutterSecureStorage();
 
   // ✅ Place order with full payload

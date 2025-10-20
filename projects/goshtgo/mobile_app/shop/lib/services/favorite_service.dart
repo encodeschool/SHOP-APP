@@ -2,9 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../core/api_client.dart';
+
 class FavoriteService {
-  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
-  final Dio _dio = Dio();
+  final Dio dio = ApiClient().dio;
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, String>> _getHeaders() async {
@@ -18,8 +19,8 @@ class FavoriteService {
 
   Future<List<String>> getFavoriteIds(String userId) async {
     final headers = await _getHeaders();
-    final response = await _dio.get(
-      '$apiUrl/api/favorites/user/$userId',
+    final response = await dio.get(
+      '/favorites/user/$userId',
       options: Options(headers: headers),
     );
 
@@ -37,8 +38,8 @@ class FavoriteService {
 
   Future<void> addFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
-    await _dio.post(
-      '$apiUrl/api/favorites',
+    await dio.post(
+      '/favorites',
       queryParameters: {
         'userId': userId,
         'productId': productId,
@@ -49,8 +50,8 @@ class FavoriteService {
 
   Future<void> removeFavorite(String userId, String productId) async {
     final headers = await _getHeaders();
-    await _dio.delete(
-      '$apiUrl/api/favorites',
+    await dio.delete(
+      '/favorites',
       queryParameters: {
         'userId': userId,
         'productId': productId,
