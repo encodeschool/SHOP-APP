@@ -56,7 +56,7 @@ class ProductTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${product.price.toStringAsFixed(2)}',
+                      '${product.price.toStringAsFixed(2)}',
                       style: const TextStyle(color: Colors.black54),
                     ),
                   ],

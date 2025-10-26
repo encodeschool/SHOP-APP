@@ -362,7 +362,8 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: CategorySection(
                   title: loc.beefSection,
-                  icon: Icons.set_meal,
+                  // icon: Icons.no_meals,
+                  image: 'assets/icons/beef.png',
                   products: _allProducts,
                   categoryId: beefCategory.id,
                   onSeeAll: () => context.push(

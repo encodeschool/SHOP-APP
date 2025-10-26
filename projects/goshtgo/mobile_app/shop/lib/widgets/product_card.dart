@@ -34,7 +34,7 @@ class ProductCard extends StatelessWidget {
               : const Icon(Icons.image, size: 40),
         ),
         title: Text(product.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text("\$${product.price}"),
+        subtitle: Text("${product.price}"),
         trailing: Icon(
             Icons.arrow_forward_ios,
             size: 24,

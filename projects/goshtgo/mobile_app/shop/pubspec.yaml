@@ -102,6 +102,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icon/
+    - assets/icons/
     - assets/logo/
     - assets/onboarding/
     - .env.development

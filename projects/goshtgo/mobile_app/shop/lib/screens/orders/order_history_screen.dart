@@ -60,7 +60,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
               return ExpansionTile(
                 title: Text(
-                  "${loc.orderNumber}: ${order.id.substring(0, 8)} • \$${order.total.toStringAsFixed(2)}",
+                  "${loc.orderNumber}: ${order.id.substring(0, 8)} • ${order.total.toStringAsFixed(2)}",
                 ),
                 subtitle: Text(
                   "${order.status} • ${DateFormat.yMd().add_jm().format(order.createdAt.toLocal())}",
@@ -72,7 +72,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         : const Icon(Icons.image_not_supported),
                     title: Text(item.productTitle),
                     subtitle: Text("${loc.quantity}: ${item.quantity}"),
-                    trailing: Text("\$${(item.pricePerUnit * item.quantity).toStringAsFixed(2)}"),
+                    trailing: Text("${(item.pricePerUnit * item.quantity).toStringAsFixed(2)}"),
                   );
                 }).toList(),
               );

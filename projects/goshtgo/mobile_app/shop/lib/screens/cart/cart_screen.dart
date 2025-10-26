@@ -56,7 +56,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: Text("\$${item.totalPrice.toStringAsFixed(2)}"),
+                  trailing: Text("${item.totalPrice.toStringAsFixed(2)}"),
                 );
               },
             ),
@@ -71,7 +71,7 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Text(loc.total, style: const TextStyle(fontSize: 18)),
                     Text(
-                      "\$${cart.totalPrice.toStringAsFixed(2)}",
+                      "${cart.totalPrice.toStringAsFixed(2)}",
                       style: const TextStyle(fontSize: 18),
                     ),
                   ],

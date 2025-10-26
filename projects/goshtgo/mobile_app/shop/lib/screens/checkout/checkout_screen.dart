@@ -19,6 +19,8 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  Country? _selectedCountry;
+
   final _formKey = GlobalKey<FormState>();
   final _promoController = TextEditingController();
   final storage = const FlutterSecureStorage();
@@ -192,7 +194,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(loc.contactInfo, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: loc.fullName),
@@ -210,12 +211,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 keyboardType: TextInputType.phone,
                 validator: (v) => v!.isEmpty ? loc.phone : null,
               ),
-              const SizedBox(height: 10),
-              CheckboxListTile(
-                title: Text(loc.legalEntity),
-                value: isLegalEntity,
-                onChanged: (v) => setState(() => isLegalEntity = v!),
-              ),
+              // const SizedBox(height: 10),
+              // CheckboxListTile(
+              //   title: Text(loc.legalEntity),
+              //   value: isLegalEntity,
+              //   onChanged: (v) => setState(() => isLegalEntity = v!),
+              // ),
               if (isLegalEntity) ...[
                 const SizedBox(height: 8),
                 Text(loc.companyInfo, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -249,10 +250,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onTap: () {
                   showCountryPicker(
                     context: context,
-                    showPhoneCode: false, // set to true if you want to show calling codes
+                    showPhoneCode: true,
                     onSelect: (Country country) {
                       setState(() {
-                        _countryController.text = country.name;
+                        _selectedCountry = country;
+                        _countryController.text =
+                        '${country.flagEmoji} ${country.name} (+${country.phoneCode})';
                       });
                     },
                   );
@@ -261,10 +264,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   child: TextFormField(
                     controller: _countryController,
                     decoration: InputDecoration(
-                      labelText: loc.country,
+                      labelText: 'Country',
+                      prefixIcon: _selectedCountry != null
+                          ? Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text(
+                          _selectedCountry!.flagEmoji,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      )
+                          : const Icon(Icons.flag_outlined),
                       suffixIcon: const Icon(Icons.arrow_drop_down),
                     ),
-                    validator: (v) => v!.isEmpty ? loc.country : null,
+                    validator: (v) => v!.isEmpty ? 'Please select a country' : null,
                   ),
                 ),
               ),
@@ -277,8 +289,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               RadioListTile<String>(title: Text(loc.expressShipping), value: 'express', groupValue: shippingMethod, onChanged: (v) => setState(() => shippingMethod = v!)),
               const SizedBox(height: 16),
               Text(loc.paymentMethod, style: const TextStyle(fontWeight: FontWeight.bold)),
-              RadioListTile<String>(title: Text(loc.cardPayment), value: 'card', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
-              RadioListTile<String>(title: Text(loc.paypalPayment), value: 'paypal', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
+              // RadioListTile<String>(title: Text(loc.cardPayment), value: 'card', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
+              // RadioListTile<String>(title: Text(loc.paypalPayment), value: 'paypal', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
               RadioListTile<String>(title: Text(loc.codPayment), value: 'cod', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
               const SizedBox(height: 16),
               Text(loc.promoCode, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -298,13 +310,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ...cart.items.map((item) => ListTile(
                 leading: item.product.images.isNotEmpty ? Image.network('$apiUrl${item.product.images[0]}', width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image)) : const Icon(Icons.image, size: 50),
                 title: Text("${item.product.title} x${item.quantity}"),
-                trailing: Text("\$${item.totalPrice.toStringAsFixed(2)}"),
+                trailing: Text("${item.totalPrice.toStringAsFixed(2)}"),
               )),
               const Divider(),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.shipping), Text("\$${shippingPrice.toStringAsFixed(2)}")]),
-              if (discount > 0) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.discount, style: const TextStyle(color: Colors.green)), Text("-\$${discount.toStringAsFixed(2)}", style: const TextStyle(color: Colors.green))]),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.shipping), Text("${shippingPrice.toStringAsFixed(2)}")]),
+              if (discount > 0) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.discount, style: const TextStyle(color: Colors.green)), Text("-${discount.toStringAsFixed(2)}", style: const TextStyle(color: Colors.green))]),
               const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.total, style: const TextStyle(fontSize: 18)), Text("\$${(totalBeforeDiscount - discount).toStringAsFixed(2)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.total, style: const TextStyle(fontSize: 18)), Text("${(totalBeforeDiscount - discount).toStringAsFixed(2)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
               const SizedBox(height: 20),
               ElevatedButton(onPressed: loading || !isLoggedIn ? null : () => submitOrder(context, cart), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, minimumSize: const Size(double.infinity, 50)), child: loading ? const CircularProgressIndicator(color: Colors.white) : Text(loc.placeOrder, style: const TextStyle(color: Colors.white, fontSize: 16))),
             ],
