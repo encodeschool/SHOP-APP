@@ -439,7 +439,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String selectImages(Object count) {
-    return 'Выбрать изображения ($count)';
+    return 'Выбрано $count изображений';
   }
 
   @override
@@ -527,4 +527,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qualityText5 => 'Это культура ответственного мяса в Ташкенте: от пастбища до вашей кухни — без компромиссов, без лишних посредников и без потери свежести.';
+
+  @override
+  String get skip => 'Пропустить';
+
+  @override
+  String get next => 'Далее';
+
+  @override
+  String get get_started => 'Начать';
+
+  @override
+  String get onboarding_title_1 => 'Добро пожаловать в Gosht Go!';
+
+  @override
+  String get onboarding_subtitle_1 => 'Ваш надёжный маркетплейс свежего мяса и продуктов.';
+
+  @override
+  String get onboarding_title_2 => 'Покупай и продавай легко';
+
+  @override
+  String get onboarding_subtitle_2 => 'Присоединяйтесь к нашему сообществу местных продавцов и находите отличные предложения.';
+
+  @override
+  String get onboarding_title_3 => 'Быстрая и надёжная доставка';
+
+  @override
+  String get onboarding_subtitle_3 => 'Получайте свои заказы быстро прямо к вашей двери.';
 }

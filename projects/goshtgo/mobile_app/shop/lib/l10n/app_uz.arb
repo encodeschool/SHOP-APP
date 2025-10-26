@@ -148,7 +148,7 @@
                             "descriptionLabel": "Tavsif",
                             "featuredLabel": "Tavsiya etilgan",
                             "availableLabel": "Mavjud",
-                            "selectImages": "{count} ta rasm tanlandi"
+                            "selectImages": "{count} ta rasm tanlandi",
                             "createProduct": "Mahsulot yaratish",
                             "requiredField": "Majburiy",
                             "categoryRequired": "Kategoriya tanlash kerak",
@@ -181,5 +181,19 @@
                                   "qualityHeader4": "Ustalar qoʻli",
                                   "qualityText4": "Har bir yetkazib berish — bu yosh hayvonlarning saralangan goʻshti, u har kuni yetkazib beriladi va tajribali usta go‘shtchilar tomonidan qo‘lda bo‘linadi. Shu yo‘l bilan faqat haqiqiy to‘qimalar va boy ta’m saqlanadi, bu oshpazlar va haqiqiy gurmanlar qadrlaydi.",
                                   "qualityHeader5": "💡 GoshtGo — bu doʻkondan koʻproq.",
-                                  "qualityText5": "Bu Toshkentda mas’uliyatli goʻsht madaniyati: yaylovdan oshxonangizgacha — kompromissiz, ortiqcha vositachisiz va yangilikni yo‘qotmasdan."
+                                  "qualityText5": "Bu Toshkentda mas’uliyatli goʻsht madaniyati: yaylovdan oshxonangizgacha — kompromissiz, ortiqcha vositachisiz va yangilikni yo‘qotmasdan.",
+                                    "skip": "O‘tkazib yuborish",
+                                    "next": "Keyingisi",
+                                    "get_started": "Boshlash",
+
+                                    "onboarding_title_1": "Gosht Go! ga xush kelibsiz!",
+                                    "onboarding_subtitle_1": "Go‘sht va oziq-ovqat mahsulotlari uchun ishonchli bozor joyingiz.",
+
+                                    "onboarding_title_2": "Oson xarid va savdo qiling",
+                                    "onboarding_subtitle_2": "Mahalliy sotuvchilar hamjamiyatiga qo‘shiling va ajoyib takliflarni toping.",
+
+                                    "onboarding_title_3": "Tez va ishonchli yetkazib berish",
+                                    "onboarding_subtitle_3": "Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz."
+
+
 }

@@ -439,7 +439,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String selectImages(Object count) {
-    return 'Rasmlarni tanlash ($count)';
+    return '$count ta rasm tanlandi';
   }
 
   @override
@@ -527,4 +527,31 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get qualityText5 => 'Bu Toshkentda mas’uliyatli goʻsht madaniyati: yaylovdan oshxonangizgacha — kompromissiz, ortiqcha vositachisiz va yangilikni yo‘qotmasdan.';
+
+  @override
+  String get skip => 'O‘tkazib yuborish';
+
+  @override
+  String get next => 'Keyingisi';
+
+  @override
+  String get get_started => 'Boshlash';
+
+  @override
+  String get onboarding_title_1 => 'Gosht Go! ga xush kelibsiz!';
+
+  @override
+  String get onboarding_subtitle_1 => 'Go‘sht va oziq-ovqat mahsulotlari uchun ishonchli bozor joyingiz.';
+
+  @override
+  String get onboarding_title_2 => 'Oson xarid va savdo qiling';
+
+  @override
+  String get onboarding_subtitle_2 => 'Mahalliy sotuvchilar hamjamiyatiga qo‘shiling va ajoyib takliflarni toping.';
+
+  @override
+  String get onboarding_title_3 => 'Tez va ishonchli yetkazib berish';
+
+  @override
+  String get onboarding_subtitle_3 => 'Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz.';
 }

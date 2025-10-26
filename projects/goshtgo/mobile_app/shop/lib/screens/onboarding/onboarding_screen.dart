@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,22 +14,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> _pages = [
+  List<Map<String, String>> _pages(BuildContext context) => [
     {
-      "title": "Welcome to Gosht Go!",
-      "subtitle": "Your trusted marketplace for fresh meat and groceries.",
-      "image": "assets/images/panda.png",
+      "title": AppLocalizations.of(context)!.onboarding_title_1,
+      "subtitle": AppLocalizations.of(context)!.onboarding_subtitle_1,
+      "image": "assets/onboarding/onboarding_1_low_resolution.png",
     },
     {
-      "title": "Buy & Sell Easily",
-      "subtitle": "Join our community of local sellers and discover great deals.",
-      "image": "assets/images/panda.png",
+      "title": AppLocalizations.of(context)!.onboarding_title_2,
+      "subtitle": AppLocalizations.of(context)!.onboarding_subtitle_2,
+      "image": "assets/onboarding/onboarding_2_low.png"
     },
-    {
-      "title": "Fast & Reliable Delivery",
-      "subtitle": "Get your orders delivered quickly right to your doorstep.",
-      "image": "assets/images/panda.png",
-    },
+    // {
+    //   "title": AppLocalizations.of(context)!.onboarding_title_3,
+    //   "subtitle": AppLocalizations.of(context)!.onboarding_subtitle_3,
+    //   "image": "assets/images/panda.png",
+    // },
   ];
 
   Future<void> _finishOnboarding(BuildContext context) async {
@@ -38,7 +39,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage == _pages.length - 1) {
+    if (_currentPage == _pages(context).length - 1) {
       _finishOnboarding(context);
     } else {
       _controller.nextPage(
@@ -48,13 +49,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  void _skip() {
-    _finishOnboarding(context);
-  }
+  void _skip() => _finishOnboarding(context);
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = Colors.red[900];
+    final pages = _pages(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -66,9 +66,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _skip,
-                child: const Text(
-                  "Skip",
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                child: Text(
+                  AppLocalizations.of(context)!.skip,
+                  style: const TextStyle(color: Colors.grey, fontSize: 16),
                 ),
               ),
             ),
@@ -77,23 +77,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
                 },
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (page["image"] != null)
-                          Image.asset(
-                            page["image"]!,
-                            height: 250,
-                            fit: BoxFit.contain,
-                          ),
+                        Image.asset(page["image"]!, width: 250, fit: BoxFit.cover),
                         const SizedBox(height: 40),
                         Text(
                           page["title"]!,
@@ -123,16 +118,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                _pages.length,
+                pages.length,
                     (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   height: 8,
                   width: _currentPage == index ? 20 : 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? primaryColor
-                        : Colors.grey.shade300,
+                    color: _currentPage == index ? primaryColor : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -153,13 +146,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 onPressed: _nextPage,
                 child: Text(
-                  _currentPage == _pages.length - 1
-                      ? "Get Started"
-                      : "Next",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
+                  _currentPage == pages.length - 1
+                      ? AppLocalizations.of(context)!.get_started
+                      : AppLocalizations.of(context)!.next,
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
             ),

@@ -958,7 +958,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectImages.
   ///
   /// In en, this message translates to:
-  /// **'Select Images ({count})'**
+  /// **'Select {count} images'**
   String selectImages(Object count);
 
   /// No description provided for @createProduct.
@@ -1128,6 +1128,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'It is a culture of responsible meat in Tashkent: from pasture to your kitchen — without compromise, intermediaries, or loss of freshness.'**
   String get qualityText5;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @get_started.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get get_started;
+
+  /// No description provided for @onboarding_title_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Gosht Go!'**
+  String get onboarding_title_1;
+
+  /// No description provided for @onboarding_subtitle_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your trusted marketplace for fresh meat and groceries.'**
+  String get onboarding_subtitle_1;
+
+  /// No description provided for @onboarding_title_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy & Sell Easily'**
+  String get onboarding_title_2;
+
+  /// No description provided for @onboarding_subtitle_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Join our community of local sellers and discover great deals.'**
+  String get onboarding_subtitle_2;
+
+  /// No description provided for @onboarding_title_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast & Reliable Delivery'**
+  String get onboarding_title_3;
+
+  /// No description provided for @onboarding_subtitle_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your orders delivered quickly right to your doorstep.'**
+  String get onboarding_subtitle_3;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

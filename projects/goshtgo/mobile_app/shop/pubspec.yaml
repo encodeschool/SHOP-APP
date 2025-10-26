@@ -60,6 +60,7 @@ dependencies:
   package_info_plus:
   country_picker:
   connectivity_plus:
+  flutter_native_splash: ^2.4.7
 
 
 dev_dependencies:
@@ -78,6 +79,13 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_native_splash:
+  color: "#000"        # Цвет фона
+  image: assets/logo/logo.png  # Логотип
+  android: true
+  ios: true
+  web: true
+
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -95,6 +103,7 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/logo/
+    - assets/onboarding/
     - .env.development
     - .env.production
     - .env

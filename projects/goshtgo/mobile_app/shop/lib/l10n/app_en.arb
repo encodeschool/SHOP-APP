@@ -149,12 +149,6 @@
                             "featuredLabel": "Featured",
                             "availableLabel": "Available",
                             "selectImages": "Select {count} images",
-                              "@selectImages": {
-                                "description": "Label showing how many images are selected",
-                                "placeholders": {
-                                  "count": {}
-                                }
-                              }
                             "createProduct": "Create Product",
                             "requiredField": "Required",
                             "categoryRequired": "Category required",
@@ -187,6 +181,15 @@
                                   "qualityHeader4": "Master handwork",
                                   "qualityText4": "Each delivery is select meat of young animals, delivered daily and butchered by experienced hands. This preserves texture and rich flavor valued by chefs and true gourmets.",
                                   "qualityHeader5": "💡 GoshtGo is more than a store.",
-                                  "qualityText5": "It is a culture of responsible meat in Tashkent: from pasture to your kitchen — without compromise, intermediaries, or loss of freshness."
+                                  "qualityText5": "It is a culture of responsible meat in Tashkent: from pasture to your kitchen — without compromise, intermediaries, or loss of freshness.",
+                                  "skip": "Skip",
+                                    "next": "Next",
+                                    "get_started": "Get Started",
+                                    "onboarding_title_1": "Welcome to Gosht Go!",
+                                    "onboarding_subtitle_1": "Your trusted marketplace for fresh meat and groceries.",
+                                    "onboarding_title_2": "Buy & Sell Easily",
+                                    "onboarding_subtitle_2": "Join our community of local sellers and discover great deals.",
+                                    "onboarding_title_3": "Fast & Reliable Delivery",
+                                    "onboarding_subtitle_3": "Get your orders delivered quickly right to your doorstep."
 
 }
