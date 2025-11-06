@@ -31,7 +31,7 @@ public class HomeWidget {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    // @JsonIgnore // Prevent serialization of the Category object
+    @JsonIgnore // Prevent serialization of the Category object
     private Category category; // if widgetType is CATEGORY_SECTION
 
     // Transient getter for categoryId in JSON response
