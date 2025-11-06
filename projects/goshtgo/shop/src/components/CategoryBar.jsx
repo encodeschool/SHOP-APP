@@ -23,6 +23,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { MdLanguage } from "react-icons/md";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { RiLoginCircleFill } from "react-icons/ri";
+import 'flag-icons/css/flag-icons.min.css';
 
 const CategoryBar = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -166,11 +167,11 @@ const CategoryBar = () => {
           >
             {(!isOpen ?
               <span className="transition-transform duration-300 transform uppercase flex items-center">
-                <FaBars className='mr-3' /> Catalogue
+                <FaBars className='mr-3' /> {t('Catalogue')}
               </span>
               :
               <span className="transition-transform duration-300 transform uppercase flex items-center">
-                <FaTimes className='mr-3' /> Catalogue
+                <FaTimes className='mr-3' /> {t('Catalogue')}
               </span>
             )}
           </button>
@@ -186,7 +187,7 @@ const CategoryBar = () => {
         <div className="flex-1 mx-6 max-w-3xl flex">
           <input
             type="text"
-            placeholder="Search for Products"
+            placeholder={t("Search for Products")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -226,10 +227,18 @@ const CategoryBar = () => {
             </div>
             {languageOpen && (
               <div className="absolute right-0 mt-1 bg-white text-red-800 shadow-md border rounded z-[101]">
-                <button onClick={() => handleLanguageChange('en')} className="block px-4 py-2 hover:bg-gray-100">English</button>
-                <button onClick={() => handleLanguageChange('lv')} className="block px-4 py-2 hover:bg-gray-100">Latvian</button>
-                <button onClick={() => handleLanguageChange('ru')} className="block px-4 py-2 hover:bg-gray-100">Russian</button>
-                <button onClick={() => handleLanguageChange('uz')} className="block px-4 py-2 hover:bg-gray-100">Uzbek</button>
+                <button onClick={() => handleLanguageChange('en')} className="flex items-center w-[100%] gap-2 px-4 py-2 hover:bg-gray-100">
+                  <span className="fi fi-us"></span> English
+                </button>
+                {/* <button onClick={() => handleLanguageChange('lv')} className="flex items-center w-[100%] gap-2 px-4 py-2 hover:bg-gray-100">
+                  <span className="fi fi-lv"></span> Latvian
+                </button> */}
+                <button onClick={() => handleLanguageChange('ru')} className="flex items-center w-[100%] gap-2 px-4 py-2 hover:bg-gray-100">
+                  <span className="fi fi-ru"></span> Russian
+                </button>
+                <button onClick={() => handleLanguageChange('uz')} className="flex items-center w-[100%] gap-2 px-4 py-2 hover:bg-gray-100">
+                  <span className="fi fi-uz"></span> Uzbek
+                </button>
               </div>
             )}
             {/* Tooltip for compare link */}
@@ -243,7 +252,7 @@ const CategoryBar = () => {
             </Link>
             {/* Tooltip for compare link */}
             <div className="absolute top-full bg-white left-1/2 -translate-x-1/2 mt-2 px-3 py-1 text-red-500 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
-              Compare Products
+              {t('Compare Products')}
             </div>
           </div>
           <div className="relative group">
@@ -252,7 +261,7 @@ const CategoryBar = () => {
             </Link>
             {/* Tooltip for favorites link */}
             <div className="absolute top-full bg-white left-1/2 -translate-x-1/2 mt-2 px-3 py-1 text-red-500 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
-              My Favorites
+              {t('My Favorites')}
             </div>
           </div>
           <div className="relative group">
@@ -267,7 +276,7 @@ const CategoryBar = () => {
             </Link>
             {/* Tooltip for cart link */}
             <div className="absolute top-full bg-white left-1/2 -translate-x-1/2 mt-2 px-3 py-1  text-red-500 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
-              My Shopping Cart
+              {t('My Shopping Cart')}
             </div>
           </div>
         </div>
@@ -283,7 +292,7 @@ const CategoryBar = () => {
         <div className="flex-1 mx-4 flex">
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("Search for Products")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -319,7 +328,7 @@ const CategoryBar = () => {
           <div className="flex-1 mb-4 flex">
             <input
               type="text"
-              placeholder="Search for Products"
+              placeholder={t("Search for Products")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -353,7 +362,7 @@ const CategoryBar = () => {
                 </Link>
                 <Link to="/cart" onClick={toggleMobileMenu} className="text-gray-600 hover:text-red-500 flex items-center gap-2">
                   <FaShoppingBag />
-                  {t('My Cart')}
+                  {t('My Shopping Cart')}
                 </Link>
               </div>
             </div>

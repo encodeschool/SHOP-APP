@@ -237,7 +237,7 @@ const Home = () => {
             <FaStar className='mx-1' size={25} />
             <FaStar className='mx-1' size={25} />
           </div>
-          <h1 className="mb-4 text-center font-[100] text-3xl uppercase">Popular Meat Products</h1>
+          <h1 className="mb-4 text-center font-[100] text-3xl uppercase">{t('Popular Meat Products')}</h1>
           <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
             {products.slice(0, productsToShow).map((product, index) => (
               <Link
@@ -310,7 +310,7 @@ const Home = () => {
                 onClick={handleExpand}
                 className="text-white bg-red-600 py-2 px-6 rounded-full hover:bg-red-800 transition delay-150"
               >
-                Show More
+                {t('Show More')}
               </button>
             </div>
           )}
@@ -323,27 +323,27 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 py-10">
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/100/rkcgt2qjs04d6hft2ryxqaw4tvfenzmf/midi_uzhin.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              For Home Supper
+              {t('For Home Supper')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/3ca/fs4l14f2mwzdiy0datcbsr3bcy5kwoij/banner_360kh360_shashlyk_new.webp)"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              For Shashlik
+              {t('For Shashlik')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/f71/42ili6yme5omfvd7xagaei11c46rk3ph/banner_360kh360_kotlety_new.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              For Burgers
+              {t('For Burgers')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ed7/l9p288v02doy0y7nppl6zhjndil3tn0o/kolbaski.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Sausages
+              {t('Sausages')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/560/ijvhpcbgsk23pabzooybqgyd2h2g5lr6/banner_360kh360_kulinaria.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Cooking
+              {t('Cooking')}
             </p>
           </Link>
         </div>
@@ -361,7 +361,7 @@ const Home = () => {
               >
                 <FaLongArrowAltLeft />
               </button>
-              <h1 className="text-center font-[100] text-3xl uppercase flex justify-center items-center"><FaCalendarAlt className='mr-3' />Ideas for a week</h1>
+              <h1 className="text-center font-[100] text-3xl uppercase flex justify-center items-center"><FaCalendarAlt className='mr-3' />{t('Ideas for a week')}</h1>
               <button
                 ref={featuredNextRef}
                 className="swiper-button-next-custom text-red-500 p-2 px-4 rounded-full hover:text-red-500 hover:cursor-pointer"
@@ -371,7 +371,7 @@ const Home = () => {
             </div>
           </div>
           <div className="mb-14 flex justify-center items-center">
-            <Link to='/filtered' className='text-sm text-red-600 underline hover:text-red-800 transition delay-150'>See all</Link>
+            <Link to='/filtered' className='text-sm text-red-600 underline hover:text-red-800 transition delay-150'>{t('See all')}</Link>
           </div>
           <Swiper
             modules={[Navigation, Pagination]}
@@ -476,7 +476,7 @@ const Home = () => {
       {/* Beef for a week Section Ends Here */}
 
       {widgets.length === 0 && (
-        <div className="text-center p-10 text-gray-500">Loading widgets...</div>
+        <div className="text-center p-10 text-gray-500">{t('Loading widgets...')}</div>
       )}
 
       {widgets.map((widget) => {
@@ -666,28 +666,28 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 py-10">
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/6b6/tp1awwjksxtpr9oogj8f5jgw90ovfvhj/banner_360kh360_2023_kolbasa.webp)"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Gostronom of Meats
+              {t('Gostronom of Meats')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/d28/lbc4wal6ijqvj2p7wpwje006khaalrlp/mini_pelmeni_hinkali.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Pelmen & Hinkali
+              {t('Pelmen & Hinkali')}
             </p>
           </Link>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10'>
             <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ccf/category_img_8_1.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-                Oil & Marinads
+                {t('Oil & Marinads')}
               </p>
             </Link>
             <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/6fd/category_img_8_2.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-                Spicies
+                {t('Spicies')}
               </p>
             </Link>
             <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/997/category_img_8_3.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-                Souces
+                {t('Souces')}
               </p>
             </Link>
           </div>
@@ -695,22 +695,22 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-10">
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/b80/3hbrzlcvwrzup0z36gribden4pge1btw/banner_263kh263_2023_kids.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Child menu
+              {t('Child menu')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/a10/k6q33pr90byyp6nj42h2o28bkuu136uo/banner_263kh263_2023_promo.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Promocodes
+              {t('Promocodes')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/c34/wssp1kposjps0t4tpchae3utrimbtn95/novinki25.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              New
+              {t('New')}
             </p>
           </Link>
           <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/e5a/prz8jvpamc3jzc6rsf6pnjdehrv63jfn/banner_263kh263_2023_spice.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
-              Seasoning of primemeat
+              {t('Seasoning of primemeat')}
             </p>
           </Link>
         </div>
@@ -764,28 +764,28 @@ const Home = () => {
 
       {/* Ddelivery Section Goes Here */}
       <div className="container mx-auto px-4 md:px-10 py-10 relative">
-        <h1 className="mb-14 text-center font-[100] text-3xl uppercase">Delivery to Home</h1>
+        <h1 className="mb-14 text-center font-[100] text-3xl uppercase">{t('Delivery to Home')}</h1>
         <div className="grid md:grid-cols-9 grid-cols-1 gap-4">
           <div className='flex md:justify-end justify-center md:mr-6'>
             <MdOutlineMenuBook size={75} />
           </div>
           <div className='col-span-2'>
-            <h1 className='mb-3 text-red-600 text-lg'>Уникальный ассортимент</h1>
-            <p className='text-sm text-gray-400'>Уже более 12 лет мы ответственно работаем вместе с несколькими тщательно отобранными фермерскими хозяйствами центральной части России и вместе производим по-настоящему лучшую мясную продукцию для наших покупателей по доступной цене.</p>
+            <h1 className='mb-3 text-red-600 text-lg'>{t('Unique assortment')}</h1>
+            <p className='text-sm text-gray-400'>{t('For over 12 years, we have been responsibly working with several carefully selected farms in central Russia, producing truly superior meat products for our customers at an affordable price.')}</p>
           </div>
           <div className='flex md:justify-end justify-center md:mr-6'>
             <GrValidate size={75} />
           </div>
           <div className='col-span-2'>
-            <h1 className='mb-3 text-red-600 text-lg'>Гарантия качества</h1>
-            <p className='text-sm text-gray-400'>Мы хотим быть уверены, в том, что вы остались довольны каждой покупкой. Если вдруг вы остались неудовлетворены товаром, просто верните его в течение 14 дней в любом виде. Мы гарантируем немедленную 100% компенсацию.</p>
+            <h1 className='mb-3 text-red-600 text-lg'>{t('Quality assurance')}</h1>
+            <p className='text-sm text-gray-400'>{t("We want to ensure you're satisfied with every purchase. If you're dissatisfied with an item, simply return it within 14 days in any condition. We guarantee an immediate 100% refund.")}</p>
           </div>
           <div className='flex md:justify-end justify-center md:mr-6'>
             <TbTruckDelivery size={75} />
           </div>
           <div className='col-span-2'>
-            <h1 className='mb-3 text-red-600 text-lg'>Первоклассный сервис</h1>
-            <p className='text-sm text-gray-400'>Мы доставляем свежее охлаждённое мясо по Москве, Московской области, Санкт-Петербургу и Ленинградской области ежедневно c 9.30 до 21.00 (кроме 1, 2 и 3 января). Так же Вы можете воспользоваться услугой "Экспресс-доставка в день заказа".</p>
+            <h1 className='mb-3 text-red-600 text-lg'>{t('First-class service')}</h1>
+            <p className='text-sm text-gray-400'>{t('We deliver fresh chilled meat throughout Moscow, the Moscow region, St. Petersburg, and the Leningrad region daily from 9:30 AM to 9:00 PM (except January 1st, 2nd, and 3rd). You can also use our same-day express delivery service.')}</p>
           </div>
         </div>
       </div>      

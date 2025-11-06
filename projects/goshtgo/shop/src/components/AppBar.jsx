@@ -69,13 +69,13 @@ export default function AppBar() {
                     <div className='hidden md:flex gap-4 items-center'>
                         <Link to='tel:+123456789' className='font-medium text-[24px]'>+123 4567 89</Link>
                         <p className='text-gray-500'>9:00-19:30</p>
-                        <button className='hover:bg-red-600 transition delay-50 duration-100 hover:text-white text-red-600 border border-red-600 rounded-full color-red px-4 py-1'>Order a call</button>
+                        <button className='hover:bg-red-600 transition delay-50 duration-100 hover:text-white text-red-600 border border-red-600 rounded-full color-red px-4 py-1'>{t("Order a call")}</button>
                     </div>
                     <div className='hidden md:flex gap-4 items-center mt-5'>
-                        <Link to='/delivery' className='flex uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px] items-center'><TbTruckDelivery className='mr-2 text-gray-500' />Delivery</Link>
-                        <Link to='/quality' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>Quality</Link>
-                        <Link to='/contact' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>Contacts</Link>
-                        <Link to='/about' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>About</Link>
+                        <Link to='/delivery' className='flex uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px] items-center'><TbTruckDelivery className='mr-2 text-gray-500' />{t('deliveryheading')}</Link>
+                        <Link to='/quality' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>{t('qualityheading')}</Link>
+                        <Link to='/contact' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>{t('Contacts')}</Link>
+                        <Link to='/about' className='uppercase transition delay-50 duration-100 hover:text-red-500 text-[14px]'>{t('About Us')}</Link>
                     </div>
                 </div>
                 <div>
@@ -92,8 +92,8 @@ export default function AppBar() {
                     </div>
                     <div className=' mt-5'>
                         <Link className='text-right hover:underline text-red-600 hover:bold'> 
-                            <p>Ближайшая доставка: завтра</p>
-                            <p>Экспресс-доставка: сегодня, после 13:39</p>
+                            <p>{t('deliverytommorow')}</p>
+                            <p>{t('earlyDelivery')}</p>
                         </Link>
                     </div>
                 </div>

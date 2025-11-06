@@ -57,7 +57,7 @@ const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, fa
             to={`/filtered?category=${categoryId}`}
             className="text-sm text-red-600 underline hover:text-red-800 transition delay-150"
           >
-            See all
+            {t('See all')}
           </Link>
         </div>
 

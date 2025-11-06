@@ -62,7 +62,7 @@ export default function NewsletterFooter() {
                 loading ? "opacity-60 cursor-not-allowed" : ""
               }`}
             >
-              {loading ? "Signing up..." : "Sign up"}
+              {loading ? t("signingUp") : t("signUp")}
             </button>
           </div>
           {message && (
