@@ -6,6 +6,7 @@ import '../widgets/product_card.dart';
 class CategorySection extends StatelessWidget {
   final String title;
   final IconData? icon;
+  final String? image;
   final List<Product> products;
   final String categoryId;
   final VoidCallback? onSeeAll;
@@ -17,6 +18,7 @@ class CategorySection extends StatelessWidget {
   required this.categoryId,
   this.icon,
   this.onSeeAll,
+  this.image,
   });
 
   @override
@@ -37,12 +39,16 @@ class CategorySection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
-                if (icon != null)
-                  Icon(
-                    icon,
-                    size: 24,
-                    color: Colors.red[900],
+                if (image != null)
+                  Image.asset(
+                      image!,
+                      width: 25
                   ),
+                  // Icon(
+                  //   icon,
+                  //   size: 24,
+                  //   color: Colors.red[900],
+                  // ),
                 const SizedBox(width: 8),
                 Text(
                   title,

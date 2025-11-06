@@ -7,10 +7,12 @@ class User {
   final String email;
   final String username;
   final String name;
+  final String phone;
   final List<String> roles;
   final String? profilePicture; // <-- new field
 
   User({
+    required this.phone,
     required this.id,
     required this.email,
     required this.username,

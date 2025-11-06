@@ -1,6 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
+import 'package:shop/widgets/carousel_section.dart';
+import 'package:shop/widgets/category_section.dart';
+import 'package:shop/widgets/category_tile.dart';
+import 'package:shop/widgets/product_card.dart';
+import 'package:shop/widgets/product_tile.dart';
 import '../../core/cart_provider.dart';
 import '../../models/category_model.dart';
 import '../../models/product_model.dart';
@@ -8,11 +16,6 @@ import '../../models/user_model.dart';
 import '../../services/category_service.dart';
 import '../../services/product_service.dart';
 import '../../services/user_service.dart';
-import '../../widgets/category_section.dart';
-import '../../widgets/category_tile.dart';
-import '../../widgets/product_card.dart';
-import '../../widgets/product_tile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,15 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final productService = ProductService();
   final userService = UserService();
 
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
   List<Category> _categories = [];
   List<Product> _products = [];
-  List<Product> _all_products = [];
-  Product? searchedProduct;
+  List<Product> _allProducts = [];
+  List<Product> _searchResults = [];
+
   User? _user;
   bool _loading = true;
+  bool _searching = false;
 
-  int _visibleTopCount = 4; // initial visible "Топ мясо"
-  int _visibleAllCount = 6; // initial visible "Все продукции"
+  int _visibleTopCount = 4;
+  int _visibleAllCount = 6;
+
   Map<String, List<Product>> _productsByCategory = {};
 
   @override
@@ -48,28 +57,48 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       _categories = await categoryService.fetchRootCategories();
       _products = await productService.fetchFeaturedProducts();
-      _all_products = await productService.fetchAllProducts();
+      _allProducts = await productService.fetchAllProducts();
       _user = await userService.getUserDetails();
 
-      // Group products by category
-      _productsByCategory = {};
-      for (var product in _all_products) {
-        if (!_productsByCategory.containsKey(product.categoryId)) {
-          _productsByCategory[product.categoryId] = [];
-        }
-        _productsByCategory[product.categoryId]!.add(product);
+      _productsByCategory.clear();
+      for (var product in _allProducts) {
+        _productsByCategory.putIfAbsent(product.categoryId, () => []).add(product);
       }
-
-      if (!mounted) return;
     } catch (e) {
-      print('Error loading data: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to load data: $e')));
       }
     }
     setState(() => _loading = false);
+  }
+
+  // 🔍 Debounced search
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (query.isEmpty) {
+        setState(() => _searchResults.clear());
+        return;
+      }
+
+      setState(() => _searching = true);
+      try {
+        final results = await productService.searchProducts(query);
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _searching = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Search failed: $e')));
+          setState(() => _searching = false);
+        }
+      }
+    });
   }
 
   Category? findSubcategoryByCode(String code) {
@@ -78,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Category? searchNode(Category? node) {
       if (node == null) return null;
-      if (node.categoryCode != null && node.categoryCode!.toLowerCase().contains(lower)) {
+      if (node.categoryCode != null &&
+          node.categoryCode!.toLowerCase().contains(lower)) {
         return node;
       }
       if (node.subcategories != null && node.subcategories!.isNotEmpty) {
@@ -97,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return null;
   }
 
-
   void _loadMoreTop() {
     setState(() {
       _visibleTopCount = (_visibleTopCount + 4).clamp(0, _products.length);
@@ -106,74 +135,94 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadMoreAll() {
     setState(() {
-      _visibleAllCount = (_visibleAllCount + 6).clamp(0, _all_products.length);
+      _visibleAllCount = (_visibleAllCount + 6).clamp(0, _allProducts.length);
     });
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final primaryColor = Colors.red[900];
     final beefCategory = findSubcategoryByCode('beef');
     final chickenCategory = findSubcategoryByCode('chicken');
     final marbledBeef = findSubcategoryByCode('marbled');
-    final rabbitCategory = findSubcategoryByCode('rabbit');
 
     return Scaffold(
-      // appBar: AppBar(
-      //   // title: const Text("E-Commerce"),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.shopping_cart),
-      //       onPressed: () => context.push('/cart'),
-      //     ),
-      //   ],
-      // ),
       drawer: Drawer(
+        backgroundColor: Colors.white,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            SizedBox(height: 25),
-            // DrawerHeader(
-            //   decoration: BoxDecoration(
-            //     color: primaryColor,
-            //   ),
-            //   child: Text(
-            //     'Menu',
-            //     style: TextStyle(color: Colors.white, fontSize: 24),
-            //   ),
-            // ),
-            SizedBox(height: 25),
+            DrawerHeader(
+              padding: EdgeInsets.zero,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network('https://picsum.photos/800/400?img=1',
+                      fit: BoxFit.cover),
+                  Container(color: Colors.red[900]!.withOpacity(0.7)),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(loc.appTitle,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 6),
+                          Text(loc.appSlogan,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('О нас'),
+              leading: const Icon(Icons.home),
+              title: Text(loc.about),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/about');
-              }
+              },
             ),
             ListTile(
-              leading: Icon(Icons.delivery_dining),
-              title: Text('Доставка'),
+              leading: const Icon(Icons.delivery_dining),
+              title: Text(loc.delivery),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/delivery');
-              }
+              },
             ),
             ListTile(
-              leading: Icon(Icons.high_quality),
-              title: Text('Качество'),
+              leading: const Icon(Icons.high_quality),
+              title: Text(loc.quality),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/quality');
-              }
+              },
             ),
             ListTile(
-              leading: Icon(Icons.support),
-              title: Text('Контакты'),
+              leading: const Icon(Icons.support),
+              title: Text(loc.contact),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/contact');
-              }
+              },
             ),
           ],
         ),
@@ -185,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: primaryColor,
         child: CustomScrollView(
           slivers: [
+            // 🔝 Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -195,48 +245,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SvgPicture.asset(
-                          'assets/logo/logo.svg',
-                          width: 50,
-                          height: 50,
-                          // placeholderBuilder: (context) => const CircularProgressIndicator(),
-                        ),
+                        SvgPicture.asset('assets/logo/logo.svg',
+                            width: 50, height: 50),
                         Builder(
                           builder: (context) => IconButton(
                             icon: const Icon(Icons.menu, size: 32),
-                            onPressed: () {
-                              Scaffold.of(context).openDrawer();
-                            },
+                            onPressed: () =>
+                                Scaffold.of(context).openDrawer(),
                           ),
                         ),
-                      ]
+                      ],
                     ),
                     const SizedBox(height: 15),
-                    Text(
-                      'Мясо нового поколения',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                    Text(
-                      'Для нас мясо — это чистота, уважение и доверие.',
-                      style: TextStyle(
-                        color: primaryColor?.withOpacity(0.6),
-                      ),
-                    ),
+                    Text(loc.appSlogan,
+                        style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor)),
+                    Text(loc.appSubtitle,
+                        style: TextStyle(
+                            color: primaryColor?.withOpacity(0.6))),
                   ],
                 ),
               ),
             ),
+
+            // 🔍 Search Bar
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: primaryColor!, width: 2),
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border:
+                    Border.all(color: primaryColor!, width: 2),
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
                   ),
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -245,49 +288,60 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          decoration: const InputDecoration(
-                            hintText: 'Поиск продукции...',
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: loc.searchHint,
                             border: InputBorder.none,
                             isDense: true,
                           ),
-                          onChanged: (value) {},
+                          onChanged: _onSearchChanged,
                         ),
                       ),
-                      if (_loading)
-                        CircularProgressIndicator(color: primaryColor),
+                      if (_searching)
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: primaryColor),
+                        ),
+                      if (_searchController.text.isNotEmpty &&
+                          !_searching)
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          color: primaryColor,
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchResults.clear());
+                          },
+                        ),
                     ],
                   ),
                 ),
               ),
             ),
-            if (searchedProduct != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Найденные продукты: ${searchedProduct!.title}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                    Text(searchedProduct!.description),
-                  ],
+
+            // 🔎 Search Results
+            if (_searchResults.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.all(8),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                        ProductCard(product: _searchResults[index]),
+                    childCount: _searchResults.length,
+                  ),
                 ),
               ),
+
+            // 🏷 Categories
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(
-                  "Категории",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
+                child: Text(loc.categoryLabel,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor)),
               ),
             ),
             SliverToBoxAdapter(
@@ -296,119 +350,93 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    return CategoryTile(category: category);
-                  },
+                  itemBuilder: (context, index) =>
+                      CategoryTile(category: _categories[index]),
                 ),
               ),
             ),
-            // Products by category
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  if (beefCategory != null)
-                    CategorySection(
-                      title: "Beef Meats",
-                      icon: Icons.set_meal, // use any suitable icon
-                      products: _all_products,
-                      categoryId: beefCategory.id,
-                      onSeeAll: () => context.push('/filtered?category=${beefCategory.id}'),
-                    ),
-                ],
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  "Топ мясо",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
+
+            SliverToBoxAdapter(child: CarouselSection()),
+
+            if (beefCategory != null)
+              SliverToBoxAdapter(
+                child: CategorySection(
+                  title: loc.beefSection,
+                  // icon: Icons.no_meals,
+                  image: 'assets/icons/beef.png',
+                  products: _allProducts,
+                  categoryId: beefCategory.id,
+                  onSeeAll: () => context.push(
+                      '/filtered?category=${beefCategory.id}'),
                 ),
               ),
-            ),
+
+            // 🔥 Featured products
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final product = _products[index];
-                  return ProductCard(product: product);
-                },
-                childCount:
-                _visibleTopCount.clamp(0, _products.length),
+                    (context, index) =>
+                    ProductCard(product: _products[index]),
+                childCount: _visibleTopCount.clamp(0, _products.length),
               ),
             ),
-            // "Load more" button for Top
             if (_visibleTopCount < _products.length)
               SliverToBoxAdapter(
                 child: Center(
                   child: TextButton(
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            primaryColor
-                        )
-                    ),
+                        backgroundColor:
+                        MaterialStateProperty.all(primaryColor)),
                     onPressed: _loadMoreTop,
-                    child: Text(
-                      "Показать больше",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: Text(loc.showMore,
+                        style:
+                        const TextStyle(color: Colors.white)),
                   ),
                 ),
               ),
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  if (chickenCategory != null)
-                    CategorySection(
-                      title: "Chicken Meats",
-                      icon: Icons.egg,
-                      products: _all_products,
-                      categoryId: chickenCategory.id,
-                      onSeeAll: () => context.push('/filtered?category=${chickenCategory.id}'),
-                    ),
-                  if (marbledBeef != null)
-                    CategorySection(
-                      title: "Marbled Beef",
-                      icon: Icons.restaurant,
-                      products: _all_products,
-                      categoryId: marbledBeef.id,
-                      onSeeAll: () => context.push('/filtered?category=${marbledBeef.id}'),
-                    ),
-                ],
-              ),
-            ),
 
-            // --- Все продукции section ---
+            // if (chickenCategory != null)
+            //   SliverToBoxAdapter(
+            //     child: CategorySection(
+            //       title: loc.chickenSection,
+            //       icon: Icons.egg,
+            //       products: _allProducts,
+            //       categoryId: chickenCategory.id,
+            //       onSeeAll: () => context.push(
+            //           '/filtered?category=${chickenCategory.id}'),
+            //     ),
+            //   ),
+            // if (marbledBeef != null)
+            //   SliverToBoxAdapter(
+            //     child: CategorySection(
+            //       title: loc.marbledSection,
+            //       icon: Icons.restaurant,
+            //       products: _allProducts,
+            //       categoryId: marbledBeef.id,
+            //       onSeeAll: () => context.push(
+            //           '/filtered?category=${marbledBeef.id}'),
+            //     ),
+            //   ),
+
+            // 🛒 All products grid
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 16,
-                  bottom: 0,
-                  left: 16,
-                ),
-                child: Text(
-                  'Все продукции',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
+                padding:
+                const EdgeInsets.only(top: 16, left: 16, bottom: 8),
+                child: Text(loc.allProductsSection,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor)),
               ),
             ),
             SliverPadding(
               padding: const EdgeInsets.all(8),
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    return ProductTile(product: _all_products[index]);
-                  },
-                  childCount: _visibleAllCount.clamp(
-                      0, _all_products.length),
+                      (context, index) =>
+                      ProductTile(product: _allProducts[index]),
+                  childCount:
+                  _visibleAllCount.clamp(0, _allProducts.length),
                 ),
                 gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -419,20 +447,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            if (_visibleAllCount < _all_products.length)
+            if (_visibleAllCount < _allProducts.length)
               SliverToBoxAdapter(
                 child: Center(
                   child: TextButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        primaryColor
-                      )
-                    ),
+                        backgroundColor:
+                        MaterialStateProperty.all(primaryColor)),
                     onPressed: _loadMoreAll,
-                    child: Text(
-                      "Показать больше",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: Text(loc.showMore,
+                        style:
+                        const TextStyle(color: Colors.white)),
                   ),
                 ),
               ),
@@ -440,51 +465,40 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: Consumer<CartProvider>(
-        builder: (context, cart, child) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              FloatingActionButton(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                onPressed: () => context.push('/cart'),
-                backgroundColor: Colors.red[900],
-                child: const Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              if (cart.totalItems > 0)
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 20,
-                      minHeight: 20,
-                    ),
-                    child: Text(
-                      '${cart.totalItems}',
-                      style: TextStyle(
+        builder: (context, cart, child) => Stack(
+          clipBehavior: Clip.none,
+          children: [
+            FloatingActionButton(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              onPressed: () => context.push('/cart'),
+              backgroundColor: Colors.red[900],
+              child:
+              const Icon(Icons.shopping_cart, color: Colors.white, size: 24),
+            ),
+            if (cart.totalItems > 0)
+              Positioned(
+                right: -4,
+                top: -4,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  constraints:
+                  const BoxConstraints(minWidth: 20, minHeight: 20),
+                  child: Text(
+                    '${cart.totalItems}',
+                    style: TextStyle(
                         color: primaryColor,
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-            ],
-          );
-        },
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -38,6 +38,7 @@ class Product {
       id: json['user']?['id'] ?? '',
       name: json['user']?['name'] ?? 'Unknown',
       email: json['user']?['email'] ?? '',
+      phone: json['phone']?['phone']?? '',
       username: json['user']?['username'] ?? '',
       roles: List<String>.from(json['user']?['roles'] ?? []),
     );

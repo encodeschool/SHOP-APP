@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shop/services/category_service.dart';
+import '../core/api_client.dart';
 import '../models/user_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UserService {
-  final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
 
-  late final dio = Dio(BaseOptions(baseUrl: '$apiUrl/api'));
+  final Dio dio = ApiClient().dio;
   final storage = const FlutterSecureStorage();
 
   // Get User Object

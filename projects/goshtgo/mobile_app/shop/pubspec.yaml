@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+6
 
 environment:
   sdk: ^3.9.2
@@ -42,7 +42,6 @@ dependencies:
   go_router:                        # For navigation
   cached_network_image:
   #  stripe_payment:                   # For Stripe integration (or latest plugin)
-  intl:                             # Date formatting
   file_picker:                      # Image upload
   provider:
   flutter_stripe:
@@ -51,9 +50,18 @@ dependencies:
   flutter_launcher_icons:
   flutter_dotenv:
   flutter_svg: ^2.2.1
+  carousel_slider: ^5.0.0
   url_launcher:
   flutter_map:
   latlong2:
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  package_info_plus:
+  country_picker:
+  connectivity_plus:
+  flutter_native_splash: ^2.4.7
+
 
 dev_dependencies:
   flutter_test:
@@ -65,9 +73,18 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  build_runner:
+  json_serializable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_native_splash:
+  color: "#000"        # Цвет фона
+  image: assets/logo/logo.png  # Логотип
+  android: true
+  ios: true
+  web: true
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -75,6 +92,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -84,7 +102,9 @@ flutter:
   assets:
     - assets/images/
     - assets/icon/
+    - assets/icons/
     - assets/logo/
+    - assets/onboarding/
     - .env.development
     - .env.production
     - .env

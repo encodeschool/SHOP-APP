@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import '../../services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -58,13 +58,16 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         _loading = false;
       });
     } catch (e) {
+      final loc = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load profile: $e")),
+        SnackBar(content: Text("${loc.failedToLoadProfile}: $e")),
       );
     }
   }
 
   Future<void> _save() async {
+    final loc = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     try {
@@ -78,11 +81,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       }, _image);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile updated")),
+        SnackBar(content: Text(loc.profileUpdated)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to update: $e")),
+        SnackBar(content: Text("${loc.failedToUpdateProfile}: $e")),
       );
     }
   }
@@ -108,8 +111,10 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile")),
+      appBar: AppBar(title: Text(loc.editProfile)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -142,36 +147,35 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               TextFormField(
                 initialValue: _name,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: loc.name),
                 onSaved: (value) => _name = value ?? '',
               ),
               TextFormField(
                 initialValue: _username,
-                decoration: const InputDecoration(labelText: 'Username'),
+                decoration: InputDecoration(labelText: loc.username),
                 onSaved: (value) => _username = value ?? '',
               ),
               TextFormField(
                 initialValue: _email,
                 keyboardType: TextInputType.emailAddress,
                 enabled: false,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: loc.email),
               ),
               TextFormField(
                 initialValue: _phone,
-                decoration: const InputDecoration(labelText: 'Phone'),
+                decoration: InputDecoration(labelText: loc.phone),
                 keyboardType: TextInputType.phone,
                 onSaved: (value) => _phone = value ?? '',
               ),
               TextFormField(
-                // Remove this line: initialValue: _password,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(labelText: loc.password),
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
                 onSaved: (value) => _password = value ?? '',
               ),
               DropdownButtonFormField<String>(
                 value: _selectedRoles.isNotEmpty ? _selectedRoles.first : null,
-                decoration: const InputDecoration(labelText: 'Role'),
+                decoration: InputDecoration(labelText: loc.role),
                 items: _availableRoles.map((role) {
                   return DropdownMenuItem<String>(
                     value: role,
@@ -183,21 +187,19 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     _selectedRoles = value != null ? [value] : [];
                   });
                 },
-                validator: (value) => value == null ? 'Please select a role' : null,
+                validator: (value) => value == null ? loc.pleaseSelectRole : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _save,
-                child: const Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      color: Colors.white
-                    )
-                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black
-                )
-              )
+                  backgroundColor: Colors.black,
+                ),
+                child: Text(
+                  loc.saveChanges,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
             ],
           ),
         ),

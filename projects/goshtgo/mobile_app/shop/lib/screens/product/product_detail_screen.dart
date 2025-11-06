@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import 'package:shop/services/auth_service.dart';
 import 'package:shop/services/favorite_service.dart';
 import '../../core/cart_provider.dart';
@@ -7,7 +8,6 @@ import '../../models/product_model.dart';
 import '../../services/product_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -27,7 +27,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool _isFavorite = false;
   String? _userId;
   final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
-
+  bool _favoriteLoading = true;
 
   @override
   void initState() {
@@ -37,7 +37,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _init() async {
     _userId = await authService.getUserId();
-    print("🪪 ID: $_userId");
     await _loadProduct();
 
     if (_userId != null) {
@@ -46,21 +45,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _checkIfFavorite() async {
-    final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
-    if (!mounted) return;
-    setState(() {
-      _isFavorite = favoriteIds.contains(widget.productId);
-    });
+    try {
+      final favoriteIds = await favoriteService.getFavoriteIds(_userId!);
+      if (!mounted) return;
+      setState(() {
+        _isFavorite = favoriteIds.contains(widget.productId.trim());
+        _favoriteLoading = false;
+      });
+    } catch (e) {
+      print("Error checking favorites: $e");
+    }
   }
 
   Future<void> _toggleFavorite() async {
+    final loc = AppLocalizations.of(context)!;
+
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please log in to use favorites.")),
+        SnackBar(content: Text(loc.pleaseLoginFavorite)),
       );
-      if (context.mounted) {
-        context.go('/login'); // Use GoRouter
-      }
+      if (context.mounted) context.go('/login');
       return;
     }
 
@@ -72,8 +76,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
       if (!mounted) return;
       setState(() => _isFavorite = !_isFavorite);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_isFavorite ? "Added to favorites" : "Removed from favorites")),
+        SnackBar(
+          content: Text(_isFavorite ? loc.addedToFavorites : loc.removedFromFavorites),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,30 +93,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _product = await productService.fetchProductById(widget.productId);
     if (!mounted) return;
     setState(() => _loading = false);
-    print("ID after loading " + _userId.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     final cart = context.read<CartProvider>();
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Product Detail"),
+        title: Text(loc.productDetailTitle),
         actions: [
           IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.red,
-            ),
+            icon: _favoriteLoading
+                ? const CircularProgressIndicator(color: Colors.red)
+                : Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: Colors.red),
             onPressed: _toggleFavorite,
-          ),
+          )
         ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _product == null
-          ? const Center(child: Text("Product not found"))
+          ? Center(child: Text(loc.productNotFound))
           : SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,15 +130,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       style: const TextStyle(
                           fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text("\$${_product!.price}",
+                  Text("${_product!.price}",
                       style: const TextStyle(
                           fontSize: 20, color: Colors.green)),
                   const SizedBox(height: 8),
-                  Text("Condition: ${_product!.condition}"),
+                  Text("${loc.condition}: ${_product!.condition}"),
                   const SizedBox(height: 8),
-                  Text("Stock: ${_product!.stock}"),
+                  Text("${loc.stock}: ${_product!.stock}"),
                   const SizedBox(height: 8),
-                  Text("Seller: ${_product!.user.name}"),
+                  Text("${loc.seller}: ${_product!.user.name}"),
                   const SizedBox(height: 16),
                   Text(_product!.description),
                 ],
@@ -146,24 +152,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           : Padding(
         padding: const EdgeInsets.all(12),
         child: ElevatedButton(
-          onPressed: _product!.available && _product!.stock > 0
-              ? () {
-            cart.addToCart(_product!);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Added to cart")),
-            );
-          }
-              : null,
-          child: const Text(
-              "Add to Cart",
-              style: TextStyle(
-                color: Colors.white
-              )
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black
-          )
-        ),
+            onPressed: _product!.available && _product!.stock > 0
+                ? () {
+              cart.addToCart(_product!);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(loc.addedToCart)),
+              );
+            }
+                : null,
+            child: Text(loc.addToCart,
+                style: const TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black)),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
 import '../../core/auth_provider.dart';
 import '../../core/cart_provider.dart';
 
@@ -43,6 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
     final primaryColor = Colors.red[900];
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: widget.child,
@@ -53,17 +55,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedItemColor: Colors.grey,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         items: [
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: loc.home,
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: 'Shop',
+            label: loc.shop,
           ),
           BottomNavigationBarItem(
             icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-            label: isLoggedIn ? 'Profile' : 'Login',
+            label: isLoggedIn ?  loc.profile : loc.login,
           ),
         ],
       ),

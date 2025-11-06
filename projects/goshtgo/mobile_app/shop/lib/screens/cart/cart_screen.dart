@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop/l10n/app_localizations.dart';
+
 import '../../core/cart_provider.dart';
 import '../checkout/checkout_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!; // localization
     final cart = context.watch<CartProvider>();
     final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Your Cart")),
+      appBar: AppBar(title: Text(loc.cartTitle)),
       body: cart.items.isEmpty
-          ? const Center(child: Text("Cart is empty"))
+          ? Center(child: Text(loc.cartEmpty))
           : Column(
         children: [
           Expanded(
@@ -30,18 +33,16 @@ class CartScreen extends StatelessWidget {
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image),
                   )
                       : const Icon(Icons.image, size: 50),
                   title: Text(item.product.title),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("Quantity: ${item.quantity}"),
+                      Text("${loc.quantity}: ${item.quantity}"),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.remove),
@@ -55,7 +56,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: Text("\$${item.totalPrice.toStringAsFixed(2)}"),
+                  trailing: Text("${item.totalPrice.toStringAsFixed(2)}"),
                 );
               },
             ),
@@ -68,29 +69,27 @@ class CartScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Total:", style: TextStyle(fontSize: 18)),
-                    Text("\$${cart.totalPrice.toStringAsFixed(2)}",
-                        style: const TextStyle(fontSize: 18)),
+                    Text(loc.total, style: const TextStyle(fontSize: 18)),
+                    Text(
+                      "${cart.totalPrice.toStringAsFixed(2)}",
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to Checkout Screen
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const CheckoutScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const CheckoutScreen()),
                     );
                   },
-                  child: const Text(
-                      "Proceed to Checkout",
-                      style: TextStyle(
-                        color: Colors.white
-                      )
+                  child: Text(
+                    loc.checkout,
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black
-                  )
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
                 ),
               ],
             ),

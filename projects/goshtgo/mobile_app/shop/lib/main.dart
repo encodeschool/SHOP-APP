@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/screens/about/about_screen.dart';
 import 'package:shop/screens/auth/login_screen.dart';
 import 'package:shop/screens/auth/register_screen.dart';
@@ -13,6 +14,8 @@ import 'package:shop/screens/contact/contact_screen.dart';
 import 'package:shop/screens/delivery/delivery_screen.dart';
 import 'package:shop/screens/home/home_screen.dart';
 import 'package:shop/screens/navigation/main_navigation_screen.dart';
+import 'package:shop/screens/noInternet/no_internet_screen.dart';
+import 'package:shop/screens/onboarding/onboarding_screen.dart';
 import 'package:shop/screens/orders/order_history_screen.dart';
 import 'package:shop/screens/product/product_add_screen.dart';
 import 'package:shop/screens/product/product_detail_screen.dart';
@@ -21,47 +24,69 @@ import 'package:shop/screens/profile/profile_edit_screen.dart';
 import 'package:shop/screens/profile/profile_screen.dart';
 import 'package:shop/screens/quality/quality_screen.dart';
 import 'package:shop/screens/settings/settings_screen.dart';
+import 'core/api_client.dart';
 import 'core/auth_provider.dart';
 import 'core/cart_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'core/locale_provider.dart';
+import 'core/network_manager.dart';
+import 'l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   const bool isProd = bool.fromEnvironment('dart.vm.product');
   final envFile = isProd ? ".env.production" : ".env.development";
+  await dotenv.load(fileName: envFile);
 
-  try {
-    await dotenv.load(fileName: envFile);
-    print("Loaded $envFile successfully");
-  } catch (e) {
-    print("Failed to load $envFile: $e");
-  }
+  ApiClient().initialize();
+  NetworkManager().initialize();
 
-  // Now safe to use env variables
   final stripeKey = dotenv.env['STRIPE_KEY'] ?? "pk_test_fallback";
   Stripe.publishableKey = stripeKey;
 
-  final storage = FlutterSecureStorage();
-  await storage.deleteAll(); // <-- resets everything
-  final token = await storage.read(key: 'token');
-  final isLoggedIn = token != null;
+  final authProvider = AuthProvider();
+  await authProvider.loadAuthData();
+
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingShown = prefs.getBool('onboarding_shown') ?? false;
+
+  // Determine the first screen
+  String initialRoute;
+  if (!onboardingShown) {
+    initialRoute = '/onboarding';
+  } else if (authProvider.isLoggedIn) {
+    initialRoute = '/home';
+  } else {
+    initialRoute = '/login';
+  }
 
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()..loadLocale()),
       ],
-      child: MyApp(initialRoute: isLoggedIn ? '/home' : '/login'),
+      child: MyApp(initialRoute: initialRoute),
     ),
   );
 }
 
 GoRouter createRouter(String initialRoute) => GoRouter(
-  initialLocation: '/home',
+  initialLocation: initialRoute,
+  navigatorKey: navigatorKey,
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -127,16 +152,44 @@ GoRouter createRouter(String initialRoute) => GoRouter(
 class MyApp extends StatelessWidget {
   final String initialRoute;
   const MyApp({super.key, required this.initialRoute});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Gosht Go',
-      theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF6F6F6), // light grey example
-      ),
-      routerConfig: createRouter(initialRoute),
-      debugShowCheckedModeBanner: false,
+    final localeProvider = context.watch<LocaleProvider>();
+
+    return StreamBuilder<bool>(
+      stream: NetworkManager().connectionStream,
+      initialData: true,
+      builder: (context, snapshot) {
+        final hasInternet = snapshot.data ?? true;
+
+        return MaterialApp.router(
+          title: 'Gosht Go',
+          theme: ThemeData(useMaterial3: true),
+          routerConfig: createRouter(initialRoute),
+          debugShowCheckedModeBanner: false,
+          locale: localeProvider.locale,
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ru'),
+            Locale('uz'),
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child ?? const SizedBox(),
+                if (!hasInternet) NoInternetOverlay(),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

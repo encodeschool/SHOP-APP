@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -21,81 +22,110 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     setState(() => _loading = true);
+
     final success = await _authService.login(
       _emailController.text,
       _passwordController.text,
     );
+
     setState(() => _loading = false);
 
     if (success) {
-      if (context.mounted) {
-        context.go('/home');
-        context.read<AuthProvider>().login();
-        context.go('/profile'); // or wherever you want to go after login
+      final token = await _authService.getToken();
+      final userId = await _authService.getUserId();
+
+      if (token != null && userId != null) {
+        await context.read<AuthProvider>().login(token, userId);
+        if (context.mounted) context.go('/home');
       }
     } else {
-      await _authService.logout(); // clear storage
+      await _authService.logout();
       setState(() => _error = 'Login failed. Check credentials.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     final primaryColor = Colors.red[900];
+
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Text("Login", style: Theme.of(context).textTheme.headlineMedium),
-            SvgPicture.asset(
-              'assets/logo/logo.svg',
-              width: 80,
-              height: 80,
-              // placeholderBuilder: (context) => const CircularProgressIndicator(),
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          // Makes it scroll when keyboard appears
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: size.height - MediaQuery.of(context).padding.vertical,
             ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Почта'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Пароль'),
-            ),
-            const SizedBox(height: 24),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _login,
-              child: _loading ? const CircularProgressIndicator() : const Text(
-                  "Войти",
-                  style: TextStyle(
-                    color: Colors.white
-                  )
-              ),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(size.width, 40),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // Rounded corners for aesthetics
+            child: IntrinsicHeight(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/logo/logo.svg',
+                        width: 80,
+                        height: 80,
+                      ),
+                      const SizedBox(height: 24),
+                      TextField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Почта'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(labelText: 'Пароль'),
+                      ),
+                      const SizedBox(height: 24),
+                      if (_error != null)
+                        Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _loading ? null : _login,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(size.width, 50),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: primaryColor,
+                        ),
+                        child: _loading
+                            ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                            : const Text(
+                          "Войти",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => context.go('/register'),
+                        child: const Text(
+                          "У вас нет аккаунта? Создайте новый",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                backgroundColor: primaryColor,
-              )
-            ),
-            TextButton(
-              onPressed: () => context.go('/register'),
-              child: Text(
-                  "У вас нет аккаунта? Создайте новый",
-                  style: TextStyle(
-                    color: Colors.grey
-                  )
               ),
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );

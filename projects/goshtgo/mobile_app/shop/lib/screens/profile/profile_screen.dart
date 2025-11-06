@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
+import '../../core/locale_provider.dart';
+import '../../core/auth_provider.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  Future<void> _logout(BuildContext context) async {
-    const storage = FlutterSecureStorage();
-    await storage.deleteAll(); // Clear token and userId
-    context.go('/home');
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _selectedLang = 'en';
+
+  @override
+  void initState() {
+    super.initState();
+    final localeProvider = context.read<LocaleProvider>();
+    _selectedLang = localeProvider.locale.languageCode;
+  }
+
+  Future<void> _changeLanguage(String lang) async {
+    final localeProvider = context.read<LocaleProvider>();
+    await localeProvider.setLocale(lang);
+
+    setState(() => _selectedLang = lang);
+
+    final loc = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(lang == 'uz'
+            ? loc.languageChanged
+            : lang == 'ru'
+            ? loc.languageChanged
+            : loc.languageChanged),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<User?> _loadUser() async {
@@ -20,15 +50,44 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar:  AppBar(
-        title: Text('Profile'),
+      appBar: AppBar(
+        title: Text(loc.profileTitle),
         actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Select language',
+            initialValue: _selectedLang,
+            onSelected: _changeLanguage,
+            icon: Text(
+              _selectedLang == 'uz'
+                  ? '🇺🇿'
+                  : _selectedLang == 'ru'
+                  ? '🇷🇺'
+                  : '🇬🇧',
+              style: const TextStyle(fontSize: 22),
+            ),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'en',
+                child: Row(children: [Text('🇬🇧 '), SizedBox(width: 8), Text('English')]),
+              ),
+              const PopupMenuItem(
+                value: 'ru',
+                child: Row(children: [Text('🇷🇺 '), SizedBox(width: 8), Text('Русский')]),
+              ),
+              const PopupMenuItem(
+                value: 'uz',
+                child: Row(children: [Text('🇺🇿 '), SizedBox(width: 8), Text("Oʻzbekcha")]),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.support_agent),
             tooltip: 'Support',
             onPressed: () {
-              // TODO: Navigate to support
+              context.go('/contact');
             },
           ),
           IconButton(
@@ -48,11 +107,12 @@ class ProfileScreen extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text("Failed to load user info"));
+            return Center(child: Text(loc.failedLoadUser));
           }
 
           final user = snapshot.data!;
-          final firstLetter = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+          final firstLetter =
+          user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
 
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -66,54 +126,34 @@ class ProfileScreen extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                     const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user.name, style: const TextStyle(fontSize: 18)),
-                        Text(user.email, style: const TextStyle(color: Colors.grey)),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18)),
+                          Text(user.email, style: const TextStyle(color: Colors.grey)),
+                        ],
+                      ),
                     )
                   ],
                 ),
                 const SizedBox(height: 24),
-                // ListTile(
-                //   leading: const Icon(Icons.add),
-                //   title: const Text("Add Product"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () => context.go('/add-product'),
-                // ),
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text("Order History"),
+                  title: Text(loc.orderHistory),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => context.go('/orders'),
                 ),
-                // ListTile(
-                //   leading: const Icon(Icons.message),
-                //   title: const Text("Messages"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () {
-                //     // TODO: Navigate to messages
-                //   },
-                // ),
-                // ListTile(
-                //   leading: const Icon(Icons.feedback),
-                //   title: const Text("Feedbacks"),
-                //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                //   onTap: () {
-                //     // TODO: Navigate to feedbacks
-                //   },
-                // ),
-                // const Spacer(),
-                // ElevatedButton.icon(
-                //   onPressed: () => _logout(context),
-                //   icon: const Icon(Icons.logout),
-                //   label: const Text("Logout"),
-                //   style: ElevatedButton.styleFrom(
-                //     foregroundColor: Colors.white,
-                //     backgroundColor: Colors.black,
-                //   ),
-                // ),
+                const Spacer(),
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(Colors.red[900])),
+                  onPressed: () async {
+                    await context.read<AuthProvider>().logout();
+                    context.go('/login');
+                  },
+                  child: Text(loc.logout, style: const TextStyle(color: Colors.white)),
+                ),
               ],
             ),
           );
