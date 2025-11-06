@@ -67,7 +67,7 @@ export default function AppBar() {
             <div className='container mx-auto md:px-10 md:py-5 flex justify-between items-center'>
                 <div className=''>
                     <div className='hidden md:flex gap-4 items-center'>
-                        <Link to='tel:+123456789' className='font-medium text-[24px]'>+123 4567 89</Link>
+                        <Link to='tel:+123456789' className='font-medium text-[24px]'>+998 95 777-11-55</Link>
                         <p className='text-gray-500'>9:00-19:30</p>
                         <button className='hover:bg-red-600 transition delay-50 duration-100 hover:text-white text-red-600 border border-red-600 rounded-full color-red px-4 py-1'>{t("Order a call")}</button>
                     </div>

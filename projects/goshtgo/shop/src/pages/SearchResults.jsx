@@ -78,7 +78,7 @@ export default function SearchResults() {
                   className="relative border p-4 rounded-xl hover:shadow group h-full block"
                 >
                   <p
-                    className={`absolute top-0 px-3 py-1 flex items-center justify-center left-0 z-10 bg-gray-100 text-indigo-400 rounded-tl-xl`}
+                    className={`absolute top-0 px-3 py-1 flex items-center justify-center left-0 z-10 bg-gray-100 text-red-600 rounded-tl-xl`}
                   >
                     {product.condition === 'NEW' ? (
                       <>
@@ -113,11 +113,11 @@ export default function SearchResults() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
-                      <p className="text-indigo-600 text-3xl font-bold mt-2">${product.price}</p>
+                      <p className="text-red-600 text-3xl font-bold mt-2">${product.price}</p>
                       <CompareButton product={product} />
                     </div>
                     <button
-                      className="bg-indigo-400 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-indigo-500"
+                      className="bg-red-600 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-red-600"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddToCart(product);
