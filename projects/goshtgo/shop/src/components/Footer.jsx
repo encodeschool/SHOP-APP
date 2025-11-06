@@ -15,12 +15,12 @@ export default function Footer() {
           <div className="flex items-center">
             <MdSupportAgent className='text-red-700' size={60} />
             <div className='ml-4'>
-              <p>bazaarly@gmail.com</p>
-              <h1 className='text-2xl'>+371 26648735</h1>
+              <p>goshtgo@gmail.com</p>
+              <h1 className='text-2xl'>+998 95 777-11-55</h1>
             </div>
           </div>
           <div className="info text-sm mt-5 mb-10">
-            <p className='mb-3 font-bold'>Raunas iela 44, Rīga, LV-1039</p>
+            <p className='mb-3 font-bold'>Tashkent city, Uzbekistan</p>
             <p>{t("Mon-Fri")}: 11:00 – 19:00</p>
             <p>{t("Sat")}: 11:00 – 15:00</p>
             <p>{t("Sun")}: {t("Holiday")}</p>
