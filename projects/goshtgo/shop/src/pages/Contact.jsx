@@ -48,15 +48,15 @@ export default function Contact() {
           </p>
           <div className="flex items-center gap-3">
             <FaMapMarkerAlt className="text-red-700 text-xl" />
-            <span>Raunas iela 44, Rīga, LV-1039</span>
+            <span>Tashkent city, Uzbekistan</span>
           </div>
           <div className="flex items-center gap-3">
             <FaPhoneAlt className="text-red-700 text-xl" />
-            <span>+371 26648735</span>
+            <span>+998 95 777-11-55</span>
           </div>
           <div className="flex items-center gap-3">
             <FaEnvelope className="text-red-700 text-xl" />
-            <span>bazaarly@gmail.com</span>
+            <span>goshtgo@gmail.com</span>
           </div>
         </div>
 
