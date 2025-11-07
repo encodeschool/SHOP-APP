@@ -188,7 +188,7 @@ const CategoryPage = () => {
     <div className='container mx-auto px-4 py-3 md:px-10'>
       <div className="flex flex-col md:flex-row my-5 gap-6">
         <aside className="hidden md:block w-64 md:w-[350px]">
-          <div className="sticky top-24 h-fit">
+          <div className="sticky top-32 h-fit">
             <FilterSidebar />
           </div>
         </aside>
@@ -222,9 +222,9 @@ const CategoryPage = () => {
                 </div>
                 <div className="content_wrapper p-2">
                   <h2 className="font-bold">{p.title}</h2>
-                  <p className='text-indigo-600 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
+                  <p className='text-red-600 text-3xl font-bold mt-2'>€{p.price.toFixed(2)}</p>
                   <button
-                    className="flex items-center absolute bottom-0 right-0 bg-indigo-400 p-5 rounded-br-xl rounded-2 text-white hover:bg-indigo-500"
+                    className="flex items-center absolute bottom-0 right-0 bg-red-600 p-5 rounded-br-xl rounded-2 text-white hover:bg-red-600"
                     onClick={(e) => {
                       e.preventDefault();
                       handleAddToCart(p);
@@ -256,7 +256,7 @@ const CategoryPage = () => {
               <button
                 key={index}
                 onClick={() => handlePageChange(index)}
-                className={`px-4 py-2 border rounded-lg ${currentPage === index ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'}`}
+                className={`px-4 py-2 border rounded-lg ${currentPage === index ? 'bg-red-600 text-white' : 'hover:bg-gray-100'}`}
               >
                 {index + 1}
               </button>
@@ -273,12 +273,12 @@ const CategoryPage = () => {
 
         </div>
       </div>
-      <div>
+      {/* <div>
         <h1 className="text-2xl font-bold mb-4">{t("Category")}: {categoryName}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {contentToDisplay}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

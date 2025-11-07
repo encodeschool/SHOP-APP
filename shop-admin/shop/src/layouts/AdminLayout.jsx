@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getUserById } from "../api/authService";
+import { TbRulerMeasure } from "react-icons/tb";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -87,6 +88,10 @@ export default function AdminLayout() {
             <NavLink to="/banner" className={linkClass}>
               <FaImages   />
               <span>Banner</span>
+            </NavLink>
+            <NavLink to="/units" className={linkClass}>
+              <TbRulerMeasure />
+              <span>Units</span>
             </NavLink>
           </nav>
         </div>

@@ -7,7 +7,9 @@ import { FaCartPlus } from 'react-icons/fa';
 import Breadcrumb from '../components/Breadcrumb';
 import CompareButton from '../components/CompareButton';
 import { LanguageContext } from '../contexts/LanguageContext';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
+import { useLoading } from '../contexts/LoadingContext';
+import FavoriteButton from '../components/FavoriteButton';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -18,8 +20,58 @@ const ProductDetail = () => {
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
   const [activeTab, setActiveTab] = useState('specification');
   const [brand, setBrand] = useState(null);
+  const [weight, setWeight] = useState(1);
+  const { setLoading } = useLoading();
+  const [favorites, setFavorites] = useState([]);
+  const [options, setOptions] = useState({
+    vacuum: false,
+    debone: false,
+    mince: false,
+  });
   const BASE_URL = process.env.REACT_APP_BASE_URL;
   const { t } = useTranslation();
+
+  const optionPrices = {
+    vacuum: 40,
+    debone: 55,
+    mince: 45,
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchFavorites = async () => {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      if (userId && token) {
+        try {
+          const res = await axios.get(`/favorites/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const productIds = res.data.map((fav) => fav.productId);
+          setFavorites(productIds);
+        } catch (error) {
+          console.error('Failed to fetch favorites:', error);
+          setFavorites([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchFavorites();
+  }, [setLoading]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const apiLang = language === 'lv' ? 'en' : language;
+        const res = await axios.get(`/products/lang/${id}?lang=${apiLang}`);
+        setProduct(res.data);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+      }
+    };
+    fetchProduct();
+  }, [id, language]);
 
   useEffect(() => {
     const fetchBrand = async (brandId) => {
@@ -34,20 +86,6 @@ const ProductDetail = () => {
       fetchBrand(product.brandId);
     }
   }, [product]);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        // Fallback to 'en' if language is 'lv' (not supported by backend)
-        const apiLang = language === 'lv' ? 'en' : language;
-        const res = await axios.get(`/products/lang/${id}?lang=${apiLang}`);
-        setProduct(res.data);
-      } catch (err) {
-        console.error('Error fetching product:', err);
-      }
-    };
-    fetchProduct();
-  }, [id, language]);
 
   useEffect(() => {
     const buildBreadcrumbPath = async (categoryId) => {
@@ -66,20 +104,36 @@ const ProductDetail = () => {
       }
       setBreadcrumbPath(path);
     };
-
     if (product?.categoryId) {
       buildBreadcrumbPath(product.categoryId);
     }
   }, [product]);
 
   const handleAddToCart = () => {
-    dispatch(addToCart(product));
+    const totalPrice = getTotalPrice();
+    dispatch(addToCart({ ...product, weight, options, totalPrice }));
   };
 
-  if (!product) return <div className="p-6">{t("Loading...")}</div>;
+  const increaseWeight = () => setWeight((w) => +(w + 0.1).toFixed(1));
+  const decreaseWeight = () => setWeight((w) => (w > 0.1 ? +(w - 0.1).toFixed(1) : w));
+
+  const handleOptionChange = (key) => {
+    setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const getTotalPrice = () => {
+    if (!product?.price) return 0;
+    const base = product.price * weight;
+    const extras = Object.entries(options)
+      .filter(([key, value]) => value)
+      .reduce((sum, [key]) => sum + optionPrices[key] * weight, 0);
+    return base + extras;
+  };
+
+  if (!product) return <div className="p-6">{t('Loading...')}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 md:px-10 py-6">
       <Breadcrumb pathArray={breadcrumbPath} productTitle={product.title} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -91,8 +145,8 @@ const ProductDetail = () => {
                 ? `${BASE_URL}${product.imageUrls[currentImageIndex]}`
                 : '/placeholder.jpg'
             }
-            alt={`${product.title} image`}
-            className="object-contain h-[400px] w-full"
+            alt={product.title}
+            className="object-contain h-[400px] w-full rounded-lg"
           />
           <div className="flex mt-4 justify-center gap-2">
             {product.imageUrls?.map((imgUrl, index) => (
@@ -100,8 +154,8 @@ const ProductDetail = () => {
                 key={index}
                 src={`${BASE_URL}${imgUrl}`}
                 alt={`Thumbnail ${index + 1}`}
-                className={`w-16 h-16 object-contain cursor-pointer border-2 ${
-                  index === currentImageIndex ? 'border-black' : 'border-transparent'
+                className={`w-16 h-16 object-contain cursor-pointer border-2 rounded ${
+                  index === currentImageIndex ? 'border-red-700' : 'border-gray-300'
                 }`}
                 onClick={() => setCurrentImageIndex(index)}
               />
@@ -111,44 +165,112 @@ const ProductDetail = () => {
 
         {/* Right - Product Info */}
         <div>
-          <div className="flex mb-3">
-            <div>
-              <img
-                src={
-                  brand?.icon
-                    ? `${BASE_URL}${brand.icon}`
-                    : '/placeholder.jpg'
-                }
-                alt={`${brand?.name} image`}
-                className="object-contain h-[25px]"
-              />
+          <div className="grid grid-cols-2">
+            <div className='bg-gray-50 p-6 pinkish'>
+              <p className='text-center'>Order by number</p>
+            </div>
+            <div className='bg-white p-6'>
+              
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
-          <p className="text-5xl font-bold text-red-800 mb-4">${product.price}</p>
-          <p className="mb-2">{product.description}</p>
-          <p className="mb-2">{t("Stock")}: {product.stock}</p>
+          <div className="bg-gray-50 p-6 pinkish relative">
+            <FavoriteButton
+                productId={product.id}
+                favorites={favorites}
+                setFavorites={setFavorites}
+            />
+            {brand && (
+              <div className="flex mb-3">
+                <img
+                  src={brand.icon ? `${BASE_URL}${brand.icon}` : '/placeholder.jpg'}
+                  alt={brand.name}
+                  className="object-contain h-[25px]"
+                />
+              </div>
+            )}
 
-          <button
-            className="bg-black text-white px-4 py-2 rounded flex items-center mb-3"
-            onClick={handleAddToCart}
-          >
-            <FaCartPlus className="mr-2" /> {t("Add to Cart")}
-          </button>
+            <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
 
-          <CompareButton product={product} />
+            {/* Weight selector */}
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-lg font-semibold">{t('Weight')}:</span>
+              <button
+                className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                onClick={decreaseWeight}
+              >
+                −
+              </button>
+              <span className="text-xl font-bold">{weight.toFixed(1)} kg</span>
+              <button
+                className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                onClick={increaseWeight}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Base price */}
+            <p className="text-2xl font-bold text-red-800 mb-3">
+              {getTotalPrice().toLocaleString()} ₽
+            </p>
+
+            {/* Options */}
+            <div className="space-y-2 mb-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.vacuum}
+                  onChange={() => handleOptionChange('vacuum')}
+                />
+                <span>Упаковать под вакуумом + {optionPrices.vacuum} ₽/кг</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.debone}
+                  onChange={() => handleOptionChange('debone')}
+                />
+                <span>Снять с кости + {optionPrices.debone} ₽/кг</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.mince}
+                  onChange={() => handleOptionChange('mince')}
+                />
+                <span>Фарш из этого куска + {optionPrices.mince} ₽/кг</span>
+              </label>
+            </div>
+
+            {/* Total */}
+            <div className="flex justify-between items-center mb-4 border-t pt-3">
+              <span className="text-lg font-semibold">Итого:</span>
+              <span className="text-2xl font-bold text-red-700">
+                {getTotalPrice().toLocaleString()} ₽
+              </span>
+            </div>
+
+            <button
+              className="bg-red-700 text-white px-6 py-3 rounded-full text-lg flex items-center justify-center w-full hover:bg-red-800 transition"
+              onClick={handleAddToCart}
+            >
+              <FaCartPlus className="mr-2" /> В корзину
+            </button>
+
+            <CompareButton product={product} />
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="mt-10">
-        <div className="flex space-x-4 pb-2 mb-6">
+        <div className="flex space-x-4 mb-6 border-b-[2px] border-red-800">
           {['specification', 'warehouse', 'together'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`capitalize py-4 ml-0 text-2xl rounded-t ${
-                activeTab === tab ? 'text-black font-bold border-b-[4px] border-red-800' : 'text-gray-800'
+              className={`capitalize py-4 ml-0 text-2xl border-red-800 px-[25px] py-[12px] rounded-t ${
+                activeTab === tab ? 'text-black font-bold border-[2px] border-b-[0]' : 'text-gray-800'
               }`}
             >
               {t(tab)}

@@ -118,7 +118,7 @@ export default function FilterPage() {
   return (
     <div className="flex flex-col md:flex-row  md:px-10 my-5 gap-6 container mx-auto px-4 py-3">
       <aside className="hidden md:block w-64 md:w-[350px]">
-        <div className="sticky top-24 h-fit">
+        <div className="sticky top-32 h-fit">
           <FilterSidebar />
         </div>
       </aside>
