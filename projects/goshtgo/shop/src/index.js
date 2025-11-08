@@ -7,21 +7,26 @@ import App from './App';
 import { store } from './redux/store';
 import { Provider } from 'react-redux';
 import { AuthProvider } from './contexts/AuthContext.js';
+import { LoadingProvider } from './contexts/LoadingContext';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n'; // ✅ make sure you have this file configured
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </AuthProvider>
-    </BrowserRouter>
+    <I18nextProvider i18n={i18n}> {/* ✅ Added */}
+      <BrowserRouter>
+        <AuthProvider>
+          <Provider store={store}>
+            <LoadingProvider>   {/* ✅ Added here, now has access to translations */}
+              <App />
+            </LoadingProvider>
+          </Provider>
+        </AuthProvider>
+      </BrowserRouter>
+    </I18nextProvider>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

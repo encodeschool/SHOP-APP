@@ -1,8 +1,11 @@
 import { createContext, useState, useContext } from "react";
+import { useTranslation } from 'react-i18next';
+
 
 const LoadingContext = createContext();
 
 export function LoadingProvider({ children }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   return (
     <LoadingContext.Provider value={{ loading, setLoading }}>
@@ -28,8 +31,8 @@ export function LoadingProvider({ children }) {
                 />
               </svg>
             </div>
-            <h5 className="mt-4 text-xl font-semibold text-gray-900">Loading...</h5>
-            <p className="mt-2 text-sm text-gray-600">Please wait while we process your request.</p>
+            <h5 className="mt-4 text-xl font-semibold text-gray-900">{t("Loading...")}</h5>
+            <p className="mt-2 text-sm text-gray-600">{t("Please wait while we process your request.")}</p>
           </div>
         </div>
       )}

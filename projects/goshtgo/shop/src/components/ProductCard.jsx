@@ -7,6 +7,7 @@ import axios from '../api/axios';
 const ProductCard = ({ product }) => {
   const [favorites, setFavorites] = useState([]);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+      
   useEffect(() => {
     const fetchFavorites = async () => {
       const userId = localStorage.getItem('userId');

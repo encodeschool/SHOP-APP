@@ -52,7 +52,7 @@ const FavoriteButton = ({ productId, favorites, setFavorites }) => {
     <>
       <button
         onClick={toggleFavorite}
-        className={`absolute top-2 right-2 z-10 bg-white rounded-full p-3 hover:text-red-500 ${
+        className={`absolute top-2 right-2 z-10  p-3 hover:text-red-500 ${
           isFavorite ? 'text-red-500' : 'text-gray-400'
         }`}
       >

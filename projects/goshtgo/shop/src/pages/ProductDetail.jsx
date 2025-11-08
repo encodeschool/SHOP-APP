@@ -37,6 +37,9 @@ const ProductDetail = () => {
     mince: 45,
   };
 
+  // ✅ UPDATED: Determine if product is measured in kg
+  const isKgUnit = product?.unit?.code === 'kg';
+
   useEffect(() => {
     setLoading(true);
     const fetchFavorites = async () => {
@@ -114,19 +117,25 @@ const ProductDetail = () => {
     dispatch(addToCart({ ...product, weight, options, totalPrice }));
   };
 
-  const increaseWeight = () => setWeight((w) => +(w + 0.1).toFixed(1));
-  const decreaseWeight = () => setWeight((w) => (w > 0.1 ? +(w - 0.1).toFixed(1) : w));
+  // ✅ UPDATED: Adjust weight/quantity controls based on unit
+  const increaseWeight = () =>
+    isKgUnit ? setWeight((w) => +(w + 0.1).toFixed(1)) : setWeight((w) => w + 1);
+  const decreaseWeight = () =>
+    isKgUnit
+      ? setWeight((w) => (w > 0.1 ? +(w - 0.1).toFixed(1) : w))
+      : setWeight((w) => (w > 1 ? w - 1 : w));
 
   const handleOptionChange = (key) => {
     setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // ✅ UPDATED: Update total price calculation for kg or pcs
   const getTotalPrice = () => {
     if (!product?.price) return 0;
     const base = product.price * weight;
     const extras = Object.entries(options)
       .filter(([key, value]) => value)
-      .reduce((sum, [key]) => sum + optionPrices[key] * weight, 0);
+      .reduce((sum, [key]) => sum + optionPrices[key] * (isKgUnit ? weight : 1), 0);
     return base + extras;
   };
 
@@ -165,19 +174,21 @@ const ProductDetail = () => {
 
         {/* Right - Product Info */}
         <div>
+          {/* ✅ UPDATED: Dynamic Order by tab */}
           <div className="grid grid-cols-2">
-            <div className='bg-gray-50 p-6 pinkish'>
-              <p className='text-center'>Order by number</p>
+            <div className="bg-gray-50 p-6 pinkish">
+              <p className="text-center">
+                {isKgUnit ? 'Order by Kg' : 'Order by number'}
+              </p>
             </div>
-            <div className='bg-white p-6'>
-              
-            </div>
+            <div className="bg-white p-6">{/* optional additional info */}</div>
           </div>
+
           <div className="bg-gray-50 p-6 pinkish relative">
             <FavoriteButton
-                productId={product.id}
-                favorites={favorites}
-                setFavorites={setFavorites}
+              productId={product.id}
+              favorites={favorites}
+              setFavorites={setFavorites}
             />
             {brand && (
               <div className="flex mb-3">
@@ -191,23 +202,42 @@ const ProductDetail = () => {
 
             <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
 
-            {/* Weight selector */}
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-lg font-semibold">{t('Weight')}:</span>
-              <button
-                className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
-                onClick={decreaseWeight}
-              >
-                −
-              </button>
-              <span className="text-xl font-bold">{weight.toFixed(1)} kg</span>
-              <button
-                className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
-                onClick={increaseWeight}
-              >
-                +
-              </button>
-            </div>
+            {/* ✅ UPDATED: Conditional weight/quantity selector */}
+            {isKgUnit ? (
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-lg font-semibold">{t('Weight')}:</span>
+                <button
+                  className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                  onClick={decreaseWeight}
+                >
+                  −
+                </button>
+                <span className="text-xl font-bold">{weight.toFixed(1)} kg</span>
+                <button
+                  className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                  onClick={increaseWeight}
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-lg font-semibold">{t('Quantity')}:</span>
+                <button
+                  className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                  onClick={decreaseWeight}
+                >
+                  −
+                </button>
+                <span className="text-xl font-bold">{Math.floor(weight)}</span>
+                <button
+                  className="border px-2 py-1 bg-white rounded hover:bg-gray-200"
+                  onClick={increaseWeight}
+                >
+                  +
+                </button>
+              </div>
+            )}
 
             {/* Base price */}
             <p className="text-2xl font-bold text-red-800 mb-3">
@@ -264,13 +294,13 @@ const ProductDetail = () => {
 
       {/* Tabs */}
       <div className="mt-10">
-        <div className="flex space-x-4 mb-6 border-b-[2px] border-red-800">
+        <div className="flex space-x-4 mb-6 border-b-[1px] border-red-800">
           {['specification', 'warehouse', 'together'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`capitalize py-4 ml-0 text-2xl border-red-800 px-[25px] py-[12px] rounded-t ${
-                activeTab === tab ? 'text-black font-bold border-[2px] border-b-[0]' : 'text-gray-800'
+                activeTab === tab ? 'text-black font-bold border-[1px] border-red-600 border-b-[0]' : 'text-gray-800'
               }`}
             >
               {t(tab)}

@@ -93,6 +93,7 @@ public class ProductResponseDTO {
         this.translations = product.getTranslations().stream()
                 .map(t -> new ProductTranslationDTO(t.getLanguage(), t.getName(), t.getDescription()))
                 .collect(Collectors.toList());
+        this.unit = product.getUnit();
     }
 
 }
