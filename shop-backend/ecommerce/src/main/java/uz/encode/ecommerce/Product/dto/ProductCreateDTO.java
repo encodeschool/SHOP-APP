@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
+import uz.encode.ecommerce.Units.entity.Unit;
 
 @Data
 @AllArgsConstructor
@@ -43,6 +44,8 @@ public class ProductCreateDTO {
     private UUID categoryId;
 
     private boolean featured;
+
+    private Long unitId;  // ✅ must exist and match JSON key
 
     private List<AttributeValueDTO> attributes; // 👈 add this
 

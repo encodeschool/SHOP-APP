@@ -15,6 +15,7 @@ import uz.encode.ecommerce.Product.entity.ProductAttributeTranslation;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
 import uz.encode.ecommerce.Product.entity.ProductTranslation;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
+import uz.encode.ecommerce.Units.entity.Unit;
 import uz.encode.ecommerce.User.entity.User;
 
 @Data
@@ -31,6 +32,7 @@ public class ProductResponseDTO {
     private ProductCondition condition;
     private LocalDateTime createdAt;
     private User user;
+    private Unit unit;
     private UUID categoryId;
     private boolean featured; // Flag for featured products
     private List<String> imageUrls; // assuming images are stored by URL

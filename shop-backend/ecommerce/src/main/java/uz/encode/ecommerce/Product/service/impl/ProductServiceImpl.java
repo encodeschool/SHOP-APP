@@ -45,6 +45,8 @@ import uz.encode.ecommerce.Product.repository.ProductAttributeValueRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.Product.service.ProductService;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
+import uz.encode.ecommerce.Units.entity.Unit;
+import uz.encode.ecommerce.Units.repository.UnitRepository;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
@@ -79,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductAttributeValueRepository productAttributeValueRepository;
     @Autowired
     private BrandRepository brandRepository;
+    @Autowired
+    private UnitRepository unitRepository;
 
     @Override
     @Transactional
@@ -100,6 +104,10 @@ public class ProductServiceImpl implements ProductService {
         product.setUser(user);
         product.setCategory(category);
         product.setFeatured(dto.isFeatured());
+
+        Unit unit = unitRepository.findById(dto.getUnitId())
+            .orElseThrow(() -> new RuntimeException("Unit not found"));
+        product.setUnit(unit);
 
         // Load and set brand
         Brand brand = brandRepository.findById(dto.getBrandId())
@@ -203,6 +211,9 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
         product.setFeatured(dto.isFeatured());
+        Unit unit = unitRepository.findById(dto.getUnitId())
+            .orElseThrow(() -> new RuntimeException("Unit not found"));
+        product.setUnit(unit);
 
         // Load and set brand
         Brand brand = brandRepository.findById(dto.getBrandId())
@@ -307,6 +318,7 @@ public class ProductServiceImpl implements ProductService {
         dto.setUser(product.getUser());
         dto.setCategoryId(product.getCategory().getId());
         dto.setFeatured(product.isFeatured());
+        dto.setUnit(product.getUnit());
         dto.setImageUrls(
                 product.getImages().stream().map(ProductImage::getUrl).toList());
         dto.setAttributes(

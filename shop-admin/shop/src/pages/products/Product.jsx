@@ -11,6 +11,7 @@ export default function Products() {
   const [users, setUsers] = useState([]);
   const [attributes, setAttributes] = useState([]); // Fixed typo: setAttributes was missing
   const [brands, setBrands] = useState([]);
+  const [units, setUnits] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,6 +32,7 @@ export default function Products() {
     brandId: '',
     attributes: [],
     translations: [],
+    unitId: ''
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -56,6 +58,15 @@ export default function Products() {
       .catch(err => {
         console.error('Error fetching brands:', err);
         setBrands([]);
+      });
+  };
+
+  const fetchUnits = () => {
+    axios.get('/units')
+      .then(res => setUnits(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching units:', err);
+        setUnits([]);
       });
   };
 
@@ -102,7 +113,8 @@ export default function Products() {
     fetchProducts();
     fetchCategories();
     fetchUsers();
-    fetchBrands();
+    fetchBrands();  
+    fetchUnits();
   }, []);
 
   const handleInputChange = (e) => {
@@ -199,6 +211,7 @@ export default function Products() {
       attributes: newProduct.attributes,
       brandId: newProduct.brandId,
       translations: newProduct.translations,
+      unitId: newProduct.unitId
     };
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
@@ -234,6 +247,7 @@ export default function Products() {
         attributes: [],
         brandId: '',
         translations: [],
+        unitId: ''
       });
       setAttributes([]);
       setEditingId(null);
@@ -278,6 +292,7 @@ export default function Products() {
       })),
       brandId: product.brand?.id || '',
       translations: product.translations || [],
+      unitId: product.unitId || ''
     });
 
     if (parentCategoryId) {
@@ -315,6 +330,7 @@ export default function Products() {
                   attributes: [],
                   brandId: '',
                   translations: [],
+                  unitId: ''
                 });
                 setIsDrawerOpen(true);
               }}
@@ -336,6 +352,7 @@ export default function Products() {
                 <tr className="bg-gray-200 text-left">
                   <th className="p-2">Product Img</th>
                   <th className="p-2">Title</th>
+                  <th className="p-2">Unit</th>
                   <th className="p-2">English Name</th>
                   <th className="p-2">Price</th>
                   <th className="p-2">Stock</th>
@@ -355,6 +372,7 @@ export default function Products() {
                       )}
                     </td>
                     <td className="p-2">{p.title}</td>
+                    <td className="p-2">{p.unit ? p.unit.name : ""}</td>
                     <td className="p-2">
                       {p.translations?.find((t) => t.language === 'en')?.name || 'N/A'}
                     </td>
@@ -475,6 +493,13 @@ export default function Products() {
                 <option value="">Select Brand</option>
                 {brands.map(brand => (
                   <option key={brand.id} value={brand.id}>{brand.name}</option>
+                ))}
+              </select>
+
+              <select name="unitId" className="border p-1 mb-3 w-full" value={newProduct.unitId} onChange={handleInputChange}>
+                <option value="">Select Unit</option>
+                {units.map(unit => (
+                  <option key={unit.id} value={unit.id}>{unit.name}</option>
                 ))}
               </select>
 

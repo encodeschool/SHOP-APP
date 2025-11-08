@@ -9,9 +9,10 @@ import uz.encode.ecommerce.Units.entity.Unit;
 @Component
 public class UnitMapper {
     public UnitDTO toDto(Unit unit) {
+        Long id = unit.getId();
         String name = unit.getName();
         String code = unit.getCode();
-        return new UnitDTO(name, code);
+        return new UnitDTO(id, name, code);
     }
 
     public Unit toUnit(UnitCreateDTO unitCreateDTO) {

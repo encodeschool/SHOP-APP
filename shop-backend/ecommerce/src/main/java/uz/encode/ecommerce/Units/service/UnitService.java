@@ -8,8 +8,8 @@ import uz.encode.ecommerce.Units.entity.Unit;
 
 public interface UnitService {
     Unit getById(Long id);
-
     void save(UnitCreateDTO unit);
-
+    void update(Long id, UnitCreateDTO unit);
+    void delete(Long id);
     List<UnitDTO> findAll();
 }

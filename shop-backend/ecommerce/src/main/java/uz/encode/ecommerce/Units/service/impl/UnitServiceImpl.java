@@ -24,7 +24,8 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public Unit getById(Long id) {
-        return unitRepository.findById(id).orElseThrow(() -> new UnitNotFoundException("Unit not found by this ID: " + id));
+        return unitRepository.findById(id)
+                .orElseThrow(() -> new UnitNotFoundException("Unit not found by this ID: " + id));
     }
 
     @Override
@@ -34,8 +35,29 @@ public class UnitServiceImpl implements UnitService {
     }
 
     @Override
-    public List<UnitDTO> findAll() {
-        return unitRepository.findAll().stream().map(unitMapper::toDto).toList();
+    public void update(Long id, UnitCreateDTO unitCreateDTO) {
+        Unit existingUnit = unitRepository.findById(id)
+                .orElseThrow(() -> new UnitNotFoundException("Unit not found by this ID: " + id));
+
+        existingUnit.setName(unitCreateDTO.getName());
+        existingUnit.setCode(unitCreateDTO.getCode());
+
+        unitRepository.save(existingUnit);
     }
-    
+
+    @Override
+    public void delete(Long id) {
+        if (!unitRepository.existsById(id)) {
+            throw new UnitNotFoundException("Unit not found by this ID: " + id);
+        }
+        unitRepository.deleteById(id);
+    }
+
+    @Override
+    public List<UnitDTO> findAll() {
+        return unitRepository.findAll()
+                .stream()
+                .map(unitMapper::toDto)
+                .toList();
+    }
 }

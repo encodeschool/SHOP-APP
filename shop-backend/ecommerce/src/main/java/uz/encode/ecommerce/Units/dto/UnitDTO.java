@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 public class UnitDTO {
+    private Long id;
     private String name;
     private String code;
 }

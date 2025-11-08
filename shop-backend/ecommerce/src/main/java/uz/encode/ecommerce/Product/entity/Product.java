@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
+import uz.encode.ecommerce.Units.entity.Unit;
 import uz.encode.ecommerce.User.entity.User;
 
 @Entity
@@ -69,6 +70,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "unit_id")
+    private Unit unit;
 
     private boolean isInStock;
 
