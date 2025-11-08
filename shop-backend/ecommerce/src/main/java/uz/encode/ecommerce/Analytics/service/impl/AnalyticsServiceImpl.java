@@ -67,16 +67,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return orderRepository.countOrdersByStatus();
     }
 
-    // @Override
-    // public List<MonthlyCountDTO> countUsersGroupedByMonth() {
-    // return userRepository.countUsersGroupedByMonth();
-    // }
-
-    // @Override
-    // public List<MonthlyRevenueDTO> sumRevenueGroupedByMonth() {
-    // return orderRepository.sumRevenueGroupedByMonth();
-    // }
-
     @Override
     public long countUsers() {
         return userRepository.count();

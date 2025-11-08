@@ -50,18 +50,6 @@ public class AnalyticsController {
         return analyticsService.getOrderStatusCounts();
     }
 
-    // Users registered per month
-    // @GetMapping("/users/monthly")
-    // public List<MonthlyCountDTO> getUserStats() {
-    // return analyticsService.countUsersGroupedByMonth();
-    // }
-
-    // Total revenue per month
-    // @GetMapping("/revenue/monthly")
-    // public List<MonthlyRevenueDTO> getRevenueStats() {
-    // return analyticsService.sumRevenueGroupedByMonth();
-    // }
-
     // Top selling products
     @GetMapping("/products/top")
     public List<TopProductDTO> getTopProducts() {

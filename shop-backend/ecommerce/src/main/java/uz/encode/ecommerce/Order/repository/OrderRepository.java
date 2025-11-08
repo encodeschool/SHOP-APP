@@ -35,12 +35,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
                         "FROM Order o GROUP BY o.status")
         List<OrderStatusCountDTO> countOrdersByStatus();
 
-        // @Query("SELECT new
-        // uz.encode.ecommerce.Analytics.dto.MonthlyRevenueDTO(MONTH(o.createdAt),
-        // SUM(o.totalPrice)) "
-        // +
-        // "FROM Order o GROUP BY MONTH(o.createdAt) ORDER BY MONTH(o.createdAt)")
-        // List<MonthlyRevenueDTO> sumRevenueGroupedByMonth();
 
         @Query("SELECT new uz.encode.ecommerce.Analytics.dto.TopProductDTO(p.id, p.title, SUM(oi.quantity)) " +
                         "FROM OrderItem oi JOIN oi.product p GROUP BY p.id, p.title ORDER BY SUM(oi.quantity) DESC")

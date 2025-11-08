@@ -25,11 +25,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios.get('/admin/analytics/products/monthly').then(res => setProductStats(res.data));
-    // axios.get('/admin/analytics/orders/monthly').then(res => setOrderStats(res.data));
-    // axios.get('/admin/analytics/products/category').then(res => setCategoryStats(res.data));
-    // axios.get('/admin/analytics/users/monthly').then(res => setUserStats(res.data));
-    // axios.get('/admin/analytics/revenue/monthly').then(res => setRevenueStats(res.data));
-    // axios.get('/admin/analytics/products/top').then(res => setTopProducts(res.data));
+    axios.get('/admin/analytics/stats').then(res => setTotals(res.data));
+    axios.get('/admin/analytics/orders/monthly').then(res => setOrderStats(res.data));
+    axios.get('/admin/analytics/products/category').then(res => setCategoryStats(res.data));
+    axios.get('/admin/analytics/products/top').then(res => setTopProducts(res.data));
     // axios.get('/admin/analytics/totals').then(res => setTotals(res.data));
   }, []);
 
@@ -38,118 +37,93 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Users</h3>
-          <p className="text-2xl font-bold">{totals.users}</p>
+          <p className="text-2xl font-bold">{totals.totalUsers}</p>
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Orders</h3>
-          <p className="text-2xl font-bold">{totals.orders}</p>
+          <p className="text-2xl font-bold">{totals.totalOrders}</p>
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Revenue</h3>
-          <p className="text-2xl font-bold">${totals.revenue?.toFixed(2)}</p>
+          <p className="text-2xl font-bold">${totals.totalRevenue?.toFixed(2)}</p>
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Products</h3>
-          <p className="text-2xl font-bold">{totals.products}</p>
+          <p className="text-2xl font-bold">{totals.totalProducts}</p>
         </div>
       </div>
 
-      {/* Bar Chart - Products per Month */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">Products Created per Month</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={productStats}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="count" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="grid grid-cols-2 gap-8">
+        {/* Bar Chart - Products per Month */}
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Products Created per Month</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={productStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Line Chart - Orders per Month */}
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Orders per Month</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={orderStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="count" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      {/* Line Chart - Orders per Month */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">Orders per Month</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={orderStats}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="count" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Line Chart - Revenue per Month */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">Revenue per Month</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={revenueStats}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="totalRevenue" stroke="#ff8042" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Line Chart - Users per Month */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">New Users per Month</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={userStats}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="count" stroke="#8884d8" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Pie Chart - Products by Category */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">Products by Category</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={categoryStats}
-              dataKey="count"
-              nameKey="category"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#ffc658"
-              label
-            >
-              {categoryStats.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Legend />
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Bar Chart - Top Products */}
-      <div className="bg-white p-4 shadow rounded">
-        <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={topProducts}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="product" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="sales" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="grid grid-cols-2 gap-8">
+        {/* Pie Chart - Products by Category */}
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Products by Category</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryStats}
+                dataKey="productCount"
+                nameKey="categoryName"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#ffc658"
+                label
+              >
+                {categoryStats.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Bar Chart - Top Products */}
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Top Selling Products</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={topProducts}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="productTitle" />      {/* matches your API */}
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="totalSold" fill="#82ca9d" /> {/* matches your API */}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

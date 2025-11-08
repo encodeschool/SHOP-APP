@@ -2,34 +2,37 @@ package uz.encode.ecommerce.Analytics.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class MonthlyCountDTO {
 
-    private String month;
-    private long count;
+    private String monthName;
+    private Long count;
 
-    public MonthlyCountDTO() {
-    }
-
-    public MonthlyCountDTO(String month, long count) {
-        this.month = month;
+    // THIS CONSTRUCTOR MUST EXIST AND BE PUBLIC
+    public MonthlyCountDTO(String monthName, Long count) {
+        this.monthName = monthName;
         this.count = count;
     }
 
-    public String getMonth() {
-        return month;
+    // Default constructor (optional but safe)
+    public MonthlyCountDTO() {}
+
+    // Getters (required for Hibernate result mapping)
+    public String getMonthName() {
+        return monthName;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
-    }
-
-    public long getCount() {
+    public Long getCount() {
         return count;
     }
 
-    public void setCount(long count) {
-        this.count = count;
+    // Setters (optional, but good practice)
+    public void setMonthName(String monthName) {
+        this.monthName = monthName;
     }
 
+    public void setCount(Long count) {
+        this.count = count;
+    }
 }

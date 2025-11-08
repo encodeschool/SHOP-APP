@@ -23,10 +23,6 @@ public interface AnalyticsService {
 
     List<OrderStatusCountDTO> getOrderStatusCounts();
 
-    // List<MonthlyCountDTO> countUsersGroupedByMonth();
-
-    // List<MonthlyRevenueDTO> sumRevenueGroupedByMonth();
-
     long countUsers();
 
     long countOrders();
