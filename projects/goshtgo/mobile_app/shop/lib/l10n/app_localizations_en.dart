@@ -554,4 +554,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboarding_subtitle_3 => 'Get your orders delivered quickly right to your doorstep.';
+
+  @override
+  String get notHaveAnAccount => 'Don\'t have an account? Create a new one.';
+
+  @override
+  String get required => 'Required';
+
+  @override
+  String get invalidEmail => 'Invalid email';
+
+  @override
+  String get invalidPhone => 'Invalid phone number';
+
+  @override
+  String get minPassword => 'Minimum 6 characters';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? Log in';
+
+  @override
+  String get registrationSuccess => 'You have registered successfully';
+
+  @override
+  String get registrationFailed => 'Registration failed. Try again.';
+
+  @override
+  String get aiHelp => 'AI Help';
+
+  @override
+  String get aiAppBar => 'AI Meal Assistant';
+
+  @override
+  String get queryInputHint => 'Ask about a meal or recipe...';
+
+  @override
+  String get thinking => 'Thinking...';
+
+  @override
+  String get askAi => 'Ask AI';
+
+  @override
+  String get emptyTitle => 'Ask me anything about meals!';
+
+  @override
+  String get emptySubtitle => 'Try: \"Quick dinner under 30 mins\" or \"Healthy snacks\"';
+
+  @override
+  String get loadingText => 'Chef AI is thinking...';
+
+  @override
+  String get errorText => 'Failed to get response. Please try again.';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get responseCopied => 'Response copied!';
+
+  @override
+  String get aiAssistant => 'AI Chef Assistant';
+
+  @override
+  String get availableInShop => 'Available in shop';
+
+  @override
+  String get notAvailable => 'None of the suggested meats are currently available.';
 }

@@ -63,7 +63,7 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={productStats}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="monthName" />
               <YAxis />
               <Tooltip />
               <Bar dataKey="count" fill="#8884d8" />
@@ -77,7 +77,7 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={orderStats}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="monthName" />
               <YAxis />
               <Tooltip />
               <Line type="monotone" dataKey="count" stroke="#82ca9d" />

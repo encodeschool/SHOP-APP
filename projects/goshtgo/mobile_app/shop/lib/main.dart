@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/screens/about/about_screen.dart';
+import 'package:shop/screens/ai/ai_help_screen.dart';
 import 'package:shop/screens/auth/login_screen.dart';
 import 'package:shop/screens/auth/register_screen.dart';
 import 'package:shop/screens/cart/cart_screen.dart';

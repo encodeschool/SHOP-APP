@@ -25,6 +25,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     _orders = _orderService.getUserOrders();
   }
 
+  Color? getStatusColor(String status) {
+    switch (status) {
+      case "PENDING":
+        return Colors.red[300];
+      case "PAID":
+        return Colors.green[300];
+      case "CANCELLED":
+        return Colors.grey[400];
+      default:
+        return Colors.blue[300];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -62,8 +75,26 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 title: Text(
                   "${loc.orderNumber}: ${order.id.substring(0, 8)} • ${order.total.toStringAsFixed(2)}",
                 ),
-                subtitle: Text(
-                  "${order.status} • ${DateFormat.yMd().add_jm().format(order.createdAt.toLocal())}",
+                subtitle: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      decoration: BoxDecoration(
+                          color: getStatusColor(order.status),
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: Text(
+                        "${order.status}",
+                        style: TextStyle(
+                            color: Colors.white
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      "${DateFormat.yMd().add_jm().format(order.createdAt.toLocal())}"
+                    )
+                  ],
                 ),
                 children: order.items.map((item) {
                   return ListTile(

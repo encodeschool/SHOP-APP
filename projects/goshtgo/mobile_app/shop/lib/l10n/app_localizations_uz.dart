@@ -33,7 +33,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get email => 'Elektron pochta';
 
   @override
-  String get phone => 'Telefon';
+  String get phone => 'Telefon raqami';
 
   @override
   String get password => 'Parol';
@@ -554,4 +554,73 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get onboarding_subtitle_3 => 'Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz.';
+
+  @override
+  String get notHaveAnAccount => 'Akauntingiz yo\'qmi? Yangisini yarating.';
+
+  @override
+  String get required => 'Majburiy';
+
+  @override
+  String get invalidEmail => 'Noto‘g‘ri email';
+
+  @override
+  String get invalidPhone => 'Noto‘g‘ri telefon raqam';
+
+  @override
+  String get minPassword => 'Kamida 6 ta belgi';
+
+  @override
+  String get register => 'Ro‘yxatdan o‘tish';
+
+  @override
+  String get alreadyHaveAccount => 'Akauntingiz bormi? Kirish';
+
+  @override
+  String get registrationSuccess => 'Siz muvaffaqiyatli ro‘yxatdan o‘tdingiz';
+
+  @override
+  String get registrationFailed => 'Ro‘yxatdan o‘tish muvaffaqiyatsiz. Qayta urinib ko‘ring.';
+
+  @override
+  String get aiHelp => 'AI yordami';
+
+  @override
+  String get aiAppBar => 'AI Ovqat Yordamchisi';
+
+  @override
+  String get queryInputHint => 'Taom yoki retsept haqida so‘rang...';
+
+  @override
+  String get thinking => 'O‘ylanmoqda...';
+
+  @override
+  String get askAi => 'AI dan so‘rash';
+
+  @override
+  String get emptyTitle => 'Ovqatlar haqida istalgan narsani so‘rang!';
+
+  @override
+  String get emptySubtitle => 'Masalan: \"30 daqiqada tez kechki ovqat\" yoki \"Sog‘lom gazaklar\"';
+
+  @override
+  String get loadingText => 'AI oshpaz o‘ylamoqda...';
+
+  @override
+  String get errorText => 'Javob olinmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get retry => 'Qayta urinib ko‘rish';
+
+  @override
+  String get responseCopied => 'Javob nusxalandi!';
+
+  @override
+  String get aiAssistant => 'AI Oshpaz Yordamchisi';
+
+  @override
+  String get availableInShop => 'Do‘konda mavjud';
+
+  @override
+  String get notAvailable => 'Taklif etilgan go‘sht turlari hozircha mavjud emas.';
 }

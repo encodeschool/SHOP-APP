@@ -554,4 +554,73 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onboarding_subtitle_3 => 'Получайте свои заказы быстро прямо к вашей двери.';
+
+  @override
+  String get notHaveAnAccount => 'Нет учётной записи? Создайте новую.';
+
+  @override
+  String get required => 'Обязательно';
+
+  @override
+  String get invalidEmail => 'Неправильная почта';
+
+  @override
+  String get invalidPhone => 'Неправильный номер телефона';
+
+  @override
+  String get minPassword => 'Мин. 6 символов';
+
+  @override
+  String get register => 'Регистрация';
+
+  @override
+  String get alreadyHaveAccount => 'У вас уже есть аккаунт? Войдите в учетную запись';
+
+  @override
+  String get registrationSuccess => 'Вы зарегистрировались успешно';
+
+  @override
+  String get registrationFailed => 'Регистрация не удалась. Попробуйте снова.';
+
+  @override
+  String get aiHelp => 'Помощь ИИ';
+
+  @override
+  String get aiAppBar => 'ИИ Помощник по блюдам';
+
+  @override
+  String get queryInputHint => 'Спросите о блюде или рецепте...';
+
+  @override
+  String get thinking => 'Думает...';
+
+  @override
+  String get askAi => 'Спросить ИИ';
+
+  @override
+  String get emptyTitle => 'Спросите меня о любом блюде!';
+
+  @override
+  String get emptySubtitle => 'Попробуйте: \"Быстрый ужин за 30 минут\" или \"Полезные закуски\"';
+
+  @override
+  String get loadingText => 'ИИ повар думает...';
+
+  @override
+  String get errorText => 'Не удалось получить ответ. Попробуйте еще раз.';
+
+  @override
+  String get retry => 'Повторить';
+
+  @override
+  String get responseCopied => 'Ответ скопирован!';
+
+  @override
+  String get aiAssistant => 'ИИ Кулинарный помощник';
+
+  @override
+  String get availableInShop => 'Есть в магазине';
+
+  @override
+  String get notAvailable => 'Ни одно из предложенных мяс не доступно в данный момент.';
 }

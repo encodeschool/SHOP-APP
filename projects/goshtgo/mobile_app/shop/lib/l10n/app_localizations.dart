@@ -1182,6 +1182,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get your orders delivered quickly right to your doorstep.'**
   String get onboarding_subtitle_3;
+
+  /// No description provided for @notHaveAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Create a new one.'**
+  String get notHaveAnAccount;
+
+  /// No description provided for @required.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get required;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email'**
+  String get invalidEmail;
+
+  /// No description provided for @invalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number'**
+  String get invalidPhone;
+
+  /// No description provided for @minPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 6 characters'**
+  String get minPassword;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Log in'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @registrationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You have registered successfully'**
+  String get registrationSuccess;
+
+  /// No description provided for @registrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration failed. Try again.'**
+  String get registrationFailed;
+
+  /// No description provided for @aiHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Help'**
+  String get aiHelp;
+
+  /// No description provided for @aiAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Meal Assistant'**
+  String get aiAppBar;
+
+  /// No description provided for @queryInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about a meal or recipe...'**
+  String get queryInputHint;
+
+  /// No description provided for @thinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking...'**
+  String get thinking;
+
+  /// No description provided for @askAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask AI'**
+  String get askAi;
+
+  /// No description provided for @emptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask me anything about meals!'**
+  String get emptyTitle;
+
+  /// No description provided for @emptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try: \"Quick dinner under 30 mins\" or \"Healthy snacks\"'**
+  String get emptySubtitle;
+
+  /// No description provided for @loadingText.
+  ///
+  /// In en, this message translates to:
+  /// **'Chef AI is thinking...'**
+  String get loadingText;
+
+  /// No description provided for @errorText.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get response. Please try again.'**
+  String get errorText;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @responseCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Response copied!'**
+  String get responseCopied;
+
+  /// No description provided for @aiAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Chef Assistant'**
+  String get aiAssistant;
+
+  /// No description provided for @availableInShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Available in shop'**
+  String get availableInShop;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'None of the suggested meats are currently available.'**
+  String get notAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
