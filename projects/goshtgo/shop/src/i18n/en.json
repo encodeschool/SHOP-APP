@@ -296,5 +296,27 @@
     "qualityText": "We offer only premium-grade meat. If the product doesn’t meet expectations, we’ll refund 100% or provide a replacement.",
     "qualityPolicy": "💡 Your peace of mind is our highest quality standard.",
     "qualityFinal": "✨ GoshtGo guarantees: every purchase should bring satisfaction."
-  }
+  },
+  "Order by Kg": "Order by Kg",
+  "Order by number": "Order by number",
+  "Weight": "Weight",
+  "Quantity": "Quantity",
+  "Loading...": "Loading...",
+  "specification": "Specifications",
+  "warehouse": "Warehouse",
+  "together": "Frequently Bought Together",
+  "Warehouse Info": "Warehouse info",
+  "Coming soon..": "Coming soon...",
+  "Frequently Bought Together": "Frequently bought together",
+  "Bundle suggestions will appear here.": "Bundle suggestions will appear here.",
+  
+  "Vacuum pack": "Vacuum pack",
+  "Debone": "Debone",
+  "Mince": "Mince",
+  "Total": "Total",
+  "Add to Cart": "Add to cart",
+
+  "Vacuum price": "Vacuum package + {{price}} ₽/kg",
+  "Debone price": "Debone + {{price}} ₽/kg",
+  "Mince price": "Mince from this piece + {{price}} ₽/kg"
 }

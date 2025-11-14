@@ -37,9 +37,15 @@ const ProductDetail = () => {
     mince: 45,
   };
 
-  // ✅ UPDATED: Determine if product is measured in kg
+  // Determine if product is measured in kg
   const isKgUnit = product?.unit?.code === 'kg';
 
+  // Pre-translate option labels with price
+  const tVacuum = t('Vacuum price', { price: optionPrices.vacuum });
+  const tDebone = t('Debone price', { price: optionPrices.debone });
+  const tMince = t('Mince price', { price: optionPrices.mince });
+
+  // Fetch favorites
   useEffect(() => {
     setLoading(true);
     const fetchFavorites = async () => {
@@ -58,11 +64,14 @@ const ProductDetail = () => {
         } finally {
           setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
     fetchFavorites();
   }, [setLoading]);
 
+  // Fetch product
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -76,6 +85,7 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id, language]);
 
+  // Fetch brand
   useEffect(() => {
     const fetchBrand = async (brandId) => {
       try {
@@ -90,6 +100,7 @@ const ProductDetail = () => {
     }
   }, [product]);
 
+  // Build breadcrumb path
   useEffect(() => {
     const buildBreadcrumbPath = async (categoryId) => {
       const path = [];
@@ -117,9 +128,10 @@ const ProductDetail = () => {
     dispatch(addToCart({ ...product, weight, options, totalPrice }));
   };
 
-  // ✅ UPDATED: Adjust weight/quantity controls based on unit
+  // Adjust weight/quantity controls
   const increaseWeight = () =>
     isKgUnit ? setWeight((w) => +(w + 0.1).toFixed(1)) : setWeight((w) => w + 1);
+
   const decreaseWeight = () =>
     isKgUnit
       ? setWeight((w) => (w > 0.1 ? +(w - 0.1).toFixed(1) : w))
@@ -129,7 +141,7 @@ const ProductDetail = () => {
     setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // ✅ UPDATED: Update total price calculation for kg or pcs
+  // Calculate total price
   const getTotalPrice = () => {
     if (!product?.price) return 0;
     const base = product.price * weight;
@@ -174,14 +186,14 @@ const ProductDetail = () => {
 
         {/* Right - Product Info */}
         <div>
-          {/* ✅ UPDATED: Dynamic Order by tab */}
+          {/* Order by tab */}
           <div className="grid grid-cols-2">
             <div className="bg-gray-50 p-6 pinkish">
               <p className="text-center">
-                {isKgUnit ? 'Order by Kg' : 'Order by number'}
+                {isKgUnit ? t('Order by Kg') : t('Order by number')}
               </p>
             </div>
-            <div className="bg-white p-6">{/* optional additional info */}</div>
+            <div className="bg-white p-6">{/* optional */}</div>
           </div>
 
           <div className="bg-gray-50 p-6 pinkish relative">
@@ -202,7 +214,7 @@ const ProductDetail = () => {
 
             <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
 
-            {/* ✅ UPDATED: Conditional weight/quantity selector */}
+            {/* Weight / Quantity selector */}
             {isKgUnit ? (
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-lg font-semibold">{t('Weight')}:</span>
@@ -252,7 +264,7 @@ const ProductDetail = () => {
                   checked={options.vacuum}
                   onChange={() => handleOptionChange('vacuum')}
                 />
-                <span>Упаковать под вакуумом + {optionPrices.vacuum} ₽/кг</span>
+                <span>{tVacuum}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -260,7 +272,7 @@ const ProductDetail = () => {
                   checked={options.debone}
                   onChange={() => handleOptionChange('debone')}
                 />
-                <span>Снять с кости + {optionPrices.debone} ₽/кг</span>
+                <span>{tDebone}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -268,13 +280,13 @@ const ProductDetail = () => {
                   checked={options.mince}
                   onChange={() => handleOptionChange('mince')}
                 />
-                <span>Фарш из этого куска + {optionPrices.mince} ₽/кг</span>
+                <span>{tMince}</span>
               </label>
             </div>
 
             {/* Total */}
             <div className="flex justify-between items-center mb-4 border-t pt-3">
-              <span className="text-lg font-semibold">Итого:</span>
+              <span className="text-lg font-semibold">{t('Total')}:</span>
               <span className="text-2xl font-bold text-red-700">
                 {getTotalPrice().toLocaleString()} ₽
               </span>
@@ -284,7 +296,7 @@ const ProductDetail = () => {
               className="bg-red-700 text-white px-6 py-3 rounded-full text-lg flex items-center justify-center w-full hover:bg-red-800 transition"
               onClick={handleAddToCart}
             >
-              <FaCartPlus className="mr-2" /> В корзину
+              <FaCartPlus className="mr-2" /> {t('Add to Cart')}
             </button>
 
             <CompareButton product={product} />
@@ -300,7 +312,9 @@ const ProductDetail = () => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`capitalize py-4 ml-0 text-2xl border-red-800 px-[25px] py-[12px] rounded-t ${
-                activeTab === tab ? 'text-black font-bold border-[1px] border-red-600 border-b-[0]' : 'text-gray-800'
+                activeTab === tab
+                  ? 'text-black font-bold border-[1px] border-red-600 border-b-[0]'
+                  : 'text-gray-800'
               }`}
             >
               {t(tab)}
@@ -337,15 +351,15 @@ const ProductDetail = () => {
 
         {activeTab === 'warehouse' && (
           <div>
-            <h3 className="text-lg font-semibold mb-2">{t("Warehouse Info")}</h3>
-            <p>{t("Coming soon..")}.</p>
+            <h3 className="text-lg font-semibold mb-2">{t('Warehouse Info')}</h3>
+            <p>{t('Coming soon..')}</p>
           </div>
         )}
 
         {activeTab === 'together' && (
           <div>
-            <h3 className="text-lg font-semibold mb-2">{t("Frequently Bought Together")}</h3>
-            <p>{t("Bundle suggestions will appear here.")}</p>
+            <h3 className="text-lg font-semibold mb-2">{t('Frequently Bought Together')}</h3>
+            <p>{t('Bundle suggestions will appear here.')}</p>
           </div>
         )}
       </div>

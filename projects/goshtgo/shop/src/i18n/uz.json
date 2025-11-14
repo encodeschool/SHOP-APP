@@ -292,5 +292,27 @@
   "Quality assurance": "Sifat kafolati",
   "We want to ensure you're satisfied with every purchase. If you're dissatisfied with an item, simply return it within 14 days in any condition. We guarantee an immediate 100% refund.": "Har bir xaridingizdan mamnun bo‘lishingizni istaymiz. Agar mahsulot sizni qoniqtirmasa, uni 14 kun ichida istalgan holatda qaytarishingiz mumkin. Biz 100% darhol pulni qaytarishni kafolatlaymiz.",
   "First-class service": "Birinchi darajali xizmat",
-  "We deliver fresh chilled meat throughout Moscow, the Moscow region, St. Petersburg, and the Leningrad region daily from 9:30 AM to 9:00 PM (except January 1st, 2nd, and 3rd). You can also use our same-day express delivery service.": "Biz har kuni soat 9:30 dan 21:00 gacha Moskva, Moskva viloyati, Sankt-Peterburg va Leningrad viloyatida yangi sovutilgan go‘sht yetkazib beramiz (1-, 2-, va 3-yanvar kunlaridan tashqari). Shuningdek, bizning ekspress yetkazib berish xizmatimizdan ham foydalanishingiz mumkin."
+  "We deliver fresh chilled meat throughout Moscow, the Moscow region, St. Petersburg, and the Leningrad region daily from 9:30 AM to 9:00 PM (except January 1st, 2nd, and 3rd). You can also use our same-day express delivery service.": "Biz har kuni soat 9:30 dan 21:00 gacha Moskva, Moskva viloyati, Sankt-Peterburg va Leningrad viloyatida yangi sovutilgan go‘sht yetkazib beramiz (1-, 2-, va 3-yanvar kunlaridan tashqari). Shuningdek, bizning ekspress yetkazib berish xizmatimizdan ham foydalanishingiz mumkin.",
+  "Order by Kg": "Kilogramm bo‘yicha buyurtma",
+  "Order by number": "Soni bo‘yicha buyurtma",
+  "Weight": "Vazn",
+  "Quantity": "Miqdor",
+  "Loading...": "Yuklanmoqda...",
+  "specification": "Xususiyatlar",
+  "warehouse": "Ombor",
+  "together": "Birgalikda tez-tez olinadi",
+  "Warehouse Info": "Ombor haqida ma’lumot",
+  "Coming soon..": "Tez orada qo‘shiladi...",
+  "Frequently Bought Together": "Birgalikda tez-tez xarid qilinadigan mahsulotlar",
+  "Bundle suggestions will appear here.": "Bu yerda tavsiya to‘plamlar chiqadi.",
+
+  "Vacuum pack": "Vakuum qadoqlash",
+  "Debone": "Suyakdan ajratish",
+  "Mince": "Ushbu bo‘lakdan qiymalash",
+  "Total": "Jami",
+  "Add to Cart": "Savatga qo‘shish",
+
+  "Vacuum price": "Vakuum qadoqlash + {{price}} ₽/kg",
+  "Debone price": "Suyakdan ajratish + {{price}} ₽/kg",
+  "Mince price": "Qiymalash + {{price}} ₽/kg"
 }
