@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
 
 import '../../core/auth_provider.dart';
 import '../../services/auth_service.dart';
@@ -16,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _authService = AuthService();
+  late final loc = AppLocalizations.of(context)!;
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -53,12 +55,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Вы зарегистрировались успешно'),
+          content: Text(loc.registrationSuccess),
           duration: const Duration(seconds: 2),
         ),
       );
     } else {
-      setState(() => _error = 'Registration failed. Try again.');
+      setState(() => _error = loc.registrationFailed);
     }
   }
 
@@ -97,53 +99,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         TextFormField(
                           controller: _nameController,
-                          decoration:
-                          const InputDecoration(labelText: "Полное имя"),
-                          validator: (val) =>
-                          val!.isEmpty ? "Обязательно" : null,
+                          decoration: InputDecoration(labelText: loc.fullName),
+                          validator: (val) => val!.isEmpty ? loc.required : null,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _emailController,
-                          decoration:
-                          const InputDecoration(labelText: "Почта"),
-                          validator: (val) => val!.contains('@')
-                              ? null
-                              : "Неправильная почта",
+                          decoration: InputDecoration(labelText: loc.email),
+                          validator: (val) => val!.contains('@') ? null : loc.invalidEmail,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _usernameController,
-                          decoration: const InputDecoration(
-                              labelText: "Имя пользователя"),
-                          validator: (val) =>
-                          val!.isEmpty ? "Обязательно" : null,
+                          decoration: InputDecoration(labelText: loc.username),
+                          validator: (val) => val!.isEmpty ? loc.required : null,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _phoneController,
-                          decoration:
-                          const InputDecoration(labelText: "Телефон"),
-                          validator: (val) => val!.length < 7
-                              ? "Неправильный номер телефона"
-                              : null,
+                          decoration: InputDecoration(labelText: loc.phone),
+                          validator: (val) =>
+                          val!.length < 7 ? loc.invalidPhone : null,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
-                          decoration:
-                          const InputDecoration(labelText: "Пароль"),
+                          decoration: InputDecoration(labelText: loc.password),
                           validator: (val) =>
-                          val!.length < 6 ? "Мин. 6 символов" : null,
+                          val!.length < 6 ? loc.minPassword : null,
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: _loading ? null : _register,
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(size.width, 50),
-                            padding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -158,17 +149,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               strokeWidth: 2,
                             ),
                           )
-                              : const Text(
-                            "Регистрация",
-                            style: TextStyle(color: Colors.white),
+                              : Text(
+                            loc.register,
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
                         const SizedBox(height: 12),
                         TextButton(
                           onPressed: () => context.go('/login'),
-                          child: const Text(
-                            "У вас уже есть аккаунт? Войдите в учетную запись",
-                            style: TextStyle(color: Colors.grey),
+                          child: Text(
+                            loc.alreadyHaveAccount,
+                            style: const TextStyle(color: Colors.grey),
                             textAlign: TextAlign.center,
                           ),
                         ),

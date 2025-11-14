@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/l10n/app_localizations.dart';
 
 import '../../core/auth_provider.dart';
 import '../../services/auth_service.dart';
@@ -46,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
     final primaryColor = Colors.red[900];
 
@@ -73,13 +75,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
                       TextField(
                         controller: _emailController,
-                        decoration: const InputDecoration(labelText: 'Почта'),
+                        decoration: InputDecoration(labelText:
+                        '${loc.email}'
+                        ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _passwordController,
                         obscureText: true,
-                        decoration: const InputDecoration(labelText: 'Пароль'),
+                        decoration: InputDecoration(labelText: '${loc.password}'),
                       ),
                       const SizedBox(height: 24),
                       if (_error != null)
@@ -107,16 +111,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                            : const Text(
-                          "Войти",
+                            : Text(
+                          "${loc.login}",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextButton(
                         onPressed: () => context.go('/register'),
-                        child: const Text(
-                          "У вас нет аккаунта? Создайте новый",
+                        child: Text(
+                          "${loc.notHaveAnAccount}",
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),

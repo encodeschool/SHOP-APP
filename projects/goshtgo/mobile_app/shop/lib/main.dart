@@ -99,6 +99,10 @@ GoRouter createRouter(String initialRoute) => GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingScreen(),
     ),
+    GoRoute(
+      path: '/ai',
+      builder: (context, state) => const AIHelpScreen(),
+    ),
 
     ShellRoute(
       builder: (context, state, child) => MainNavigationScreen(child: child),

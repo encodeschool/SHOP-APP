@@ -193,7 +193,38 @@
                                     "onboarding_subtitle_2": "Mahalliy sotuvchilar hamjamiyatiga qo‘shiling va ajoyib takliflarni toping.",
 
                                     "onboarding_title_3": "Tez va ishonchli yetkazib berish",
-                                    "onboarding_subtitle_3": "Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz."
+                                    "onboarding_subtitle_3": "Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz.",
+
+                                                 "username": "Foydalanuvchi nomi",
+                                      "phone": "Telefon raqami",
+                                      "password": "Parol",
+                                      "required": "Majburiy",
+                                      "invalidEmail": "Noto‘g‘ri email",
+                                      "invalidPhone": "Noto‘g‘ri telefon raqam",
+                                      "minPassword": "Kamida 6 ta belgi",
+                                      "register": "Ro‘yxatdan o‘tish",
+                                      "alreadyHaveAccount": "Akauntingiz bormi? Kirish",
+                                      "registrationSuccess": "Siz muvaffaqiyatli ro‘yxatdan o‘tdingiz",
+                                      "registrationFailed": "Ro‘yxatdan o‘tish muvaffaqiyatsiz. Qayta urinib ko‘ring.",
+                                      "aiHelp": "AI yordami",
+
+
+                                      "aiAppBar": "AI Ovqat Yordamchisi",
+                                        "queryInputHint": "Taom yoki retsept haqida so‘rang...",
+                                        "thinking": "O‘ylanmoqda...",
+                                        "askAi": "AI dan so‘rash",
+                                        "emptyTitle": "Ovqatlar haqida istalgan narsani so‘rang!",
+                                        "emptySubtitle": "Masalan: \"30 daqiqada tez kechki ovqat\" yoki \"Sog‘lom gazaklar\"",
+                                        "loadingText": "AI oshpaz o‘ylamoqda...",
+                                        "errorText": "Javob olinmadi. Qayta urinib ko‘ring.",
+                                        "retry": "Qayta urinib ko‘rish",
+                                        "responseCopied": "Javob nusxalandi!",
+                                        "aiAssistant": "AI Oshpaz Yordamchisi",
+                                        "availableInShop": "Do‘konda mavjud",
+                                        "notAvailable": "Taklif etilgan go‘sht turlari hozircha mavjud emas.",
+                                        "notHaveAnAccount": "Akauntingiz yo'qmi? Yangisini yarating.",
+
+
 
 
 }

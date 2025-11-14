@@ -144,6 +144,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => context.go('/orders'),
                 ),
+                ListTile(
+                  leading: const Icon(Icons.star_sharp),
+                  title: Text(loc.aiHelp),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () => context.go('/ai'),
+                ),
                 const Spacer(),
                 ElevatedButton(
                   style: ButtonStyle(

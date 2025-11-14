@@ -190,6 +190,34 @@
                                     "onboarding_title_2": "Buy & Sell Easily",
                                     "onboarding_subtitle_2": "Join our community of local sellers and discover great deals.",
                                     "onboarding_title_3": "Fast & Reliable Delivery",
-                                    "onboarding_subtitle_3": "Get your orders delivered quickly right to your doorstep."
+                                    "onboarding_subtitle_3": "Get your orders delivered quickly right to your doorstep.",
+                                    "notHaveAnAccount": "Don't have an account? Create a new one.",
+                                      "username": "Username",
+                                      "phone": "Phone",
+                                      "password": "Password",
+                                      "required": "Required",
+                                      "invalidEmail": "Invalid email",
+                                      "invalidPhone": "Invalid phone number",
+                                      "minPassword": "Minimum 6 characters",
+                                      "register": "Register",
+                                      "alreadyHaveAccount": "Already have an account? Log in",
+                                      "registrationSuccess": "You have registered successfully",
+                                      "registrationFailed": "Registration failed. Try again.",
+                                      "aiHelp": "AI Help",
+
+                                      "aiAppBar": "AI Meal Assistant",
+                                        "queryInputHint": "Ask about a meal or recipe...",
+                                        "thinking": "Thinking...",
+                                        "askAi": "Ask AI",
+                                        "emptyTitle": "Ask me anything about meals!",
+                                        "emptySubtitle": "Try: \"Quick dinner under 30 mins\" or \"Healthy snacks\"",
+                                        "loadingText": "Chef AI is thinking...",
+                                        "errorText": "Failed to get response. Please try again.",
+                                        "retry": "Retry",
+                                        "responseCopied": "Response copied!",
+                                        "aiAssistant": "AI Chef Assistant",
+                                        "availableInShop": "Available in shop",
+                                        "notAvailable": "None of the suggested meats are currently available."
+
 
 }
