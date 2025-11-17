@@ -217,7 +217,12 @@
                                         "responseCopied": "Response copied!",
                                         "aiAssistant": "AI Chef Assistant",
                                         "availableInShop": "Available in shop",
-                                        "notAvailable": "None of the suggested meats are currently available."
+                                        "notAvailable": "None of the suggested meats are currently available.",
+                                            "pending": "Pending",
+                                            "paid": "Paid",
+                                            "shipped": "Shipped",
+                                            "delivered": "Delivered",
+                                            "cancelled": "Cancelled"
 
 
 }

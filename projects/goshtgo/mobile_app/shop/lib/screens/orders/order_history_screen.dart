@@ -38,6 +38,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
   }
 
+  String? getStatusText(String text) {
+    final loc = AppLocalizations.of(context)!;
+    switch (text) {
+      case "DELIVERED":
+        return loc.delivered;
+      case "PAID":
+        return loc.paid;
+      case "CANCELLED":
+        return loc.cancelled;
+      case "SHIPPED":
+        return loc.shipped;
+      default:
+        return loc.pending;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -84,7 +100,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           borderRadius: BorderRadius.circular(15)
                       ),
                       child: Text(
-                        "${order.status}",
+                        getStatusText(order.status)!,
                         style: TextStyle(
                             color: Colors.white
                         ),

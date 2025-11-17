@@ -623,4 +623,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notAvailable => 'None of the suggested meats are currently available.';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get shipped => 'Shipped';
+
+  @override
+  String get delivered => 'Delivered';
+
+  @override
+  String get cancelled => 'Cancelled';
 }

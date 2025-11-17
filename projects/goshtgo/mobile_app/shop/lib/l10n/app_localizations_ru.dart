@@ -623,4 +623,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notAvailable => 'Ни одно из предложенных мяс не доступно в данный момент.';
+
+  @override
+  String get pending => 'В ожидании';
+
+  @override
+  String get paid => 'Оплачено';
+
+  @override
+  String get shipped => 'Отправлено';
+
+  @override
+  String get delivered => 'Доставлено';
+
+  @override
+  String get cancelled => 'Отменён';
 }

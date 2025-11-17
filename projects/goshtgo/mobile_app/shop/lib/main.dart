@@ -170,7 +170,15 @@ class MyApp extends StatelessWidget {
 
         return MaterialApp.router(
           title: 'Gosht Go',
-          theme: ThemeData(useMaterial3: true),
+          theme: ThemeData(
+            useMaterial3: true,
+            scaffoldBackgroundColor: Colors.white,
+            colorScheme: ColorScheme.light(
+              background: Colors.white,
+              surface: Colors.white,
+              primary: Colors.black,
+            ),
+          ),
           routerConfig: createRouter(initialRoute),
           debugShowCheckedModeBanner: false,
           locale: localeProvider.locale,

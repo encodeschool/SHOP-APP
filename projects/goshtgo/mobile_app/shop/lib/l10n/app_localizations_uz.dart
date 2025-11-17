@@ -623,4 +623,19 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get notAvailable => 'Taklif etilgan go‘sht turlari hozircha mavjud emas.';
+
+  @override
+  String get pending => 'Kutilmoqda';
+
+  @override
+  String get paid => 'To‘langan';
+
+  @override
+  String get shipped => 'Jo‘natilgan';
+
+  @override
+  String get delivered => 'Yetkazilgan';
+
+  @override
+  String get cancelled => 'Bekor qilingan';
 }
