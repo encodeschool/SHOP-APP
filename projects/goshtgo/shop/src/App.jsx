@@ -27,6 +27,7 @@ import About from './pages/About';
 import Quality from './pages/Quality';
 import Delivery from './pages/Delivery';
 import Contact from './pages/Contact';
+import AiHelpScreen from './pages/AiHelpScreen';
 
 function App() {
     return (
@@ -66,7 +67,7 @@ function App() {
                             <Route path="/filtered" element={<FilterPage />} />
                             <Route path='/quality' element={<Quality />} />
                             <Route path='/delivery' element={<Delivery />} />
-                            
+                            <Route path='/ai' element={<AiHelpScreen />} />
                             <Route path="/compare" element={<Compare />} />
                             {/* <Route path="/search" element={<SearchResults />} /> */}
                             

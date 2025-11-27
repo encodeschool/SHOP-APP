@@ -10,6 +10,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import axios from 'axios';
 import { useTranslation } from "react-i18next";
+import Logo from '../static/img/logo.png';
 
 export default function AppBar() {
     const [languageOpen, setLanguageOpen] = useState(false);
@@ -80,7 +81,7 @@ export default function AppBar() {
                 </div>
                 <div>
                     <Link to='/'>
-                        <img src="https://primemeat.ru/local/templates/primemeat/static/images/logo.svg" alt="" />
+                        <img src={Logo} alt="Logo" className="w-[200px]" />
                     </Link>
                 </div>
                 <div>

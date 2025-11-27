@@ -15,7 +15,7 @@ export default function Footer() {
           <div className="flex items-center">
             <MdSupportAgent className='text-red-700' size={60} />
             <div className='ml-4'>
-              <p>goshtgo@gmail.com</p>
+              <p>goshtgo.uz@gmail.com</p>
               <h1 className='text-2xl'>+998 95 777-11-55</h1>
             </div>
           </div>

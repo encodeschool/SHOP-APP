@@ -24,6 +24,8 @@ import { MdLanguage } from "react-icons/md";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { RiLoginCircleFill } from "react-icons/ri";
 import 'flag-icons/css/flag-icons.min.css';
+import { BsStars } from "react-icons/bs";
+import Logo from '../static/img/logo.png';
 
 const CategoryBar = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -182,7 +184,9 @@ const CategoryBar = () => {
         </div>
         <div className="flex ml-6">
           <TbRosetteDiscount size={50} className="text-white mr-1" />
-          <TbRosetteDiscountCheck size={50} className="text-white mr-1"  />
+          <Link to='/ai'>
+            <BsStars size={40} className="text-white ml-4" />
+          </Link>
         </div>
         <div className="flex-1 mx-6 max-w-3xl flex">
           <input
@@ -318,7 +322,7 @@ const CategoryBar = () => {
       >
         <div className="flex items-center justify-between p-4 border-b">
           <Link to="/" className="text-3xl font-bold flex items-center justify-center">
-            <img src="https://primemeat.ru/local/templates/primemeat/static/images/logo.svg" alt="" />
+            <img src={Logo} alt="Logo" className='w-[100px]' />
           </Link>
           <button onClick={toggleMobileMenu} className="text-gray-700">
             <FaTimes size={25} />
