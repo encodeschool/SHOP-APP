@@ -34,7 +34,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/locale_provider.dart';
 import 'core/network_manager.dart';
 import 'l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -100,10 +99,7 @@ GoRouter createRouter(String initialRoute) => GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingScreen(),
     ),
-    GoRoute(
-      path: '/ai',
-      builder: (context, state) => const AIHelpScreen(),
-    ),
+    GoRoute(path: '/ai', builder: (context, state) => const AIHelpScreen()),
 
     ShellRoute(
       builder: (context, state, child) => MainNavigationScreen(child: child),
@@ -174,7 +170,6 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
             scaffoldBackgroundColor: Colors.white,
             colorScheme: ColorScheme.light(
-              background: Colors.white,
               surface: Colors.white,
               primary: Colors.black,
             ),
@@ -182,11 +177,7 @@ class MyApp extends StatelessWidget {
           routerConfig: createRouter(initialRoute),
           debugShowCheckedModeBanner: false,
           locale: localeProvider.locale,
-          supportedLocales: const [
-            Locale('en'),
-            Locale('ru'),
-            Locale('uz'),
-          ],
+          supportedLocales: const [Locale('en'), Locale('ru'), Locale('uz')],
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
