@@ -67,10 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        'assets/logo/logo.svg',
-                        width: 80,
-                        height: 80,
+                      Image.asset(
+                        'assets/logo/logo.png',
+                        width: 150,
+                        height: 150,
                       ),
                       const SizedBox(height: 24),
                       TextField(

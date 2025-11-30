@@ -245,8 +245,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SvgPicture.asset('assets/logo/logo.svg',
-                            width: 50, height: 50),
+                        Image.asset('assets/logo/logo.png',
+                            width: 100, height: 100),
                         Builder(
                           builder: (context) => IconButton(
                             icon: const Icon(Icons.menu, size: 32),
