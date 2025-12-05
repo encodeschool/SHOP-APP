@@ -6,15 +6,18 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import { useTranslation } from 'react-i18next';
 
 export default function CarouselBanner() {
   const [banners, setBanners] = useState([]);
+  const { i18n } = useTranslation();
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   // Fetch banners from backend
   const fetchBanners = async () => {
     try {
-      const { data } = await axios.get("/banner");
+      const lang = i18n.language === 'lv' ? 'en' : i18n.language; // fallback
+      const { data } = await axios.get(`/banner/lang?lang=${lang}`);
       setBanners(data);
     } catch (err) {
       console.error("Failed to fetch banners", err);
@@ -23,9 +26,9 @@ export default function CarouselBanner() {
 
   useEffect(() => {
     fetchBanners();
-  }, []);
+  }, [i18n.language]); // lang o‘zgarganda qayta fetch qilinadi
 
-  if (!banners.length) return null; // Show nothing if no banners are available
+  if (!banners.length) return null;
 
   return (
     <div className="w-full">

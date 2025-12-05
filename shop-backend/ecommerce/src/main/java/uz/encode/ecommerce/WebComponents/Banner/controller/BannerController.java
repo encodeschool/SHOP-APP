@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,13 +37,32 @@ public class BannerController {
         return ResponseEntity.ok(bannerService.findAllBanners());
     }
 
+    @GetMapping("/lang")
+    @Operation(summary = "Get All Banners with Language")
+    public ResponseEntity<List<BannerResponseDTO>> getAllBanners(
+            @RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(bannerService.findAllBanners(lang));
+    }
+
     @PostMapping(consumes = "multipart/form-data")
     @Operation(summary = "Save Banner")
     public ResponseEntity<BannerResponseDTO> saveBanner(
-            @RequestPart("banner") BannerResponseDTO dto,
-            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
-        BannerResponseDTO banner = bannerService.saveBanner(dto, multipartFile);
-        return ResponseEntity.ok(banner);
+            @RequestPart("banner") BannerResponseDTO bannerDto,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        BannerResponseDTO saved = bannerService.saveBanner(bannerDto, image);
+        return ResponseEntity.ok(saved);
+    }
+
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    @Operation(summary = "Update Banner")
+    public ResponseEntity<BannerResponseDTO> updateBanner(
+            @PathVariable UUID id,
+            @RequestPart("banner") BannerResponseDTO bannerDto,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        BannerResponseDTO updated = bannerService.updateBanner(id, bannerDto, image);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
@@ -51,13 +71,4 @@ public class BannerController {
         bannerService.deleteBanner(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<BannerResponseDTO> updateBanner(
-            @PathVariable UUID id,
-            @RequestPart("banner") BannerResponseDTO bannerDto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        return ResponseEntity.ok(bannerService.updateBanner(id, bannerDto, image));
-    }
-
 }

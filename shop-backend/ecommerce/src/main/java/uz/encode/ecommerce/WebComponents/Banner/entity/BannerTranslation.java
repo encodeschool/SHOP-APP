@@ -1,15 +1,14 @@
 package uz.encode.ecommerce.WebComponents.Banner.entity;
 
-import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
+import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,24 +16,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "banner")
-@Setter
+@Table(name = "banner_translations")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Banner {
-    
+public class BannerTranslation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private String image;
+    private String language;
+
     private String title;
     private String description;
     private String buttonText;
-    private String buttonLink;
 
-    @OneToMany(mappedBy = "banner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<BannerTranslation> translations;
-
+    @ManyToOne
+    @JoinColumn(name = "banner_id")
+    private Banner banner;
 }

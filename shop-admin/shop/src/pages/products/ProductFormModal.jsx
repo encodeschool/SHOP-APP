@@ -1,228 +1,210 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "../../api/axios";
 
-export default function ProductFormModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  product,
-  isEditing,
-  categories,
-  subcategories,
-  users,
-  fetchAttributesFn
-}) {
+export default function Banner() {
+  const [banners, setBanners] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    price: '',
-    stock: '',
-    condition: 'NEW',
-    categoryId: '',
-    subcategoryId: '',
-    userId: '',
-    featured: false,
-    images: []
+    title: "",
+    description: "",
+    buttonText: "",
+    buttonLink: "",
+    image: null,
+    translations: [
+      { lang: "uz", title: "", description: "", buttonText: "" },
+      { lang: "ru", title: "", description: "", buttonText: "" },
+      { lang: "en", title: "", description: "", buttonText: "" }
+    ]
   });
 
-  const [attributes, setAttributes] = useState([]);
-  const [attributeValues, setAttributeValues] = useState([]);
+  // Fetch all banners
+  const fetchBanners = async () => {
+    try {
+      const { data } = await axios.get("/banner");
+      setBanners(data);
+    } catch (err) {
+      console.error("Failed to fetch banners", err);
+    }
+  };
 
   useEffect(() => {
-    if (product) {
-      const {
-        categoryId,
-        category,
-        title,
-        description,
-        price,
-        stock,
-        condition,
-        userId,
-        featured,
-        attributes: attrVals
-      } = product;
+    fetchBanners();
+  }, []);
 
-      const parentId = category?.parentId;
-      const subId = parentId ? categoryId : '';
-      const catId = parentId || categoryId;
-
-      setForm({
-        title,
-        description,
-        price,
-        stock,
-        condition,
-        categoryId: catId,
-        subcategoryId: subId,
-        userId,
-        featured,
-        images: []
-      });
-
-      fetchAttributesFn(catId).then(attrs => {
-        setAttributes(attrs);
-        setAttributeValues(attrs.map(attr => {
-          const match = attrVals?.find(a => a.attributeId === attr.id);
-          return { attributeId: attr.id, value: match?.value || '' };
-        }));
-      });
-    } else {
-      setForm({
-        title: '',
-        description: '',
-        price: '',
-        stock: '',
-        condition: 'NEW',
-        categoryId: '',
-        subcategoryId: '',
-        userId: '',
-        featured: false,
-        images: []
-      });
-      setAttributeValues([]);
-      setAttributes([]);
-    }
-  }, [product, isEditing, fetchAttributesFn]);
-
+  // Handle simple input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-    if (name === 'categoryId') {
-      fetchAttributesFn(value).then(attrs => {
-        setAttributes(attrs);
-        setAttributeValues(attrs.map(attr => ({
-          attributeId: attr.id,
-          value: ''
-        })));
+  // Handle translation inputs
+  const handleTranslationChange = (index, field, value) => {
+    const updated = [...form.translations];
+    updated[index][field] = value;
+    setForm((prev) => ({ ...prev, translations: updated }));
+  };
+
+  // Handle image
+  const handleFileChange = (e) => {
+    setForm((prev) => ({ ...prev, image: e.target.files[0] }));
+  };
+
+  // Submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+
+      const bannerJson = {
+        title: form.title,
+        description: form.description,
+        buttonText: form.buttonText,
+        buttonLink: form.buttonLink,
+        translations: form.translations
+      };
+
+      formData.append(
+        "banner",
+        new Blob([JSON.stringify(bannerJson)], { type: "application/json" })
+      );
+
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+
+      if (editingId) {
+        await axios.put(`/banner/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      } else {
+        await axios.post(`/banner`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      }
+
+      // Reset form
+      setForm({
+        title: "",
+        description: "",
+        buttonText: "",
+        buttonLink: "",
+        image: null,
+        translations: [
+          { lang: "uz", title: "", description: "", buttonText: "" },
+          { lang: "ru", title: "", description: "", buttonText: "" },
+          { lang: "en", title: "", description: "", buttonText: "" }
+        ]
       });
-    }
-    if (name === 'subcategoryId') {
-      fetchAttributesFn(value).then(attrs => {
-        setAttributes(attrs);
-        setAttributeValues(attrs.map(attr => ({
-          attributeId: attr.id,
-          value: ''
-        })));
-      });
+
+      setEditingId(null);
+      fetchBanners();
+    } catch (err) {
+      console.error("Failed to save banner", err);
     }
   };
 
-  const handleAttributeChange = (index, value) => {
-    const updated = [...attributeValues];
-    updated[index].value = value;
-    setAttributeValues(updated);
+  const handleEdit = (banner) => {
+    setForm({
+      title: banner.title,
+      description: banner.description,
+      buttonText: banner.buttonText,
+      buttonLink: banner.buttonLink,
+      image: null,
+      translations: banner.translations || []
+    });
+    setEditingId(banner.id);
   };
 
-  const handleImageChange = (e) => {
-    setForm(prev => ({ ...prev, images: Array.from(e.target.files) }));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete banner?")) return;
+    try {
+      await axios.delete(`/banner/${id}`);
+      fetchBanners();
+    } catch (err) {
+      console.error("Failed to delete banner", err);
+    }
   };
-
-  const handleSubmit = () => {
-    const finalCategoryId = form.subcategoryId || form.categoryId;
-
-    const payload = {
-      ...form,
-      categoryId: finalCategoryId,
-      stock: parseInt(form.stock),
-      price: parseFloat(form.price),
-      attributes: attributeValues.filter(a => a.value !== '')
-    };
-
-    onSubmit(payload, form.images);
-    onClose();
-  };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white p-6 w-[500px] rounded shadow-lg overflow-y-auto max-h-[90vh]">
-        <h2 className="text-xl font-bold mb-4">{isEditing ? 'Edit' : 'Add'} Product</h2>
+    <div className="p-4">
 
-        <input name="title" placeholder="Title" className="border p-2 mb-3 w-full" value={form.title} onChange={handleChange} />
-        <input name="description" placeholder="Description" className="border p-2 mb-3 w-full" value={form.description} onChange={handleChange} />
-        <input name="price" type="number" placeholder="Price" className="border p-2 mb-3 w-full" value={form.price} onChange={handleChange} />
-        <input name="stock" type="number" placeholder="Stock" className="border p-2 mb-3 w-full" value={form.stock} onChange={handleChange} />
+      <h1 className="text-2xl font-bold mb-4">
+        {editingId ? "Edit Banner" : "Create Banner"}
+      </h1>
 
-        <select name="condition" className="border p-2 mb-3 w-full" value={form.condition} onChange={handleChange}>
-          <option value="NEW">New</option>
-          <option value="USED">Used</option>
-        </select>
+      {/* ==== FORM ==== */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
 
-        <select name="categoryId" className="border p-2 mb-3 w-full" value={form.categoryId} onChange={handleChange}>
-          <option value="">Select Category</option>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+        {/* Main fields */}
+        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} className="border p-2 rounded" required />
+        <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className="border p-2 rounded" required />
+        <input name="buttonText" placeholder="Button Text" value={form.buttonText} onChange={handleChange} className="border p-2 rounded" required />
+        <input name="buttonLink" placeholder="Button Link" value={form.buttonLink} onChange={handleChange} className="border p-2 rounded" required />
+
+        {/* Image */}
+        <input type="file" onChange={handleFileChange} accept="image/*" className="border p-2 rounded col-span-2" />
+
+        {/* TRANSLATIONS */}
+        <div className="col-span-2 bg-gray-100 p-4 rounded">
+          <h2 className="font-bold mb-3">Translations</h2>
+
+          {form.translations.map((t, idx) => (
+            <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 border rounded bg-white">
+              <div>
+                <label className="text-sm font-semibold">{t.lang.toUpperCase()} Title</label>
+                <input
+                  value={t.title}
+                  onChange={(e) => handleTranslationChange(idx, "title", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold">{t.lang.toUpperCase()} Description</label>
+                <input
+                  value={t.description}
+                  onChange={(e) => handleTranslationChange(idx, "description", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold">{t.lang.toUpperCase()} Button Text</label>
+                <input
+                  value={t.buttonText}
+                  onChange={(e) => handleTranslationChange(idx, "buttonText", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+            </div>
           ))}
-        </select>
+        </div>
 
-        <select name="subcategoryId" className="border p-2 mb-3 w-full" value={form.subcategoryId} onChange={handleChange}>
-          <option value="">Select Subcategory</option>
-          {subcategories.map(sc => (
-            <option key={sc.id} value={sc.id}>{sc.name}</option>
-          ))}
-        </select>
+        <button type="submit" className="col-span-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
+          {editingId ? "Update Banner" : "Create Banner"}
+        </button>
+      </form>
 
-        <select name="userId" className="border p-2 mb-3 w-full" value={form.userId} onChange={handleChange}>
-          <option value="">Select User</option>
-          {users.map(u => (
-            <option key={u.id} value={u.id}>{u.name || u.email}</option>
-          ))}
-        </select>
+      {/* ==== LIST ==== */}
+      <h2 className="text-xl font-bold mb-4">Banners</h2>
 
-        <label className="flex items-center mb-3">
-          <input
-            type="checkbox"
-            className="mr-2"
-            checked={form.featured}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                featured: e.target.checked
-              }))
-            }
-          />
-          Featured Product
-        </label>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {banners.map((b) => (
+          <div key={b.id} className="border rounded p-2 shadow">
+            {b.image && <img src={`${BASE_URL}${b.image}`} className="w-full h-40 object-cover rounded" alt="" />}
+            <h3 className="font-bold">{b.title}</h3>
+            <p>{b.description}</p>
 
-        {/* Attributes */}
-        {attributes.map((attr, i) => (
-          <div key={attr.id} className="mb-3">
-            <label className="block mb-1 font-medium">
-              {attr.name} {attr.isRequired ? '*' : ''}
-            </label>
-            {attr.type === 'DROPDOWN' ? (
-              <select
-                className="border p-2 w-full"
-                value={attributeValues[i]?.value || ''}
-                onChange={e => handleAttributeChange(i, e.target.value)}
-              >
-                <option value="">Select {attr.name}</option>
-                {attr.options.map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                className="border p-2 w-full"
-                type={attr.type === 'NUMBER' ? 'number' : 'text'}
-                value={attributeValues[i]?.value || ''}
-                onChange={e => handleAttributeChange(i, e.target.value)}
-              />
-            )}
+            <div className="mt-2 flex gap-2">
+              <button onClick={() => handleEdit(b)} className="bg-yellow-500 px-3 py-1 rounded text-white">Edit</button>
+              <button onClick={() => handleDelete(b.id)} className="bg-red-500 px-3 py-1 rounded text-white">Delete</button>
+            </div>
           </div>
         ))}
-
-        <input type="file" multiple accept="image/*" onChange={handleImageChange} className="border p-2 mb-4 w-full" />
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
-          <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">
-            {isEditing ? 'Update' : 'Create'}
-          </button>
-        </div>
       </div>
+
     </div>
   );
 }

@@ -13,6 +13,8 @@ public interface BannerService {
     
     List<BannerResponseDTO> findAllBanners();
 
+    List<BannerResponseDTO> findAllBanners(String lang);
+
     BannerResponseDTO saveBanner(BannerResponseDTO banner, MultipartFile multipartFile);
 
     void deleteBanner(UUID id);
