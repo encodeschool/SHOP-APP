@@ -125,7 +125,7 @@ export default function TrackOrder() {
               <span className="font-medium">{order.status}</span>
             </p>
             <table className="w-full my-4 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-white uppercase bg-indigo-400 dark:text-white">
+              <thead className="text-xs text-white uppercase bg-red-700 dark:text-white">
                 <tr>
                   <th className="p-2">{t("Title")}</th>
                   <th className="p-2">{t("Quantity")}</th>
@@ -134,7 +134,7 @@ export default function TrackOrder() {
               </thead>
               <tbody>
                 {order.items.map((item, index) => (
-                  <tr key={`${item.id || item.productTitle}-${index}`} className="border-b border-indigo-400">
+                  <tr key={`${item.id || item.productTitle}-${index}`} className="border-b border-red-700">
                     <td className="p-2">{item.productTitle}</td>
                     <td className="p-2">{item.quantity}</td>
                     <td className="p-2">{item.pricePerUnit}</td>
