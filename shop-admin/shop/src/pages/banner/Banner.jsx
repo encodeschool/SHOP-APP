@@ -5,6 +5,9 @@ export default function Banner() {
   const [banners, setBanners] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -17,11 +20,15 @@ export default function Banner() {
 
   // Fetch banners
   const fetchBanners = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get("/banner");
       setBanners(data);
+      setLoading(false);
     } catch (err) {
       console.error("Failed to fetch banners", err);
+      setError("Failed to fetch banner");
+      setLoading(false);
     }
   };
 
@@ -105,6 +112,7 @@ export default function Banner() {
         image: null
       });
       setEditingId(null);
+      setIsDrawerOpen(false);
       fetchBanners();
     } catch (err) {
       console.error("Failed to save banner", err);
@@ -122,6 +130,7 @@ export default function Banner() {
       image: null
     });
     setEditingId(banner.id);
+    setIsDrawerOpen(true);
   };
 
   // Delete
@@ -136,162 +145,212 @@ export default function Banner() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">
-        {editingId ? "Edit Banner" : "Create Banner"}
-      </h1>
-
-      {/* Banner Form */}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-
-        <input
-          type="text"
-          name="buttonText"
-          placeholder="Button Text"
-          value={form.buttonText}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-
-        <input
-          type="text"
-          name="buttonLink"
-          placeholder="Button Link"
-          value={form.buttonLink}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-
-        {/* Translations Section */}
-        <div className="col-span-1 md:col-span-2 bg-gray-100 p-3 rounded">
-          <h3 className="font-semibold mb-2">Translations</h3>
-
-          {form.translations.map((t, index) => (
-            <div key={index} className="border p-3 rounded mb-3">
-              <select
-                className="border p-2 w-full mb-2"
-                value={t.language}
-                onChange={(e) => handleTranslationChange(index, "language", e.target.value)}
-              >
-                <option value="">Select Language</option>
-                <option value="en">English</option>
-                <option value="ru">Russian</option>
-                <option value="uz">Uzbek</option>
-              </select>
-
-              <input
-                type="text"
-                placeholder="Translated Title"
-                className="border p-2 w-full mb-2"
-                value={t.title}
-                onChange={(e) => handleTranslationChange(index, "title", e.target.value)}
-              />
-
-              <input
-                type="text"
-                placeholder="Translated Description"
-                className="border p-2 w-full mb-2"
-                value={t.description}
-                onChange={(e) => handleTranslationChange(index, "description", e.target.value)}
-              />
-
-              <input
-                type="text"
-                placeholder="Button Translation"
-                className="border p-2 w-full mb-2"
-                value={t.buttonText}
-                onChange={(e) => handleTranslationChange(index, "buttonText", e.target.value)}
-              />
-
-              <button
-                type="button"
-                className="bg-red-500 text-white px-3 py-1 rounded"
-                onClick={() => removeTranslation(index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-
+    <div className="h-[100%] p-4">
+      <div className="flex gap-4 h-[100%]">
+        {/* Left Column */}
+        <div className="w-[100%]">
+          <h2 className="text-xl font-bold mb-4">Banner</h2>
           <button
-            type="button"
-            className="bg-blue-500 text-white px-4 py-1 rounded"
-            onClick={addTranslation}
+            className="bg-green-500 mb-6 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded"
+            onClick={() => {
+              setEditingId(null);
+              setForm({
+                title: "",
+                description: "",
+                buttonText: "",
+                buttonLink: "",
+                translations: [],
+                image: null
+              });
+              setIsDrawerOpen(true);
+            }}
           >
-            Add Translation
+            +
           </button>
+          {loading ? (
+            <div className="p-4">Loading categories...</div>
+          ) : error ? (
+            <div className="p-4 text-red-500">{error}</div>
+          ) : (
+            <table className="w-full border bg-white shadow">
+              <thead>
+                <tr className="bg-gray-200 text-left">
+                  <th className="p-2">Image</th>
+                  <th className="p-2">Title</th>
+                  <th className="p-2">Description</th>
+                  <th className="p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {banners.map((banner) => (
+                  <tr key={banner.id}>
+                    <td className="p-2">
+                      {banner.image && (
+                        <img
+                          src={`${BASE_URL}${banner.image}`}
+                          alt={banner.title}
+                          className="w-full h-40 object-cover rounded"
+                        />
+                      )}
+                    </td>
+                    <td className="p-2">{banner.title}</td>
+                    <td className="p-2">{banner.description}</td>
+                    <td className="p-2">
+                      <button
+                        onClick={() => handleEdit(banner)}
+                        className="bg-yellow-500 text-white px-3 py-1 rounded"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(banner.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
+        {/* Drawer Overlay */}
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity ${
+            isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setIsDrawerOpen(false)}
+        ></div>
 
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="border p-2 rounded col-span-1 md:col-span-2"
-          accept="image/*"
-        />
-
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded col-span-1 md:col-span-2"
+        {/* Drawer Panel */}
+        <div
+          className={`fixed top-0 right-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+            isDrawerOpen ? "translate-x-0" : "translate-x-full"
+          } w-[100%] md:w-[500px] overflow-y-scroll`}
         >
-          {editingId ? "Update Banner" : "Create Banner"}
-        </button>
-      </form>
-
-      {/* Banner List */}
-      <h2 className="text-xl font-bold mb-4">Banners</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {banners.map((banner) => (
-          <div key={banner.id} className="border rounded shadow p-2">
-            {banner.image && (
-              <img
-                src={`${BASE_URL}${banner.image}`}
-                alt={banner.title}
-                className="w-full h-40 object-cover rounded"
+          <div className="p-4">
+            <div className="p-4 bg-white shadow h-fit">
+              <h3 className="text-2xl font-bold mb-4">{editingId ? "Edit Banner" : "Create Banner"}</h3>
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <input
+                type="text"
+                name="title"
+                placeholder="Title"
+                value={form.title}
+                onChange={handleChange}
+                className="border p-2 rounded"
+                required
               />
-            )}
 
-            <h3 className="font-bold mt-2">{banner.title}</h3>
-            <p className="text-sm">{banner.description}</p>
+              <input
+                type="text"
+                name="description"
+                placeholder="Description"
+                value={form.description}
+                onChange={handleChange}
+                className="border p-2 rounded"
+                required
+              />
 
-            <div className="flex gap-2 mt-3">
+              <input
+                type="text"
+                name="buttonText"
+                placeholder="Button Text"
+                value={form.buttonText}
+                onChange={handleChange}
+                className="border p-2 rounded"
+                required
+              />
+
+              <input
+                type="text"
+                name="buttonLink"
+                placeholder="Button Link"
+                value={form.buttonLink}
+                onChange={handleChange}
+                className="border p-2 rounded"
+                required
+              />
+
+              {/* Translations Section */}
+              <div className="col-span-1 md:col-span-2 bg-gray-100 p-3 rounded">
+                <h3 className="font-semibold mb-2">Translations</h3>
+
+                {form.translations.map((t, index) => (
+                  <div key={index} className="border p-3 rounded mb-3">
+                    <select
+                      className="border p-2 w-full mb-2"
+                      value={t.language}
+                      onChange={(e) => handleTranslationChange(index, "language", e.target.value)}
+                    >
+                      <option value="">Select Language</option>
+                      <option value="en">English</option>
+                      <option value="ru">Russian</option>
+                      <option value="uz">Uzbek</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      placeholder="Translated Title"
+                      className="border p-2 w-full mb-2"
+                      value={t.title}
+                      onChange={(e) => handleTranslationChange(index, "title", e.target.value)}
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Translated Description"
+                      className="border p-2 w-full mb-2"
+                      value={t.description}
+                      onChange={(e) => handleTranslationChange(index, "description", e.target.value)}
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Button Translation"
+                      className="border p-2 w-full mb-2"
+                      value={t.buttonText}
+                      onChange={(e) => handleTranslationChange(index, "buttonText", e.target.value)}
+                    />
+
+                    <button
+                      type="button"
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                      onClick={() => removeTranslation(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white px-4 py-1 rounded"
+                  onClick={addTranslation}
+                >
+                  Add Translation
+                </button>
+              </div>
+
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="border p-2 rounded col-span-1 md:col-span-2"
+                accept="image/*"
+              />
+
               <button
-                onClick={() => handleEdit(banner)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded"
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded col-span-1 md:col-span-2"
               >
-                Edit
+                {editingId ? "Update Banner" : "Create Banner"}
               </button>
-
-              <button
-                onClick={() => handleDelete(banner.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
+            </form>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
     </div>
