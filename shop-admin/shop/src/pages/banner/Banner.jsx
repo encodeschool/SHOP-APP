@@ -145,7 +145,7 @@ export default function Banner() {
   };
 
   return (
-    <div className="h-[100%] p-4">
+    <div className="h-[100%]">
       <div className="flex gap-4 h-[100%]">
         {/* Left Column */}
         <div className="w-[100%]">
@@ -168,7 +168,7 @@ export default function Banner() {
             +
           </button>
           {loading ? (
-            <div className="p-4">Loading categories...</div>
+            <div className="p-4">Loading banners...</div>
           ) : error ? (
             <div className="p-4 text-red-500">{error}</div>
           ) : (

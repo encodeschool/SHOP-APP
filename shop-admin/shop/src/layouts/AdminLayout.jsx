@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { getUserById } from "../api/authService";
 import { TbRulerMeasure } from "react-icons/tb";
+import { RiDiscountPercentLine } from "react-icons/ri";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -92,6 +93,10 @@ export default function AdminLayout() {
             <NavLink to="/units" className={linkClass}>
               <TbRulerMeasure />
               <span>Units</span>
+            </NavLink>
+            <NavLink to="/promos" className={linkClass}>
+              <RiDiscountPercentLine />
+              <span>Promo Code</span>
             </NavLink>
           </nav>
         </div>

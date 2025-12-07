@@ -16,6 +16,7 @@ import Forbidden from "./pages/Errors/Forbidden";
 import ServerError from "./pages/Errors/ServerError";
 import Widgets from "./pages/home/Widgets";
 import Units from './pages/units/Units';
+import PromoCode from './pages/promoCode/PromoCode';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="promos" element={<PromoCode />} />
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
           <Route path="categories" element={<Categories />} />
