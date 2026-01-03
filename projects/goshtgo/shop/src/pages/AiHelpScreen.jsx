@@ -64,12 +64,9 @@ const AiHelpScreen = () => {
     };
 
     return (
-        <div className="flex flex-col items-center w-full bg-gray-100">
-            <header className="w-full bg-white shadow p-4 text-center">
-                <h1 className="text-2xl font-bold">🍖 AI Halal Meat Assistant</h1>
-            </header>
+        <div className="flex flex-col container mx-auto px-4 md:px-10 py-6 text-gray-800 items-center w-full">
 
-            <div className="flex-1 w-full max-w-3xl bg-white shadow-lg border rounded-lg mt-4 overflow-hidden flex flex-col">
+            <div className="flex-1 w-full bg-white border rounded-lg my-4 overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {chat.map((msg, i) => (
                         <div

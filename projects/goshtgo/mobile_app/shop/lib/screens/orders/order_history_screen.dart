@@ -96,13 +96,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                       decoration: BoxDecoration(
-                          color: getStatusColor(order.status),
-                          borderRadius: BorderRadius.circular(15)
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            width: 1,
+                            color: getStatusColor(order.status)!
+                          )
                       ),
                       child: Text(
                         getStatusText(order.status)!,
                         style: TextStyle(
-                            color: Colors.white
+                            color: getStatusColor(order.status)
                         ),
                       ),
                     ),

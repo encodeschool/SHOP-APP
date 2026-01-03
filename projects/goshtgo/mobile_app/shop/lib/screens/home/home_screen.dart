@@ -320,7 +320,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // 🔎 Search Results
             if (_searchResults.isNotEmpty)
               SliverPadding(
                 padding: const EdgeInsets.all(8),

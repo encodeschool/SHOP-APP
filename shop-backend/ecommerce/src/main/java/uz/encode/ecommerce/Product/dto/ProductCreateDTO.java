@@ -52,4 +52,6 @@ public class ProductCreateDTO {
     private UUID brandId; // ✅ new
 
     private List<ProductTranslationDTO> translations = new ArrayList<>();
+
+    private LocationResponseDTO location;
 }

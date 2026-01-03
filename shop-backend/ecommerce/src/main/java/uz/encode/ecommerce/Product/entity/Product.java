@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -74,6 +78,15 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
+
+    @OneToOne(
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
+    @JoinColumn(name = "location_id")
+    @JsonManagedReference
+    private Location location;
 
     private boolean isInStock;
 

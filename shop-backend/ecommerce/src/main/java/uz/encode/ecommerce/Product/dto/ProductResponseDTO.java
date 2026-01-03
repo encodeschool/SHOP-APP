@@ -43,6 +43,7 @@ public class ProductResponseDTO {
     private UUID brandId;     // optional
     private List<ProductTranslationDTO> translations = new ArrayList<>();
     private String lang;
+    private LocationResponseDTO location;
 
     public ProductResponseDTO(Product product, String language) {
         this.id = product.getId();
@@ -94,6 +95,7 @@ public class ProductResponseDTO {
                 .map(t -> new ProductTranslationDTO(t.getLanguage(), t.getName(), t.getDescription()))
                 .collect(Collectors.toList());
         this.unit = product.getUnit();
+        this.location = product.getLocation() != null ? LocationResponseDTO.from(product.getLocation()) : null;
     }
 
 }

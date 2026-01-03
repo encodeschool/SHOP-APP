@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import DynamicAttributeForm from '../../components/DynamicAttributeForm';
 import { Link } from 'react-router-dom';
+import MapPicker from "../../components/MapPicker";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -32,7 +33,16 @@ export default function Products() {
     brandId: '',
     attributes: [],
     translations: [],
-    unitId: ''
+    unitId: '',
+    location: {
+      latitude: null,
+      longitude: null,
+      city: '',
+      region: '',
+      country: '',
+      address: '',
+      source: 'MANUAL'
+    }
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -51,6 +61,53 @@ export default function Products() {
         setIsLoading(false);
       });
   };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setNewProduct(prev => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            source: 'GPS'
+          }
+        }));
+      },
+      (err) => alert("Location permission denied")
+    );
+  };
+
+  useEffect(() => {
+    if (newProduct.location.latitude && newProduct.location.longitude) {
+      axios.get("/geo/reverse", {
+        params: {
+          lat: newProduct.location.latitude,
+          lon: newProduct.location.longitude
+        }
+      }).then(res => {
+        setNewProduct(prev => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            city: res.data.city || "",
+            region: res.data.region || "",
+            country: res.data.country || "",
+            address: res.data.address || prev.location.address
+          }
+        }));
+      }).catch(err => {
+        console.warn("Reverse geocoding failed", err);
+      });
+    }
+  }, [newProduct.location.latitude, newProduct.location.longitude]);
+
 
   const fetchBrands = () => {
     axios.get('/products/brands')
@@ -211,8 +268,15 @@ export default function Products() {
       attributes: newProduct.attributes,
       brandId: newProduct.brandId,
       translations: newProduct.translations,
-      unitId: newProduct.unitId
+      unitId: newProduct.unitId,
+      location: newProduct.location,
     };
+
+    if (!newProduct.location.latitude) {
+      alert("Please select product location");
+      return;
+    }
+
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
       type: 'application/json'
@@ -247,7 +311,17 @@ export default function Products() {
         attributes: [],
         brandId: '',
         translations: [],
-        unitId: ''
+        unitId: '',
+        location: {
+          latitude: null,
+          longitude: null,
+          city: '',
+          region: '',
+          country: '',
+          address: '',
+          source: 'MANUAL'
+        }
+
       });
       setAttributes([]);
       setEditingId(null);
@@ -292,7 +366,16 @@ export default function Products() {
       })),
       brandId: product.brand?.id || '',
       translations: product.translations || [],
-      unitId: product.unitId || ''
+      unitId: product.unitId || '',
+      location: product.location || {
+        latitude: null,
+        longitude: null,
+        city: '',
+        region: '',
+        country: '',
+        address: '',
+        source: 'MANUAL'
+      }
     });
 
     if (parentCategoryId) {
@@ -330,7 +413,16 @@ export default function Products() {
                   attributes: [],
                   brandId: '',
                   translations: [],
-                  unitId: ''
+                  unitId: '',
+                  location: {
+                    latitude: null,
+                    longitude: null,
+                    city: '',
+                    region: '',
+                    country: '',
+                    address: '',
+                    source: 'MANUAL'
+                  }
                 });
                 setIsDrawerOpen(true);
               }}
@@ -455,6 +547,53 @@ export default function Products() {
 
               <input name="price" type="number" placeholder="Price" className="border p-1 mb-3 w-full" value={newProduct.price} onChange={handleInputChange} />
               <input name="stock" type="number" placeholder="Stock" className="border p-1 mb-3 w-full" value={newProduct.stock} onChange={handleInputChange} />
+
+              <h3>📍 Product Location</h3>
+
+              <button type="button" onClick={getCurrentLocation}>
+                Use GPS Location
+              </button>
+
+              <MapPicker
+                location={newProduct.location}
+                onChange={(loc) =>
+                  setNewProduct(prev => ({
+                    ...prev,
+                    location: { ...prev.location, ...loc }
+                  }))
+                }
+              />
+
+              <div style={{ marginTop: 10 }}>
+                <input
+                  placeholder="City"
+                  value={newProduct.location.city}
+                  readOnly
+                />
+                <input
+                  placeholder="Region"
+                  value={newProduct.location.region}
+                  readOnly
+                />
+                <input
+                  placeholder="Country"
+                  value={newProduct.location.country}
+                  readOnly
+                />
+                <textarea
+                  placeholder="Full address"
+                  value={newProduct.location.address}
+                  readOnly
+                />
+              </div>
+
+              {newProduct.location.latitude && (
+                <small>
+                  Lat: {newProduct.location.latitude.toFixed(5)}, 
+                  Lng: {newProduct.location.longitude.toFixed(5)}
+                </small>
+              )}
+
 
               <select name="condition" className="border p-1 mb-3 w-full" value={newProduct.condition} onChange={handleInputChange}>
                 <option value="NEW">New</option>

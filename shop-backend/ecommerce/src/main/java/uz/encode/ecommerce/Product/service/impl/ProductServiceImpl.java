@@ -28,18 +28,22 @@ import uz.encode.ecommerce.Category.repository.CategoryRepository;
 import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
+import uz.encode.ecommerce.Product.dto.LocationResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductAttributeDTO;
 import uz.encode.ecommerce.Product.dto.ProductCreateDTO;
 import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
 import uz.encode.ecommerce.Product.dto.ProductTranslationDTO;
 import uz.encode.ecommerce.Product.entity.AttributeType;
 import uz.encode.ecommerce.Product.entity.Brand;
+import uz.encode.ecommerce.Product.entity.Location;
+import uz.encode.ecommerce.Product.entity.LocationSource;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.entity.ProductAttribute;
 import uz.encode.ecommerce.Product.entity.ProductAttributeTranslation;
 import uz.encode.ecommerce.Product.entity.ProductAttributeValue;
 import uz.encode.ecommerce.Product.entity.ProductTranslation;
 import uz.encode.ecommerce.Product.repository.BrandRepository;
+import uz.encode.ecommerce.Product.repository.LocationRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeRepository;
 import uz.encode.ecommerce.Product.repository.ProductAttributeValueRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
@@ -83,6 +87,8 @@ public class ProductServiceImpl implements ProductService {
     private BrandRepository brandRepository;
     @Autowired
     private UnitRepository unitRepository;
+    @Autowired
+    private LocationRepository locationRepository;
 
     @Override
     @Transactional
@@ -116,6 +122,20 @@ public class ProductServiceImpl implements ProductService {
 
         // Save product first to get ID
         Product savedProduct = productRepository.save(product);
+
+        if (dto.getLocation() != null) {
+            LocationResponseDTO locDto = dto.getLocation();
+            Location location = new Location();
+            location.setLatitude(locDto.getLatitude());
+            location.setLongitude(locDto.getLongitude());
+            location.setCity(locDto.getCity());
+            location.setRegion(locDto.getRegion());
+            location.setCountry(locDto.getCountry());
+            location.setAddress(locDto.getAddress());
+            location.setSource(LocationSource.valueOf(locDto.getSource()));
+            location.setProduct(savedProduct);
+            savedProduct.setLocation(location);
+        }
 
         if (dto.getAttributes() != null) {
             for (AttributeValueDTO attrDto : dto.getAttributes()) {
@@ -219,6 +239,26 @@ public class ProductServiceImpl implements ProductService {
         Brand brand = brandRepository.findById(dto.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
+
+        if (dto.getLocation() != null) {
+            LocationResponseDTO locDto = dto.getLocation();
+
+            Location location = product.getLocation();
+            if (location == null) {
+                location = new Location();
+                location.setProduct(product);
+            }
+
+            location.setLatitude(locDto.getLatitude());
+            location.setLongitude(locDto.getLongitude());
+            location.setCity(locDto.getCity());
+            location.setRegion(locDto.getRegion());
+            location.setCountry(locDto.getCountry());
+            location.setAddress(locDto.getAddress());
+            location.setSource(LocationSource.valueOf(locDto.getSource()));
+            location.setProduct(product);
+            product.setLocation(location);
+        }
 
         // Change category if different
         if (!product.getCategory().getId().equals(dto.getCategoryId())) {
@@ -344,6 +384,7 @@ public class ProductServiceImpl implements ProductService {
             dto.setBrandName(product.getBrand().getName());
             dto.setBrandId(product.getBrand().getId());
         }
+        dto.setLocation(LocationResponseDTO.from(product.getLocation()));
         return dto;
     }
 
