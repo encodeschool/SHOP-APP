@@ -63,5 +63,11 @@ public class Order {
     private String legalAddress;
     private boolean agreeToTerms;
 
+    @ManyToOne
+    @JoinColumn(name = "promo_code_id")
+    private PromoCode promoCode;
+
+    private BigDecimal discountAmount; 
+    private BigDecimal finalPrice;   
 
 }

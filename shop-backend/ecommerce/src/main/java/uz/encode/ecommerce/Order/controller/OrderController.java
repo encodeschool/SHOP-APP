@@ -2,6 +2,7 @@ package uz.encode.ecommerce.Order.controller;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.catalina.connector.Response;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
 import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
+import uz.encode.ecommerce.Order.dto.OrderStatusUpdateDTO;
 import uz.encode.ecommerce.Order.service.OrderService;
 import uz.encode.ecommerce.User.service.UserService;
 
@@ -73,9 +75,13 @@ public class OrderController {
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable UUID orderId,
-            @RequestParam String status
+            @RequestBody OrderStatusUpdateDTO dto
     ) {
-        return ResponseEntity.ok(orderService.updateStatus(orderId, status));
+
+        if (dto.getStatus() == null || dto.getStatus().isBlank()) {
+            throw new IllegalArgumentException("Status is required");
+        }
+        return ResponseEntity.ok(orderService.updateStatus(orderId, dto.getStatus()));
     }
 
     @DeleteMapping("/{orderId}")

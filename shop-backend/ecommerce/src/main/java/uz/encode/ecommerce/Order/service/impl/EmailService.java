@@ -29,7 +29,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
 
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);          // Set sender email here
+            helper.setFrom(fromEmail);        
             helper.setTo(to);
             helper.setSubject("Order Confirmation");
             helper.setText(htmlBody, true);

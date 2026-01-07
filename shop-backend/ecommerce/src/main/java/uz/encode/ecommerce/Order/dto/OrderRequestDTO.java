@@ -30,4 +30,5 @@ public class OrderRequestDTO {
 
     private List<OrderItemDTO> items;
     private BigDecimal totalPrice;
+    private String promoCode;
 }

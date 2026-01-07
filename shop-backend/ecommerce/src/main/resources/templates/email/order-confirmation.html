@@ -40,7 +40,11 @@
         </table>
 
         <!-- Total -->
-        <p style="margin-top: 20px; font-size: 16px;"><strong>Total:</strong> $<span th:text="${formattedTotal}"></span></p>
+        <p style="margin-top: 20px; font-size: 16px;"><strong>Total:</strong><span th:text="${formattedTotal}"></span></p>
+
+        <p style="margin-top: 20px; font-size: 16px;"><strong>Discount: </strong><span th:text="${order.discountAmount}"></span></p>
+
+        <p style="margin-top: 20px; font-size: 16px;"><strong>Final Price: </strong><span th:text="${order.finalPrice}"></span></p>
 
         <!-- Message -->
         <p style="margin-top: 30px;">We will notify you once your order is shipped.</p>

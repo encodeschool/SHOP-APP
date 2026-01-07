@@ -86,6 +86,7 @@ const Checkout = () => {
     setLoading(true);
     const checkoutPayload = {
       userId: user.id,
+      promoCode: promoCode || null,
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,

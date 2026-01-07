@@ -59,6 +59,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
         existing.setValidUntil(dto.getValidUntil());
         existing.setActive(dto.isActive());
         existing.setUsageLimit(dto.getUsageLimit());
+        existing.setTimesUsed(dto.getTimesUsed());
 
         PromoCode updated = promoCodeRepository.save(existing);
         return PromoCodeMapper.toDto(updated);

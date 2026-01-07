@@ -61,22 +61,61 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
-        User user = userRepository.findById(dto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (dto.getUserId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
+        User user = userRepository.findById(dto.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
         Order order = new Order();
         order.setUser(user);
+
         BigDecimal productTotal = dto.getItems().stream()
-            .map(item -> item.getPricePerUnit().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .map(item -> item.getPricePerUnit()
+                .multiply(BigDecimal.valueOf(item.getQuantity())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal shippingFee = dto.getShippingMethod().equals("express") ? BigDecimal.valueOf(15) : BigDecimal.valueOf(5);
+        BigDecimal shippingFee =
+            "express".equalsIgnoreCase(dto.getShippingMethod())
+                ? BigDecimal.valueOf(15)
+                : BigDecimal.valueOf(5);
+
         BigDecimal totalPrice = productTotal.add(shippingFee);
-        order.setTotalPrice(totalPrice);
+        order.setTotalPrice(totalPrice); 
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        BigDecimal finalPrice = totalPrice;
+
+        if (dto.getPromoCode() != null && !dto.getPromoCode().isBlank()) {
+
+            PromoCode promo = promoCodeRepository.findByCodeIgnoreCase(dto.getPromoCode())
+                .orElseThrow(() -> new RuntimeException("Invalid promo code"));
+
+            if (!promo.isValidNow()) {
+                throw new RuntimeException("Promo code expired or inactive");
+            }
+
+            if (promo.getDiscountAmount() != null) {
+                discountAmount = promo.getDiscountAmount();
+            } else if (promo.getDiscountPercent() != null) {
+                discountAmount = totalPrice
+                    .multiply(BigDecimal.valueOf(promo.getDiscountPercent()))
+                    .divide(BigDecimal.valueOf(100));
+            }
+
+            finalPrice = totalPrice.subtract(discountAmount).max(BigDecimal.ZERO);
+
+            promo.setTimesUsed(promo.getTimesUsed() + 1);
+            promoCodeRepository.save(promo);
+
+            order.setPromoCode(promo);
+        }
+
+        order.setDiscountAmount(discountAmount);
+        order.setFinalPrice(finalPrice);
+
         order.setStatus(OrderStatus.PENDING);
         order.setCountry(dto.getCountry());
         order.setCity(dto.getCity());
@@ -100,7 +139,6 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(items);
         orderRepository.save(order);
 
-        // Send confirmation email
         emailService.sendOrderConfirmation(user.getEmail(), order);
 
         return mapToDTO(order);
