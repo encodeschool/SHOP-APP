@@ -49,7 +49,7 @@ function OrderCard({ order, isOverlay = false }) {
     >
       <p className="text-xs font-medium text-gray-500">{order.status}</p>
       <p className="font-semibold text-gray-900">{order.user.name}</p>
-      <p className="text-sm text-gray-600">{order.user.email}</p>
+      <p className="text-sm text-gray-600 break-all">{order.user.email}</p>
       <p className="mt-2 text-lg font-bold text-gray-900">${order.totalPrice}</p>
     </div>
   );
