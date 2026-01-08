@@ -35,6 +35,7 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Product> _products = [];
   bool _productsLoading = true;
+  bool _mapReady = false;
 
   final MapController _mapController = MapController();
 
@@ -52,7 +53,6 @@ class _MapScreenState extends State<MapScreen> {
         _products = results.where((p) => p.location != null).toList();
         _productsLoading = false;
       });
-      print('Loaded ${_products.length} products with locations');
 
       if (_products.isNotEmpty) {
         _fitMapToProducts();
@@ -68,37 +68,45 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _fitMapToProducts() {
-    if (_products.isEmpty) return;
+    if (!_mapReady || _products.isEmpty) return;
 
-    double? minLat, maxLat, minLng, maxLng;
+    double minLat = _products.first.location!.latitude;
+    double maxLat = minLat;
+    double minLng = _products.first.location!.longitude;
+    double maxLng = minLng;
 
-    for (var product in _products) {
-      final lat = product.location!.latitude;
-      final lng = product.location!.longitude;
-
-      minLat = minLat == null ? lat : (lat < minLat ? lat : minLat);
-      maxLat = maxLat == null ? lat : (lat > maxLat ? lat : maxLat);
-      minLng = minLng == null ? lng : (lng < minLng ? lng : minLng);
-      maxLng = maxLng == null ? lng : (lng > maxLng ? lng : maxLng);
+    for (var p in _products) {
+      minLat = p.location!.latitude < minLat ? p.location!.latitude : minLat;
+      maxLat = p.location!.latitude > maxLat ? p.location!.latitude : maxLat;
+      minLng = p.location!.longitude < minLng ? p.location!.longitude : minLng;
+      maxLng = p.location!.longitude > maxLng ? p.location!.longitude : maxLng;
     }
 
-    if (minLat != null && maxLat != null && minLng != null && maxLng != null) {
-      final bounds = LatLngBounds(
-        LatLng(minLat, minLng),
-        LatLng(maxLat, maxLng),
-      );
-      _mapController.fitCamera(CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)));
-    }
+    _mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: LatLngBounds(
+          LatLng(minLat, minLng),
+          LatLng(maxLat, maxLng),
+        ),
+        padding: const EdgeInsets.all(50),
+      ),
+    );
   }
 
   void _zoomIn() {
-    final zoom = _mapController.camera.zoom + 1;
-    _mapController.move(_mapController.camera.center, zoom);
+    if (!_mapReady) return;
+    _mapController.move(
+      _mapController.camera.center,
+      _mapController.camera.zoom + 1,
+    );
   }
 
   void _zoomOut() {
-    final zoom = _mapController.camera.zoom - 1;
-    _mapController.move(_mapController.camera.center, zoom);
+    if (!_mapReady) return;
+    _mapController.move(
+      _mapController.camera.center,
+      _mapController.camera.zoom - 1,
+    );
   }
 
   void _onSearchChanged(String query) {
@@ -130,17 +138,41 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _getUserLocation() async {
     try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) throw 'Location service disabled';
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
-      var permission = await Geolocator.checkPermission();
+      if (!serviceEnabled) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Enable Location'),
+            content: const Text('Please enable GPS to show nearby products'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Geolocator.openLocationSettings();
+                },
+                child: const Text('Open Settings'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied) {
         throw 'Location permission denied';
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
       }
 
       final position = await Geolocator.getCurrentPosition(
@@ -155,12 +187,9 @@ class _MapScreenState extends State<MapScreen> {
         _loading = false;
       });
 
-      /// ✅ SAFE: move map AFTER render
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _mapController.move(latLng, 15);
-        }
-      });
+      if (_mapReady) {
+        _mapController.move(latLng, 15);
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -236,6 +265,20 @@ class _MapScreenState extends State<MapScreen> {
             options: MapOptions(
               initialCenter: _selectedLocation!,
               initialZoom: 15,
+              onMapReady: () {
+                setState(() {
+                  _mapReady = true;
+                });
+
+                // Safe operations AFTER map is rendered
+                if (_currentLocation != null) {
+                  _mapController.move(_currentLocation!, 15);
+                }
+
+                if (_products.isNotEmpty) {
+                  _fitMapToProducts();
+                }
+              },
               onTap: (_, point) {
                 setState(() {
                   _selectedLocation = point;
@@ -329,24 +372,24 @@ class _MapScreenState extends State<MapScreen> {
           ),
 
           /// ✅ Confirm button
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 40,
-            child: ElevatedButton(
-              onPressed: _confirmLocation,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Confirm location',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   left: 16,
+          //   right: 16,
+          //   bottom: 40,
+          //   child: ElevatedButton(
+          //     onPressed: _confirmLocation,
+          //     style: ElevatedButton.styleFrom(
+          //       padding: const EdgeInsets.symmetric(vertical: 16),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(12),
+          //       ),
+          //     ),
+          //     child: const Text(
+          //       'Confirm location',
+          //       style: TextStyle(fontSize: 16),
+          //     ),
+          //   ),
+          // ),
 
           Positioned(
             right: 16,

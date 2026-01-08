@@ -1,0 +1,86 @@
+.delete-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa, #eef1f5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.delete-card {
+  background: #ffffff;
+  max-width: 480px;
+  width: 100%;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.delete-card h1 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2f80ed;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background: #256ad9;
+}
+
+.info {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #444;
+}
+
+.info ul {
+  padding-left: 18px;
+}
+
+.processing-time {
+  margin-top: 12px;
+  font-weight: 600;
+}

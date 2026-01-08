@@ -27,6 +27,7 @@ import About from './pages/About';
 import Quality from './pages/Quality';
 import Delivery from './pages/Delivery';
 import Contact from './pages/Contact';
+import DeleteAccount from './pages/DeleteAccount';
 import AiHelpScreen from './pages/AiHelpScreen';
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
                             <Route path='/delivery' element={<Delivery />} />
                             <Route path='/ai' element={<AiHelpScreen />} />
                             <Route path="/compare" element={<Compare />} />
+                            <Route path="/delete-account" element={<DeleteAccount />} />
                             {/* <Route path="/search" element={<SearchResults />} /> */}
                             
                             <Route path='/favorites' element={< Favorites />} />
