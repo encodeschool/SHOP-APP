@@ -5,13 +5,8 @@ import {
   DndContext,
   closestCenter,
   DragOverlay,
-  useDroppable,
+  useDraggable,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import StatusColumn from "../../components/StatusColumn";
 
@@ -31,16 +26,14 @@ function OrderCard({ order, isOverlay = false }) {
     listeners,
     setNodeRef,
     transform,
-    transition,
     isDragging,
-  } = useSortable({
+  } = useDraggable({
     id: order.id,
     disabled: order.status === "CANCELLED",
   });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     opacity: isDragging ? 0.5 : 1,
   };
 
@@ -84,25 +77,21 @@ export default function Order() {
     if (!over) return;
 
     const orderId = active.id;
-
-    // This is the key: we get the status directly from the droppable's data
-    const newStatus = over.data?.current?.status || over.id;
-    console.log( over.data?.current?.status);
+    const newStatus = over.id; // Now over.id will be the status column
 
     if (!newStatus || !STATUSES.includes(newStatus)) return;
 
-    // Prevent moving out of CANCELLED if you want (optional)
     const order = orders.find((o) => o.id === orderId);
     if (order.status === "CANCELLED" && newStatus !== "CANCELLED") {
-      return; // or show toast: "Cancelled orders cannot be reopened"
+      return;
     }
 
-    // Optimistic update
+    if (order.status === newStatus) return;
+
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
 
-    // Update backend
     axios
       .patch(`/orders/${orderId}/status`, { status: newStatus })
       .then((res) => {
@@ -110,7 +99,6 @@ export default function Order() {
       })
       .catch((err) => {
         console.error("Failed to update status:", err);
-        // Optionally revert UI on error
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, status: order.status } : o))
         );
@@ -129,14 +117,9 @@ export default function Order() {
 
           return (
             <StatusColumn key={status} status={status} color={STATUS_COLORS[status]}>
-              <SortableContext
-                items={columnOrders.map((o) => o.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {columnOrders.map((order) => (
-                  <OrderCard key={order.id} order={order} />
-                ))}
-              </SortableContext>
+              {columnOrders.map((order) => (
+                <OrderCard key={order.id} order={order} />
+              ))}
             </StatusColumn>
           );
         })}
