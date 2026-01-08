@@ -250,7 +250,18 @@ public class OrderServiceImpl implements OrderService {
             order.getTotalPrice(),
             order.getStatus().name(),
             order.getCreatedAt(),
-            order.getClientSecret()
+            order.getCountry(),
+            order.getCity(),
+            order.getZip(),
+            order.getNotes(),
+            order.getShippingMethod(),
+            order.getPaymentMethod(),
+            order.isLegalEntity(),
+            order.getCompanyName(),
+            order.getRegistrationNr(),
+            order.getVatNumber(),
+            order.getLegalAddress(),
+            order.isAgreeToTerms()
         );
     }
 

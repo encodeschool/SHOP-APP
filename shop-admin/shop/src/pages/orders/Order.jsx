@@ -98,18 +98,18 @@ function OrderDetailModal({ order, onClose }) {
           </div>
 
           {/* Delivery Info */}
-          {order.deliveryAddress && (
+          {order.country && (
             <div>
               <h3 className="text-lg font-semibold mb-3 text-gray-700">Delivery Information</h3>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div>
+                <div className="flex justify-between">
                   <span className="text-gray-600 block mb-1">Address:</span>
-                  <span className="font-medium">{order.deliveryAddress}</span>
+                  <span className="font-medium">{order.country}, {order.city}, {order.zip}</span>
                 </div>
-                {order.deliveryNotes && (
-                  <div>
+                {order.notes && (
+                  <div className="flex justify-between">
                     <span className="text-gray-600 block mb-1">Delivery Notes:</span>
-                    <span className="italic text-gray-700">{order.deliveryNotes}</span>
+                    <span className="italic text-gray-700">{order.notes}</span>
                   </div>
                 )}
               </div>

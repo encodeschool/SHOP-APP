@@ -23,5 +23,17 @@ public class OrderResponseDTO {
     private BigDecimal totalPrice;
     private String status;
     private LocalDateTime createdAt;
-    private String clientSecret;
+
+    private String country;
+    private String city;
+    private String zip;
+    private String notes;
+    private String shippingMethod;
+    private String paymentMethod;
+    private boolean isLegalEntity;
+    private String companyName;
+    private String registrationNr;
+    private String vatNumber;
+    private String legalAddress;
+    private boolean agreeToTerms;
 }

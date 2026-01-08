@@ -96,6 +96,10 @@ const Checkout = () => {
       paymentMethod: data.paymentMethod,
       shippingPrice,
       totalPrice,
+      country: data.country,
+      city: data.city,
+      notes: data.notes || '',
+      zip: data.zip,
       shippingAddress: {
         name: data.name,
         email: data.email,
