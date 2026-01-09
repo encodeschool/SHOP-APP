@@ -39,4 +39,21 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    public void sendOrderRequest(Order order) {
+        try {
+            String htmlBody = emailContentBuilder.buildOrderRequest(order);
+            MimeMessage message = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(fromEmail);
+            helper.setSubject("Request order");
+            helper.setText(htmlBody, true);
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

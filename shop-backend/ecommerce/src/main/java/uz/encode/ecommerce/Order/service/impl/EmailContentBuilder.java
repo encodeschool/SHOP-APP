@@ -35,5 +35,18 @@ public class EmailContentBuilder {
 
         return templateEngine.process("email/order-confirmation", context);
     }
+
+    public String buildOrderRequest(Order order) {
+        Context context = new Context();
+        context.setVariable("order", order);
+        String formattedDate = order.getCreatedAt()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+
+        String formattedTotal = String.format("%.2f", order.getTotalPrice());
+        context.setVariable("order", order);
+        context.setVariable("formattedDate", formattedDate);
+        context.setVariable("formattedTotal", formattedTotal);
+        return templateEngine.process("email/order-request", context);
+    }
 }
 

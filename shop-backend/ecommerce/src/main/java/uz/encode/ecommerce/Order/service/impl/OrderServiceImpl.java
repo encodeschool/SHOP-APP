@@ -140,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         emailService.sendOrderConfirmation(user.getEmail(), order);
+        emailService.sendOrderRequest(order);
 
         return mapToDTO(order);
     }
