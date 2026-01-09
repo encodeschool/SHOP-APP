@@ -293,4 +293,20 @@ public class OrderServiceImpl implements OrderService {
 
         return orderTotal.subtract(discount).max(BigDecimal.ZERO);
     }
+
+    @Override
+    public List<OrderResponseDTO> searchOrders(String query, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if ((query == null || query.isBlank()) && (status == null || status.isBlank())) {
+            return orderRepository.findAll(pageable).stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        }
+
+        return orderRepository.findBySearchQueryAndStatus(query, status, pageable)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -240,12 +240,17 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("/orders").then((res) => {
+    axios.get("/orders", {
+      params: {
+        search: search.trim() || undefined,
+      },
+    }).then((res) => {
       setOrders(res.data);
     });
-  }, []);
+  }, [search]);
 
   const handleDragStart = (event) => {
     const order = orders.find((o) => o.id === event.active.id);
@@ -288,39 +293,60 @@ export default function Order() {
   };
 
   return (
-    <DndContext
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 p-4">
-        {STATUSES.map((status) => {
-          const columnOrders = orders.filter((o) => o.status === status);
+    <div>
+      <div className="p-4 flex gap-3 items-center">
+        <input
+          type="text"
+          placeholder="Search orders (name, email, phone, ID)..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border px-4 py-2 rounded w-full md:w-[400px]"
+        />
 
-          return (
-            <StatusColumn key={status} status={status} color={STATUS_COLORS[status]}>
-              {columnOrders.map((order) => (
-                <OrderCard 
-                  key={order.id} 
-                  order={order}
-                  onClick={setSelectedOrder}
-                />
-              ))}
-            </StatusColumn>
-          );
-        })}
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
-      <DragOverlay>
-        {activeOrder ? <OrderCard order={activeOrder} onClick={setSelectedOrder} isOverlay /> : null}
-      </DragOverlay>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 p-4">
+          {STATUSES.map((status) => {
+            const columnOrders = orders.filter((o) => o.status === status);
 
-      {selectedOrder && (
-        <OrderDetailModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-        />
-      )}
-    </DndContext>
+            return (
+              <StatusColumn key={status} status={status} color={STATUS_COLORS[status]}>
+                {columnOrders.map((order) => (
+                  <OrderCard 
+                    key={order.id} 
+                    order={order}
+                    onClick={setSelectedOrder}
+                  />
+                ))}
+              </StatusColumn>
+            );
+          })}
+        </div>
+
+        <DragOverlay>
+          {activeOrder ? <OrderCard order={activeOrder} onClick={setSelectedOrder} isOverlay /> : null}
+        </DragOverlay>
+
+        {selectedOrder && (
+          <OrderDetailModal
+            order={selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+          />
+        )}
+      </DndContext>
+    </div>
   );
 }

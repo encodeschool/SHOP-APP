@@ -16,4 +16,5 @@ public interface OrderService {
     String createPaymentIntent(UUID orderId, String paymentMethod);
     void deleteOrder(UUID orderId);
     BigDecimal applyPromo(String code, BigDecimal orderTotal);
+    List<OrderResponseDTO> searchOrders(String query, String status, int page, int size);
 }

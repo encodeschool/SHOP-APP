@@ -47,4 +47,20 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
         // "ORDER BY MONTH(o.createdAt)")
         // List<MonthlyCountDTO> countOrdersGroupedByMonth();
 
+        @Query("""
+                SELECT o FROM Order o JOIN o.user u
+                WHERE (:status IS NULL OR o.status = :status)
+                AND (
+                        :query IS NULL OR :query = '' OR
+                        str(o.id) LIKE %:query% OR
+                        LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                        LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                        u.phone LIKE %:query%
+                )
+                """)
+        Page<Order> findBySearchQueryAndStatus(@Param("query") String query,
+                                        @Param("status") String status,
+                                        Pageable pageable);
+
+
 }

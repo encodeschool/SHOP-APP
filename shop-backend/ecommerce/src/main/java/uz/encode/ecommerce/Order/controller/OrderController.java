@@ -89,4 +89,15 @@ public class OrderController {
     public void deleteOrder(@PathVariable UUID orderId) {
         orderService.deleteOrder(orderId);
     }
+
+    @Operation(summary = "Search Orders")
+    @GetMapping("/search")
+    public ResponseEntity<List<OrderResponseDTO>> searchOrders(
+        @RequestParam(required = false) String query,
+        @RequestParam(required = false) String status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(orderService.searchOrders(query, status, page, size));
+    }
 }
