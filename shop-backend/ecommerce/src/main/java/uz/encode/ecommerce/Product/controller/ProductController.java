@@ -195,4 +195,5 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam("q") String query) {
         return ResponseEntity.ok(productService.search(query));
     }
+       
 }

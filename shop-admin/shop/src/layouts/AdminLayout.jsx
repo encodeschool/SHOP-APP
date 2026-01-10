@@ -7,7 +7,9 @@ import {
   FaSignOutAlt,
   FaClipboardList,
   FaImages,
-  FaHome 
+  FaHome,
+  FaBars,
+  FaTimes
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getUserById } from "../api/authService";
@@ -16,6 +18,7 @@ import { RiDiscountPercentLine } from "react-icons/ri";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState({
     fullName: "Admin",
     profileImage: "https://via.placeholder.com/40",
@@ -23,7 +26,7 @@ export default function AdminLayout() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId"); // You'll store this during login
+    const userId = localStorage.getItem("userId");
 
     if (!token || !userId) {
       navigate("/login");
@@ -33,7 +36,7 @@ export default function AdminLayout() {
     getUserById(userId)
       .then((res) => {
         setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data)); // cache it
+        localStorage.setItem("user", JSON.stringify(res.data));
       })
       .catch((err) => {
         console.error("Failed to fetch user", err);
@@ -43,8 +46,8 @@ export default function AdminLayout() {
 
   const linkClass = ({ isActive }) =>
     isActive
-      ? "flex items-center font-semibold text-yellow-300 space-x-2"
-      : "flex items-center hover:underline space-x-2";
+      ? "flex items-center font-semibold text-yellow-300 space-x-2 p-2 rounded"
+      : "flex items-center hover:bg-gray-700 space-x-2 p-2 rounded transition-colors";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -53,56 +56,87 @@ export default function AdminLayout() {
     navigate("/login");
   };
 
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-4 flex flex-col justify-between">
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-30
+          w-64 bg-gray-800 text-white p-4 
+          flex flex-col justify-between
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0
+        `}
+      >
         <div>
-          <h1 className="text-2xl mb-6 font-bold">Admin</h1>
-          <nav className="space-y-4">
-            <NavLink to="/" end className={linkClass}>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold">Admin</h1>
+            <button
+              onClick={closeSidebar}
+              className="lg:hidden text-white hover:text-gray-300"
+            >
+              <FaTimes size={24} />
+            </button>
+          </div>
+          
+          <nav className="space-y-2">
+            <NavLink to="/" end className={linkClass} onClick={closeSidebar}>
               <FaTachometerAlt />
               <span>Dashboard</span>
             </NavLink>
-            <NavLink to="/products" className={linkClass}>
+            <NavLink to="/products" className={linkClass} onClick={closeSidebar}>
               <FaBoxOpen />
               <span>Products</span>
             </NavLink>
-            <NavLink to="/users" className={linkClass}>
+            <NavLink to="/users" className={linkClass} onClick={closeSidebar}>
               <FaUsers />
               <span>Users</span>
             </NavLink>
-            <NavLink to="/categories" className={linkClass}>
+            <NavLink to="/categories" className={linkClass} onClick={closeSidebar}>
               <FaStream />
               <span>Categories</span>
             </NavLink>
-            <NavLink to="/orders" className={linkClass}>
-              <FaClipboardList  />
+            <NavLink to="/orders" className={linkClass} onClick={closeSidebar}>
+              <FaClipboardList />
               <span>Orders</span>
             </NavLink>
-            <NavLink to="/home-widget" className={linkClass}>
+            <NavLink to="/home-widget" className={linkClass} onClick={closeSidebar}>
               <FaHome />
               <span>Home Widget</span>
             </NavLink>
-            <NavLink to="/banner" className={linkClass}>
-              <FaImages   />
+            <NavLink to="/banner" className={linkClass} onClick={closeSidebar}>
+              <FaImages />
               <span>Banner</span>
             </NavLink>
-            <NavLink to="/units" className={linkClass}>
+            <NavLink to="/units" className={linkClass} onClick={closeSidebar}>
               <TbRulerMeasure />
               <span>Units</span>
             </NavLink>
-            <NavLink to="/promos" className={linkClass}>
+            <NavLink to="/promos" className={linkClass} onClick={closeSidebar}>
               <RiDiscountPercentLine />
               <span>Promo Code</span>
             </NavLink>
           </nav>
         </div>
+        
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-2 text-red-400 hover:text-red-600 mt-6"
+          className="flex items-center space-x-2 text-red-400 hover:text-red-600 mt-6 p-2 rounded hover:bg-gray-700 transition-colors"
         >
           <FaSignOutAlt />
           <span>Logout</span>
@@ -110,21 +144,32 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden w-full">
         {/* Top navbar */}
-        <header className="h-16 bg-white border-b shadow flex items-center justify-end px-6">
-          <div className="flex items-center space-x-4">
+        <header className="h-16 bg-white border-b shadow flex items-center justify-between px-4 md:px-6">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="lg:hidden text-gray-700 hover:text-gray-900"
+          >
+            <FaBars size={24} />
+          </button>
+
+          {/* User info */}
+          <div className="flex items-center space-x-3 ml-auto">
             <img
               src={`${BASE_URL}${user.profilePictureUrl}`}
               alt="User"
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
             />
-            <span className="font-medium">{user.name}</span>
+            <span className="font-medium hidden sm:block text-sm md:text-base">
+              {user.name}
+            </span>
           </div>
         </header>
 
         {/* Outlet */}
-        <main className="flex-1 overflow-auto bg-gray-100 p-6">
+        <main className="flex-1 overflow-auto bg-gray-100 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
