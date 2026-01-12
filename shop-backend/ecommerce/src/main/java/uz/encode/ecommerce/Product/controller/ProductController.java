@@ -195,14 +195,4 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam("q") String query) {
         return ResponseEntity.ok(productService.search(query));
     }
-
-    @GetMapping("/search/result")
-    public Page<ProductResponseDTO> search(
-            @RequestParam String q,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "en") String lang
-    ) {
-        return productService.searchProducts(q, page, size, lang);
-    }
 }

@@ -42,7 +42,7 @@ export default function AdminLayout() {
   // Auto-expand section if current route matches
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId"); // You'll store this during login
+    const userId = localStorage.getItem("userId");
 
     if (!token || !userId) {
       navigate("/login");
@@ -52,7 +52,7 @@ export default function AdminLayout() {
     getUserById(userId)
       .then((res) => {
         setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data)); // cache it
+        localStorage.setItem("user", JSON.stringify(res.data));
       })
       .catch((err) => {
         console.error("Failed to fetch user", err);
@@ -102,7 +102,15 @@ export default function AdminLayout() {
   const BASE_URL = process.env.REACT_APP_BASE_URL || '';
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 text-white p-4 flex flex-col justify-between overflow-y-auto">
         <div>
@@ -249,7 +257,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden w-full">
         {/* Top navbar */}
         <header className="h-16 bg-white border-b shadow flex items-center justify-between px-6">
           <h2 className="text-xl font-semibold text-gray-800">
@@ -268,7 +276,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Outlet */}
-        <main className="flex-1 overflow-auto bg-gray-100 p-6">
+        <main className="flex-1 overflow-auto bg-gray-100 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
