@@ -294,25 +294,6 @@ export default function Order() {
 
   return (
     <div>
-      <div className="p-4 flex gap-3 items-center">
-        <input
-          type="text"
-          placeholder="Search orders (name, email, phone, ID)..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border px-4 py-2 rounded w-full md:w-[400px]"
-        />
-
-        {search && (
-          <button
-            onClick={() => setSearch("")}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
       <DndContext
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}

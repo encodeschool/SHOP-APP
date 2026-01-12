@@ -52,6 +52,10 @@ const CategoryBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
+
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
@@ -59,6 +63,43 @@ const CategoryBar = () => {
       setMobileMenuOpen(false); // Optional: close mobile menu
     }
   };
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const handler = setTimeout(async () => {
+      try {
+        const lang = i18n.language === "lv" ? "en" : i18n.language;
+        const res = await axios.get("/products/search", {
+          params: {
+            q: searchTerm,
+            limit: 6,
+            lang,
+          },
+        });
+        setSuggestions(res.data);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error("Search failed", err);
+        setSuggestions([]);
+      }
+    }, 350); // debounce delay
+
+    return () => clearTimeout(handler);
+  }, [searchTerm, i18n.language]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -188,18 +229,62 @@ const CategoryBar = () => {
             <BsStars size={40} className="text-white ml-4" />
           </Link>
         </div>
-        <div className="flex-1 mx-6 max-w-3xl flex">
+        <div className="relative flex-1 mx-6 max-w-3xl flex" ref={searchRef}>
           <input
             type="text"
             placeholder={t("Search for Products")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => suggestions.length && setShowSuggestions(true)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="flex-1 px-4 py-2 rounded-l-xl border-[4px] border border-white focus:outline-none"
+            className="flex-1 px-4 py-2 rounded-l-xl border-[4px] border-white focus:outline-none"
           />
-          <button onClick={handleSearch} className="bg-white text-red-500 px-4 rounded-r-xl text-white md:text-red-800 transition-all ">
+
+          <button
+            onClick={handleSearch}
+            className="bg-white text-red-500 px-4 rounded-r-xl"
+          >
             <FaSearch />
           </button>
+
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-xl z-[120] max-h-[320px] overflow-y-auto">
+              {suggestions.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/product/${p.id}`}
+                  onClick={() => {
+                    setShowSuggestions(false);
+                    setSearchTerm("");
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 border-b last:border-b-0"
+                >
+                  <img
+                    src={`${BASE_URL}${p.imageUrls[0]}`}
+                    alt={p.title}
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold">{p.title}</p>
+                    <p className="text-xs text-gray-500">€{p.price}</p>
+                  </div>
+                </Link>
+              ))}
+
+              {/* View all */}
+              <button
+                onClick={handleSearch}
+                className="w-full text-center py-2 text-red-600 font-semibold hover:bg-gray-100"
+              >
+                {t("View all results")}
+              </button>
+            </div>
+          )}
+          {showSuggestions && searchTerm && suggestions.length === 0 && (
+            <div className="absolute top-full bg-white w-full p-4 text-gray-500">
+              {t("No products found")}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-6 text-white">
           <div className="relative group">

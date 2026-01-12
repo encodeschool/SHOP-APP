@@ -124,4 +124,10 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponseDTO>> getSubcategories(@PathVariable UUID id) {
         return ResponseEntity.ok(categoryService.getSubCategories(id));
     }
+
+    @Operation(summary = "Search category")
+    @GetMapping("/search/category")
+    public ResponseEntity<List<CategoryResponseDTO>> search(@RequestParam String q, @RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(categoryService.searchForCategory(q, lang));
+    }
 }

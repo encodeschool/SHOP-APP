@@ -51,4 +51,17 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
         List<Product> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title,
                         String description);
+
+        @Query(
+                """
+                   SELECT DISTINCT p FROM Product p
+                   LEFT JOIN p.translations t
+                   LEFT JOIN p.brand b
+                   WHERE 
+                        LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%'))
+                        OR LOWER(b.name) LIKE LOWER(CONCAT('%', :q, '%'))
+                        OR LOWER(t.name) LIKE LOWER(CONCAT('%', :q, '%'))             
+                """
+        )
+        Page<Product> search(String q, Pageable pageable);
 }

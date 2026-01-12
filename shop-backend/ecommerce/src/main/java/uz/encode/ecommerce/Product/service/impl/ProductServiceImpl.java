@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -653,6 +654,12 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO getById(UUID id, String lang) {
         Product product = productRepository.findById(id).orElseThrow();
         return new ProductResponseDTO(product, lang);
+    }
+
+    @Override
+    public Page<ProductResponseDTO> searchProducts(String query, int page, int size, String lang) {
+        Page<Product> products = productRepository.search(query, PageRequest.of(page, size));
+        return products.map(p -> new ProductResponseDTO(p, lang));
     }
 
 }

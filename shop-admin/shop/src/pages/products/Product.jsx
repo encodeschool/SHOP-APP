@@ -3,6 +3,9 @@ import axios from '../../api/axios';
 import DynamicAttributeForm from '../../components/DynamicAttributeForm';
 import { Link } from 'react-router-dom';
 import MapPicker from "../../components/MapPicker";
+import { FaSearch } from "react-icons/fa";
+import { IoIosAddCircle } from "react-icons/io";
+
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -17,6 +20,9 @@ export default function Products() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const BASE_URL = process.env.REACT_APP_BASE_URL || ''; // Fallback for BASE_URL
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const pageSize = 10;
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -49,17 +55,24 @@ export default function Products() {
 
   const fetchProducts = () => {
     setIsLoading(true);
-    axios.get('/products')
+
+    const url = search
+      ? `/products/search?q=${encodeURIComponent(search)}&page=${page}&size=${pageSize}`
+      : `/products?page=${page}&size=${pageSize}`;
+
+    axios.get(url)
       .then(res => {
-        setProducts(Array.isArray(res.data) ? res.data : []);
-        setIsLoading(false);
+        if (res.data.content) {
+          setProducts(res.data.content);
+        } else {
+          setProducts(Array.isArray(res.data) ? res.data : []);
+        }
       })
       .catch(err => {
-        console.error('Error fetching products:', err);
-        setProducts([]);
-        setError('Failed to fetch products.');
-        setIsLoading(false);
-      });
+        console.error(err);
+        setError("Failed to fetch products");
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const getCurrentLocation = () => {
@@ -394,7 +407,7 @@ export default function Products() {
       <div className="flex gap-4 h-[100%]">
         <div className="w-[100%]">
           <h2 className="text-xl font-bold mb-4">Products</h2>
-          <div className="flex">
+          <div className="flex items-stretch">
             <button
               className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 mr-6 px-4 rounded'
               onClick={() => {
@@ -427,10 +440,27 @@ export default function Products() {
                 setIsDrawerOpen(true);
               }}
             >
-              +
+              <IoIosAddCircle />
             </button>
-            <Link to="/product_attribute" className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>Add Extra Attribute</Link>
-            <Link to="/brand" className='bg-green-500 hover:bg-green-700 text-white font-bold ml-6 py-2 px-4 rounded'>Add brand</Link>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="border p-2 w-[300px]"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && fetchProducts()}
+              />
+              <button
+                onClick={() => {
+                  setPage(0);
+                  fetchProducts();
+                }}
+                className="bg-blue-500 text-white px-4 rounded"
+              >
+                <FaSearch />
+              </button>
+            </div>
           </div>
           {isLoading ? (
             <p>Loading products...</p>
@@ -481,6 +511,28 @@ export default function Products() {
               </tbody>
             </table>
           )}
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              disabled={page === 0}
+              onClick={() => {
+                setPage(p => p - 1);
+                fetchProducts();
+              }}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            <button
+              onClick={() => {
+                setPage(p => p + 1);
+                fetchProducts();
+              }}
+              className="px-3 py-1 border rounded"
+            >
+              Next
+            </button>
+          </div>
         </div>
 
         <div

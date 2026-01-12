@@ -65,4 +65,6 @@ public interface ProductService {
 
     List<ProductResponseDTO> search(String query);
 
+    Page<ProductResponseDTO> searchProducts(String query, int page, int size, String lang);
+
 }

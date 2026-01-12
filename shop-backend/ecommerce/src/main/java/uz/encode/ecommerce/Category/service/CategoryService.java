@@ -21,4 +21,5 @@ public interface CategoryService {
     void delete(UUID id);
     List<CategoryResponseDTO> getSubCategories(UUID id);
     Category findById(UUID id);
+    List<CategoryResponseDTO> searchForCategory(String q, String language);
 }

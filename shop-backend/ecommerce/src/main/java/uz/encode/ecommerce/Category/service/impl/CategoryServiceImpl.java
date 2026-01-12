@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -263,5 +265,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category findById(UUID id) {
         return categoryRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<CategoryResponseDTO> searchForCategory(String q, String language) {
+        if (q == null || q.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Category> categories = categoryRepository.findByNameInLanguageContainingIgnoreCase(q.trim(), language);
+        return categories.stream().map(category -> new CategoryResponseDTO(category, language)).toList();
     }
 }

@@ -1,5 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "../../api/axios";
+
+
+  function useDebounce(value, delay = 500) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      return () => clearTimeout(handler);
+    }, [value, delay]);
+
+    return debouncedValue;
+  }
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -16,6 +31,39 @@ export default function Categories() {
     icon: null,
     translations: [],
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const debouncedQuery = useDebounce(searchQuery.trim(), 450);
+
+  const fetchSearchResults = useCallback(async (q) => {
+    if (!q) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const res = await axios.get(`/categories/search/category`, {
+        params: { q },
+      });
+
+      // Assuming the response is List<CategoryResponseDTO> like your table expects
+      const flatSearch = flattenCategories(res.data || []);
+      setSearchResults(flatSearch);
+    } catch (err) {
+      console.error("Search failed:", err);
+      // optional: set some error state
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);   // dependencies — add if needed
+  
+  useEffect(() => {
+    fetchSearchResults(debouncedQuery);
+  }, [debouncedQuery, fetchSearchResults]);
 
   // Enhanced duplicate prevention and logging
   const flattenCategories = (cats, parentId = null, level = 0, path = []) => {
