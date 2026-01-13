@@ -22,14 +22,20 @@ import { BsTags } from "react-icons/bs";
 import { MdEditAttributes } from "react-icons/md";
 import { SiBrandfolder } from "react-icons/si";
 import { getUserById } from "../api/authService";
+import { BsFillGeoAltFill } from "react-icons/bs";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [user, setUser] = useState({
     fullName: "Admin",
     profileImage: "https://via.placeholder.com/40",
   });
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
 
   // State for expandable sections
   const [expandedSections, setExpandedSections] = useState({
@@ -103,16 +109,21 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={closeSidebar}
-        />
-      )}
-
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-4 flex flex-col justify-between overflow-y-auto">
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside
+          className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800 text-white p-4 flex flex-col justify-between overflow-y-auto z-50
+          transform transition-transform duration-300
+          ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0`}
+        >
         <div>
           <h1 className="text-2xl mb-6 font-bold text-yellow-300">Admin Panel</h1>
           <nav className="space-y-2">
@@ -137,23 +148,23 @@ export default function AdminLayout() {
               
               {expandedSections.catalog && (
                 <div className="mt-1 space-y-1">
-                  <NavLink to="/products" className={subLinkClass}>
+                  <NavLink to="/products" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <FaTag />
                     <span>Products</span>
                   </NavLink>
-                  <NavLink to="/categories" className={subLinkClass}>
+                  <NavLink to="/categories" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <MdCategory />
                     <span>Categories</span>
                   </NavLink>
-                  <NavLink to="/units" className={subLinkClass}>
+                  <NavLink to="/units" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <TbRulerMeasure />
                     <span>Units</span>
                   </NavLink>
-                  <NavLink to="/product_attribute" className={subLinkClass}>
+                  <NavLink to="/product_attribute" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <MdEditAttributes />
                     <span>Attributes</span>
                   </NavLink>
-                  <NavLink to="/brand" className={subLinkClass}>
+                  <NavLink to="/brand" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <SiBrandfolder />
                     <span>Brand</span>
                   </NavLink>
@@ -176,11 +187,11 @@ export default function AdminLayout() {
               
               {expandedSections.sales && (
                 <div className="mt-1 space-y-1">
-                  <NavLink to="/orders" className={subLinkClass}>
+                  <NavLink to="/orders" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <FaClipboardList />
                     <span>Orders</span>
                   </NavLink>
-                  <NavLink to="/promos" className={subLinkClass}>
+                  <NavLink to="/promos" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <RiDiscountPercentLine />
                     <span>Promo Codes</span>
                   </NavLink>
@@ -203,13 +214,25 @@ export default function AdminLayout() {
               
               {expandedSections.content && (
                 <div className="mt-1 space-y-1">
-                  <NavLink to="/home-widget" className={subLinkClass}>
+                  <NavLink to="/home-widget" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <FaHome />
                     <span>Home Widget</span>
                   </NavLink>
-                  <NavLink to="/banner" className={subLinkClass}>
+                  <NavLink to="/banner" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <BsTags />
                     <span>Banners</span>
+                  </NavLink>
+                  <NavLink to="/country" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
+                    <BsFillGeoAltFill />
+                    <span>Country</span>
+                  </NavLink>
+                  <NavLink to="/city" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
+                    <BsFillGeoAltFill />
+                    <span>City</span>
+                  </NavLink>
+                  <NavLink to="/postalCode" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
+                    <BsFillGeoAltFill />
+                    <span>Postal Code</span>
                   </NavLink>
                 </div>
               )}
@@ -236,7 +259,7 @@ export default function AdminLayout() {
               
               {expandedSections.settings && (
                 <div className="mt-1 space-y-1">
-                  <NavLink to="/settings/general" className={subLinkClass}>
+                  <NavLink to="/settings/general" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <FaCog />
                     <span>General</span>
                   </NavLink>
@@ -257,26 +280,41 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden w-full">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top navbar */}
-        <header className="h-16 bg-white border-b shadow flex items-center justify-between px-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {location.pathname === '/' ? 'Dashboard' : location.pathname.split('/')[1].charAt(0).toUpperCase() + location.pathname.split('/')[1].slice(1)}
-          </h2>
-          
+        <header className="h-16 bg-white border-b shadow flex items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-3">
+            {/* Hamburger (mobile only) */}
+            <button
+              className="md:hidden text-gray-700 text-xl"
+              onClick={() => setIsMobileSidebarOpen(true)}
+            >
+              ☰
+            </button>
+
+            <h2 className="text-xl font-semibold text-gray-800">
+              {location.pathname === '/'
+                ? 'Dashboard'
+                : location.pathname.split('/')[1]?.charAt(0).toUpperCase() +
+                  location.pathname.split('/')[1]?.slice(1)}
+            </h2>
+          </div>
+
           <div className="flex items-center space-x-4">
             <img
               src={user.profilePictureUrl ? `${BASE_URL}${user.profilePictureUrl}` : 'https://via.placeholder.com/40'}
               alt="User"
-              className="w-10 h-10 rounded-full object-cover border-2"
+              className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
               onError={(e) => e.target.src = 'https://via.placeholder.com/40'}
             />
-            <span className="font-medium text-gray-700">{user.name}</span>
+            <span className="font-medium text-gray-700 hidden sm:block">
+              {user.name}
+            </span>
           </div>
         </header>
 
         {/* Outlet */}
-        <main className="flex-1 overflow-auto bg-gray-100 p-4 md:p-6">
+        <main className="flex-1 overflow-auto bg-gray-100 p-6">
           <Outlet />
         </main>
       </div>

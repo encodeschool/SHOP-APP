@@ -42,6 +42,10 @@ const Checkout = () => {
   const [discount, setDiscount] = useState(0);
   const [promoError, setPromoError] = useState("");
 
+  const [countries, setCountries] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [postalCodes, setPostalCodes] = useState([]);
+
   const applyPromo = async () => {
     try {
       setPromoError("");
@@ -54,7 +58,6 @@ const Checkout = () => {
     }
   };
 
-
   const {
     register,
     handleSubmit,
@@ -66,6 +69,39 @@ const Checkout = () => {
   const isLegalEntity = watch('isLegalEntity');
   const shippingMethod = watch('shippingMethod');
   const paymentMethod = watch('paymentMethod');
+  const selectedCountry = watch("country");
+  const selectedCity = watch("city");
+
+  useEffect(() => {
+    axios.get("/geo/countries").then(res => setCountries(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCountry) return;
+
+    setValue("city", "");
+    setValue("zip", "");
+    setCities([]);
+    setPostalCodes([]);
+
+    axios.get("/geo/cities", {
+      params: { countryCode: selectedCountry }
+    }).then(res => setCities(res.data));
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (!selectedCountry || !selectedCity) return;
+
+    setValue("zip", "");
+    setPostalCodes([]);
+
+    axios.get("/geo/postal-codes", {
+      params: {
+        countryCode: selectedCountry,
+        city: selectedCity
+      }
+    }).then(res => setPostalCodes(res.data));
+  }, [selectedCity]);
 
   useEffect(() => {
     if (!user) {
@@ -224,31 +260,46 @@ const Checkout = () => {
 
         <h3 className="text-xl font-semibold">{t("Shipping Address")}</h3>
         <div className="grid grid-cols-2 gap-4">
-          <FormField
-            label={t("Country")}
-            name="country"
-            register={register}
-            rules={{ required: true }}
-            errors={errors}
-            required
-          />
-          <FormField
-            label={t("Post Code / ZIP")}
-            name="zip"
-            register={register}
-            rules={{ required: true }}
-            errors={errors}
-            required
-          />
+          <div>
+            <label className="block text-sm font-medium">{t("Country")}</label>
+            <select
+              {...register("country", { required: true })}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">{t("Select country")}</option>
+              {countries.map(c => (
+                <option key={c.code} value={c.code}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">{t("Post Code / ZIP")}</label>
+            <select
+              {...register("zip", { required: true })}
+              disabled={!postalCodes.length}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">{t("Select ZIP")}</option>
+              {postalCodes.map(p => (
+                <option key={p.id} value={p.code}>{p.code}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <FormField
-          label={t("City")}
-          name="city"
-          register={register}
-          rules={{ required: true }}
-          errors={errors}
-          required
-        />
+        <div>
+          <label className="block text-sm font-medium">{t("City")}</label>
+          <select
+            {...register("city", { required: true })}
+            disabled={!cities.length}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">{t("Select city")}</option>
+            {cities.map(c => (
+              <option key={c.id} value={c.name}>{c.name}</option>
+            ))}
+          </select>
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">{t("Order Notes")}</label>
@@ -365,6 +416,8 @@ const Checkout = () => {
               </td>
             </tr>
 
+            <br />
+
             <tr className="border-t-2 border-red-800">
               <td colSpan={2} className="pt-4 pb-2 font-semibold">{t("Payment Method")}</td>
             </tr>
@@ -380,9 +433,6 @@ const Checkout = () => {
                   {t("Credit / Debit Card")}
                 </label>
                 <label className="block mt-2">
-                  <input type="radio" value="paypal" {...register('paymentMethod')} /> {t("PayPal")}
-                </label>
-                <label className="block mt-2">
                   <input type="radio" value="cod" {...register('paymentMethod')} />{" "}
                   {t("Cash on Delivery")}
                 </label>
@@ -393,6 +443,8 @@ const Checkout = () => {
                 )}
               </td>
             </tr>
+
+            <br />
 
             <tr className="border-t-2 border-red-800">
               <td colSpan={2} className="pt-4 pb-2 font-semibold">{t("Promo Code")}</td>

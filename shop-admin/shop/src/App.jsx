@@ -17,6 +17,9 @@ import ServerError from "./pages/Errors/ServerError";
 import Widgets from "./pages/home/Widgets";
 import Units from './pages/units/Units';
 import PromoCode from './pages/promoCode/PromoCode';
+import Country from "./pages/geo/Country";
+import City from "./pages/geo/City";
+import PostalCode from "./pages/geo/PostalCode";
 
 function App() {
   return (
@@ -46,6 +49,9 @@ function App() {
           <Route path="banner" element={<Banner />} />
           <Route path="units" element={<Units />} />
           <Route path="/home-widget" element={<Widgets />} />
+          <Route path="/country" element={<Country />} />
+          <Route path="/city" element={<City />} />
+          <Route path="/postalCode" element={<PostalCode />} />
         </Route>
 
         <Route path="/unauthorized" element={<Forbidden />} />
