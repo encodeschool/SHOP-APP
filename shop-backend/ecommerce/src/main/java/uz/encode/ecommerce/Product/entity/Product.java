@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.encode.ecommerce.Category.entity.Category;
+import uz.encode.ecommerce.Currency.entity.Currency;
 import uz.encode.ecommerce.ProductImage.entity.ProductImage;
 import uz.encode.ecommerce.Units.entity.Unit;
 import uz.encode.ecommerce.User.entity.User;
@@ -96,7 +97,10 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductTranslation> translations = new ArrayList<>();
 
-    // Optional helper
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currency_id", nullable = true)
+    private Currency currency;
+
     public void addImage(ProductImage image) {
         this.images.add(image);
         image.setProduct(this);

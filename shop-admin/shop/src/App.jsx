@@ -20,6 +20,7 @@ import PromoCode from './pages/promoCode/PromoCode';
 import Country from "./pages/geo/Country";
 import City from "./pages/geo/City";
 import PostalCode from "./pages/geo/PostalCode";
+import Currency from './pages/currency/Currency';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="/country" element={<Country />} />
           <Route path="/city" element={<City />} />
           <Route path="/postalCode" element={<PostalCode />} />
+          <Route path="/currency" element={<Currency />} />
         </Route>
 
         <Route path="/unauthorized" element={<Forbidden />} />

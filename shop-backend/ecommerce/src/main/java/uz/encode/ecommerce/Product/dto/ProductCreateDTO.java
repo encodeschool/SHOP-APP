@@ -54,4 +54,6 @@ public class ProductCreateDTO {
     private List<ProductTranslationDTO> translations = new ArrayList<>();
 
     private LocationResponseDTO location;
+
+    private Long currencyId;
 }

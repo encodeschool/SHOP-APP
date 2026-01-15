@@ -12,12 +12,13 @@ import {
   FaChevronRight,
   FaTag,
   FaCog,
-  FaShoppingCart
+  FaShoppingCart,
+  FaCodepen 
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { TbRulerMeasure } from "react-icons/tb";
 import { RiDiscountPercentLine } from "react-icons/ri";
-import { MdCategory } from "react-icons/md";
+import { MdCategory, MdCurrencyExchange } from "react-icons/md";
 import { BsTags } from "react-icons/bs";
 import { MdEditAttributes } from "react-icons/md";
 import { SiBrandfolder } from "react-icons/si";
@@ -231,8 +232,12 @@ export default function AdminLayout() {
                     <span>City</span>
                   </NavLink>
                   <NavLink to="/postalCode" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
-                    <BsFillGeoAltFill />
+                    <FaCodepen />
                     <span>Postal Code</span>
+                  </NavLink>
+                  <NavLink to="/currency" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
+                    <MdCurrencyExchange  />
+                    <span>Currencies</span>
                   </NavLink>
                 </div>
               )}
