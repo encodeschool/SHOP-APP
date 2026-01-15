@@ -132,10 +132,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get checkout => 'Перейти к оформлению заказа';
 
   @override
-  String get subcategoriesTitle => 'Под категории';
+  String get subcategoriesTitle => 'Подкатегории';
 
   @override
-  String get productsTitle => 'Продукции';
+  String get productsTitle => 'Товары';
 
   @override
   String get checkoutTitle => 'Проверка';
@@ -638,4 +638,37 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cancelled => 'Отменён';
+
+  @override
+  String get filters => 'Фильтры';
+
+  @override
+  String get priceRange => 'Диапазон цен';
+
+  @override
+  String get to => 'до';
+
+  @override
+  String get inStockOnly => 'Только в наличии';
+
+  @override
+  String get activeFiltersApplied => 'Активные фильтры применены';
+
+  @override
+  String get reset => 'Сбросить';
+
+  @override
+  String get applyFilters => 'Применить фильтры';
+
+  @override
+  String get loadingProducts => 'Загрузка товаров...';
+
+  @override
+  String get noProductsFound => 'Товары не найдены';
+
+  @override
+  String get tryAdjustingFilters => 'Попробуйте изменить фильтры';
+
+  @override
+  String get failedToLoadData => 'Не удалось загрузить данные';
 }

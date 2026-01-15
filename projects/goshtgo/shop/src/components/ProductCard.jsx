@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
           className="w-full h-48 object-contain mb-2"
         />
         <h2 className="font-bold text-lg">{product.title}</h2>
-        <p className="text-green-600">${product.price}</p>
+        <p className="text-green-600">{product.price}</p>
       </div>
     </Link>
   );

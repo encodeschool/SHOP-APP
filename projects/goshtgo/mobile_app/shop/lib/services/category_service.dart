@@ -13,7 +13,7 @@ class CategoryService {
 
   Future<String> _getLangCode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('locale') ?? 'en';
+    return prefs.getString('locale') ?? 'ru';
   }
 
   /// Fetches root categories.

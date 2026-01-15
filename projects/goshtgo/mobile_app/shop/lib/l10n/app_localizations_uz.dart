@@ -132,7 +132,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get checkout => 'Buyurtmani yakunlash';
 
   @override
-  String get subcategoriesTitle => 'Quyi kategoriyalar';
+  String get subcategoriesTitle => 'Kichik kategoriyalar';
 
   @override
   String get productsTitle => 'Mahsulotlar';
@@ -638,4 +638,37 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get cancelled => 'Bekor qilingan';
+
+  @override
+  String get filters => 'Filtrlar';
+
+  @override
+  String get priceRange => 'Narx oralig\'i';
+
+  @override
+  String get to => 'gacha';
+
+  @override
+  String get inStockOnly => 'Faqat mavjud';
+
+  @override
+  String get activeFiltersApplied => 'Faol filtrlar qo\'llanildi';
+
+  @override
+  String get reset => 'Tozalash';
+
+  @override
+  String get applyFilters => 'Filtrlarni qo\'llash';
+
+  @override
+  String get loadingProducts => 'Mahsulotlar yuklanmoqda...';
+
+  @override
+  String get noProductsFound => 'Mahsulotlar topilmadi';
+
+  @override
+  String get tryAdjustingFilters => 'Filtrlarni o\'zgartirib ko\'ring';
+
+  @override
+  String get failedToLoadData => 'Ma\'lumotlarni yuklash amalga oshmadi';
 }

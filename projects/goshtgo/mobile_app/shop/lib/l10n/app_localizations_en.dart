@@ -638,4 +638,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancelled => 'Cancelled';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get priceRange => 'Price Range';
+
+  @override
+  String get to => 'to';
+
+  @override
+  String get inStockOnly => 'In Stock Only';
+
+  @override
+  String get activeFiltersApplied => 'Active filters applied';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get applyFilters => 'Apply Filters';
+
+  @override
+  String get loadingProducts => 'Loading products...';
+
+  @override
+  String get noProductsFound => 'No products found';
+
+  @override
+  String get tryAdjustingFilters => 'Try adjusting your filters';
+
+  @override
+  String get failedToLoadData => 'Failed to load data';
 }

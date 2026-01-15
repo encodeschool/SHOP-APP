@@ -227,7 +227,20 @@
                                             "paid": "To‘langan",
                                             "shipped": "Jo‘natilgan",
                                             "delivered": "Yetkazilgan",
-                                            "cancelled": "Bekor qilingan"
+                                            "cancelled": "Bekor qilingan",
+                                            "filters": "Filtrlar",
+                                            "priceRange": "Narx oralig'i",
+                                            "to": "gacha",
+                                            "inStockOnly": "Faqat mavjud",
+                                            "activeFiltersApplied": "Faol filtrlar qo'llanildi",
+                                            "reset": "Tozalash",
+                                            "applyFilters": "Filtrlarni qo'llash",
+                                            "loadingProducts": "Mahsulotlar yuklanmoqda...",
+                                            "subcategoriesTitle": "Kichik kategoriyalar",
+                                            "productsTitle": "Mahsulotlar",
+                                            "noProductsFound": "Mahsulotlar topilmadi",
+                                            "tryAdjustingFilters": "Filtrlarni o'zgartirib ko'ring",
+                                            "failedToLoadData": "Ma'lumotlarni yuklash amalga oshmadi"
 
 
 

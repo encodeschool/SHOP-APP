@@ -95,22 +95,22 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 🗺️ Map preview
-            SizedBox(
-              height: 200,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: LatLng(41.2995, 69.2401), // Tashkent
-                  initialZoom: 13,
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
-                  ),
-                ],
-              ),
-            ),
+            // // 🗺️ Map preview
+            // SizedBox(
+            //   height: 200,
+            //   child: FlutterMap(
+            //     options: MapOptions(
+            //       initialCenter: LatLng(41.2995, 69.2401), // Tashkent
+            //       initialZoom: 13,
+            //     ),
+            //     children: [
+            //       TileLayer(
+            //         urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            //         userAgentPackageName: 'com.example.app',
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             const SizedBox(height: 30),
 

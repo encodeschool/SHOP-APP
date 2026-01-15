@@ -88,22 +88,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(page["image"]!, width: 250, fit: BoxFit.cover),
+                        Image.asset(page["image"]!, width: 200, fit: BoxFit.cover),
                         const SizedBox(height: 40),
                         Text(
                           page["title"]!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 26,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                         Text(
                           page["subtitle"]!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.grey,
                           ),
                         ),

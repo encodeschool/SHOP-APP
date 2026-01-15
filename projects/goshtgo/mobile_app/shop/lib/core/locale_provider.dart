@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocaleProvider extends ChangeNotifier {
-  Locale _locale = const Locale('en');
+  Locale _locale = const Locale('ru');
 
   Locale get locale => _locale;
 
   Future<void> loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final langCode = prefs.getString('locale') ?? 'en';
+    final langCode = prefs.getString('locale') ?? 'ru';
     _locale = Locale(langCode);
     notifyListeners();
   }

@@ -112,7 +112,7 @@ const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, fa
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold mt-2">{product.title}</h2>
-                      <p className="text-red-600 text-3xl font-bold mt-2">${product.price}</p>
+                      <p className="text-red-600 text-3xl font-bold mt-2">{product.price}</p>
                       <CompareButton product={product} />
                     </div>
                     <button

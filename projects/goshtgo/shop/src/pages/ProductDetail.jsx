@@ -253,10 +253,10 @@ const ProductDetail = () => {
 
             {/* Base price */}
             <p className="text-2xl font-bold text-red-800 mb-3">
-              {getTotalPrice().toLocaleString()} ₽
+              {getTotalPrice().toLocaleString()}
             </p>
 
-            {/* Options */}
+            {/* Options 
             <div className="space-y-2 mb-6">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -283,12 +283,13 @@ const ProductDetail = () => {
                 <span>{tMince}</span>
               </label>
             </div>
+            */}
 
             {/* Total */}
             <div className="flex justify-between items-center mb-4 border-t pt-3">
               <span className="text-lg font-semibold">{t('Total')}:</span>
               <span className="text-2xl font-bold text-red-700">
-                {getTotalPrice().toLocaleString()} ₽
+                {getTotalPrice().toLocaleString()}
               </span>
             </div>
 

@@ -58,8 +58,8 @@ const CartView = () => {
                   </button>
                 </div>
               </td>
-              <td className="border border-gray-300 p-2 text-center">${item.price.toFixed(2)}</td>
-              <td className="border border-gray-300 p-2 text-center">${(item.price * item.quantity).toFixed(2)}</td>
+              <td className="border border-gray-300 p-2 text-center">{item.price.toFixed(2)}</td>
+              <td className="border border-gray-300 p-2 text-center">{(item.price * item.quantity).toFixed(2)}</td>
               <td className="border border-gray-300 p-2 text-center">
                 <button
                   onClick={() => dispatch(removeFromCart(item.id))}
@@ -72,7 +72,7 @@ const CartView = () => {
           ))}
           <tr>
             <td colSpan="3" className="text-right font-semibold p-2 border border-gray-300">{t("Total:")}</td>
-            <td className="text-center font-semibold p-2 border border-gray-300">${totalPrice.toFixed(2)}</td>
+            <td className="text-center font-semibold p-2 border border-gray-300">{totalPrice.toFixed(2)}</td>
             <td className="border border-gray-300"></td>
           </tr>
           <tr>

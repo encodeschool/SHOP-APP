@@ -222,7 +222,20 @@
                                             "paid": "Paid",
                                             "shipped": "Shipped",
                                             "delivered": "Delivered",
-                                            "cancelled": "Cancelled"
+                                            "cancelled": "Cancelled",
+                                            "filters": "Filters",
+                                            "priceRange": "Price Range",
+                                            "to": "to",
+                                            "inStockOnly": "In Stock Only",
+                                            "activeFiltersApplied": "Active filters applied",
+                                            "reset": "Reset",
+                                            "applyFilters": "Apply Filters",
+                                            "loadingProducts": "Loading products...",
+                                            "subcategoriesTitle": "Subcategories",
+                                            "productsTitle": "Products",
+                                            "noProductsFound": "No products found",
+                                            "tryAdjustingFilters": "Try adjusting your filters",
+                                            "failedToLoadData": "Failed to load data"
 
 
 }

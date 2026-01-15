@@ -266,7 +266,7 @@ const CategoryBar = () => {
                   />
                   <div className="flex-1">
                     <p className="text-sm font-semibold">{p.title}</p>
-                    <p className="text-xs text-gray-500">€{p.price}</p>
+                    <p className="text-xs text-gray-500">{p.price}</p>
                   </div>
                 </Link>
               ))}

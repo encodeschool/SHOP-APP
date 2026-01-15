@@ -9,7 +9,7 @@ import '../../services/order_service.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/user_service.dart';
 import 'package:country_picker/country_picker.dart';
-import 'dart:ui' as ui; // Add this at top
+import 'dart:ui' as ui;
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -19,13 +19,12 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  Country? _selectedCountry;
-
   final _formKey = GlobalKey<FormState>();
-  final _promoController = TextEditingController();
   final storage = const FlutterSecureStorage();
 
-  // Controllers for user data
+  Country? _selectedCountry;
+
+  final _promoController = TextEditingController();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -35,52 +34,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _notesController = TextEditingController();
 
   bool isLegalEntity = false;
-  String shippingMethod = 'standard';
-  String paymentMethod = 'card';
   bool agreeToTerms = false;
+  bool loading = false;
+
+  String shippingMethod = 'standard';
+  String paymentMethod = 'cod';
 
   double discount = 0;
   String? promoError;
-  bool loading = false;
 
-  bool isLoggedIn = false;
   String? userId;
+  bool isLoggedIn = false;
 
-  // Legal entity fields
-  String companyName = '', registrationNr = '', vatNumber = '', legalAddress = '';
+  String companyName = '';
+  String registrationNr = '';
+  String vatNumber = '';
+  String legalAddress = '';
 
   @override
   void initState() {
     super.initState();
-    _checkLoginAndLoadUser();
+    _initUser();
   }
 
-  Future<User?> _loadUser() async {
-    final userService = UserService();
-    return await userService.getUserDetails();
-  }
-
-  Future<void> _checkLoginAndLoadUser() async {
+  Future<void> _initUser() async {
     final token = await storage.read(key: 'token');
     userId = await storage.read(key: 'userId');
 
-    _countryController.text = _countryController.text.isNotEmpty
-        ? _countryController.text
-        : ui.window.locale.countryCode ?? '';
+    _countryController.text = ui.window.locale.countryCode ?? '';
 
     if (token == null || userId == null) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.loginRequired)),
-        );
+      if (mounted) {
         context.go('/login?redirect=/checkout');
       }
       return;
     }
 
-    setState(() => isLoggedIn = true);
+    isLoggedIn = true;
+    final user = await UserService().getUserDetails();
 
-    final user = await _loadUser();
     if (user != null && mounted) {
       _nameController.text = user.name;
       _emailController.text = user.email;
@@ -88,16 +80,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  Future<void> applyPromo(double totalPrice) async {
+  Future<void> applyPromo(double total) async {
     setState(() => promoError = null);
     try {
-      final orderService = OrderService();
-      final response = await orderService.applyPromo(_promoController.text, totalPrice);
-      final newTotal = response['newTotal'];
-      setState(() {
-        discount = totalPrice - newTotal;
-      });
-    } catch (e) {
+      final response = await OrderService().applyPromo(_promoController.text, total);
+      setState(() => discount = total - response['newTotal']);
+    } catch (_) {
       setState(() {
         promoError = AppLocalizations.of(context)!.invalidPromo;
         discount = 0;
@@ -105,37 +93,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  Future<void> submitOrder(BuildContext context, CartProvider cart) async {
+  Future<void> submitOrder(CartProvider cart) async {
+    final loc = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
     if (!agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.termsRequired)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.termsRequired)));
       return;
     }
 
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.userNotFound)),
-      );
-      return;
-    }
-
-    _formKey.currentState!.save();
     setState(() => loading = true);
 
     final shippingPrice = shippingMethod == 'express' ? 15.0 : 5.0;
     final totalPrice = cart.totalPrice + shippingPrice - discount;
 
-    final checkoutPayload = {
+    final payload = {
       "userId": userId,
-      "items": cart.items
-          .map((item) => {
-        "productId": item.product.id,
-        "quantity": item.quantity,
-        "pricePerUnit": item.product.price,
-      })
-          .toList(),
+      "items": cart.items.map((i) => {
+        "productId": i.product.id,
+        "quantity": i.quantity,
+        "pricePerUnit": i.product.price,
+      }).toList(),
       "shippingMethod": shippingMethod,
       "paymentMethod": paymentMethod,
       "shippingPrice": shippingPrice,
@@ -158,31 +136,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     };
 
-    final orderService = OrderService();
-    final success = await orderService.placeOrder(context, payload: checkoutPayload);
+    final success = await OrderService().placeOrder(context, payload: payload);
     setState(() => loading = false);
 
-    if (success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.orderSuccess)),
-      );
+    if (success && mounted) {
       context.go('/success');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.orderFailed)),
-      );
     }
+  }
+
+  Widget _card({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _title(String text, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.red[900]),
+        const SizedBox(width: 8),
+        Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final cart = context.watch<CartProvider>();
-    final apiUrl = dotenv.env['API_URL'] ?? 'https://shop.encode.uz/api';
+    final apiUrl = dotenv.env['API_URL'] ?? '';
+
     final shippingPrice = shippingMethod == 'express' ? 15.0 : 5.0;
-    final totalBeforeDiscount = cart.totalPrice + shippingPrice;
+    final total = cart.totalPrice + shippingPrice - discount;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
       appBar: AppBar(title: Text(loc.checkoutTitle)),
       body: cart.items.isEmpty
           ? Center(child: Text(loc.cartEmpty))
@@ -191,138 +192,153 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(loc.contactInfo, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: loc.fullName),
-                validator: (v) => v!.isEmpty ? loc.fullName : null,
+
+              /// CONTACT
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.contactInfo, Icons.person_outline),
+                    const SizedBox(height: 16),
+                    TextFormField(controller: _nameController, decoration: InputDecoration(labelText: loc.fullName), validator: (v) => v!.isEmpty ? loc.fullName : null),
+                    const SizedBox(height: 12),
+                    TextFormField(controller: _emailController, decoration: InputDecoration(labelText: loc.email)),
+                    const SizedBox(height: 12),
+                    TextFormField(controller: _phoneController, decoration: InputDecoration(labelText: loc.phone)),
+                  ],
+                ),
               ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: loc.email),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) => v!.isEmpty ? loc.email : null,
-              ),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(labelText: loc.phone),
-                keyboardType: TextInputType.phone,
-                validator: (v) => v!.isEmpty ? loc.phone : null,
-              ),
-              // const SizedBox(height: 10),
-              // CheckboxListTile(
-              //   title: Text(loc.legalEntity),
-              //   value: isLegalEntity,
-              //   onChanged: (v) => setState(() => isLegalEntity = v!),
-              // ),
-              if (isLegalEntity) ...[
-                const SizedBox(height: 8),
-                Text(loc.companyInfo, style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  decoration: InputDecoration(labelText: loc.companyName),
-                  initialValue: companyName,
-                  onSaved: (v) => companyName = v ?? '',
-                  validator: (v) => v!.isEmpty ? loc.companyName : null,
-                ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: loc.registrationNr),
-                  initialValue: registrationNr,
-                  onSaved: (v) => registrationNr = v ?? '',
-                  validator: (v) => v!.isEmpty ? loc.registrationNr : null,
-                ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: loc.vatNumber),
-                  initialValue: vatNumber,
-                  onSaved: (v) => vatNumber = v ?? '',
-                ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: loc.legalAddress),
-                  initialValue: legalAddress,
-                  onSaved: (v) => legalAddress = v ?? '',
-                  validator: (v) => v!.isEmpty ? loc.legalAddress : null,
-                ),
-              ],
-              const SizedBox(height: 20),
-              Text(loc.shippingAddress, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              GestureDetector(
-                onTap: () {
-                  showCountryPicker(
-                    context: context,
-                    showPhoneCode: true,
-                    onSelect: (Country country) {
-                      setState(() {
-                        _selectedCountry = country;
-                        _countryController.text =
-                        '${country.flagEmoji} ${country.name} (+${country.phoneCode})';
-                      });
-                    },
-                  );
-                },
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _countryController,
-                    decoration: InputDecoration(
-                      labelText: 'Country',
-                      prefixIcon: _selectedCountry != null
-                          ? Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          _selectedCountry!.flagEmoji,
-                          style: const TextStyle(fontSize: 20),
+
+              /// SHIPPING ADDRESS
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.shippingAddress, Icons.local_shipping_outlined),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          onSelect: (c) {
+                            _selectedCountry = c;
+                            _countryController.text = c.name;
+                            setState(() {});
+                          },
+                        );
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: _countryController,
+                          decoration: const InputDecoration(labelText: 'Country'),
+                          validator: (v) => v!.isEmpty ? 'Country required' : null,
                         ),
-                      )
-                          : const Icon(Icons.flag_outlined),
-                      suffixIcon: const Icon(Icons.arrow_drop_down),
+                      ),
                     ),
-                    validator: (v) => v!.isEmpty ? 'Please select a country' : null,
-                  ),
+                    const SizedBox(height: 12),
+                    TextFormField(controller: _zipController, decoration: InputDecoration(labelText: loc.zipCode)),
+                    const SizedBox(height: 12),
+                    TextFormField(controller: _cityController, decoration: InputDecoration(labelText: loc.city)),
+                    const SizedBox(height: 12),
+                    TextFormField(controller: _notesController, decoration: InputDecoration(labelText: loc.notes), maxLines: 3),
+                  ],
                 ),
               ),
-              TextFormField(controller: _zipController, decoration: InputDecoration(labelText: loc.zipCode), validator: (v) => v!.isEmpty ? loc.zipCode : null),
-              TextFormField(controller: _cityController, decoration: InputDecoration(labelText: loc.city), validator: (v) => v!.isEmpty ? loc.city : null),
-              TextFormField(controller: _notesController, decoration: InputDecoration(labelText: loc.notes), maxLines: 3),
-              const SizedBox(height: 20),
-              Text(loc.shippingMethod, style: const TextStyle(fontWeight: FontWeight.bold)),
-              RadioListTile<String>(title: Text(loc.standardShipping), value: 'standard', groupValue: shippingMethod, onChanged: (v) => setState(() => shippingMethod = v!)),
-              RadioListTile<String>(title: Text(loc.expressShipping), value: 'express', groupValue: shippingMethod, onChanged: (v) => setState(() => shippingMethod = v!)),
-              const SizedBox(height: 16),
-              Text(loc.paymentMethod, style: const TextStyle(fontWeight: FontWeight.bold)),
-              // RadioListTile<String>(title: Text(loc.cardPayment), value: 'card', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
-              // RadioListTile<String>(title: Text(loc.paypalPayment), value: 'paypal', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
-              RadioListTile<String>(title: Text(loc.codPayment), value: 'cod', groupValue: paymentMethod, onChanged: (v) => setState(() => paymentMethod = v!)),
-              const SizedBox(height: 16),
-              Text(loc.promoCode, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Row(
-                children: [
-                  Expanded(child: TextField(controller: _promoController, decoration: InputDecoration(hintText: loc.promoCode))),
-                  const SizedBox(width: 8),
-                  ElevatedButton(onPressed: () => applyPromo(totalBeforeDiscount), style: ElevatedButton.styleFrom(backgroundColor: Colors.black), child: Text(loc.apply, style: const TextStyle(color: Colors.white))),
-                ],
+
+              /// SHIPPING METHOD
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.shippingMethod, Icons.delivery_dining),
+                    RadioListTile(value: 'standard', groupValue: shippingMethod, title: Text(loc.standardShipping), onChanged: (v) => setState(() => shippingMethod = v!)),
+                    RadioListTile(value: 'express', groupValue: shippingMethod, title: Text(loc.expressShipping), onChanged: (v) => setState(() => shippingMethod = v!)),
+                  ],
+                ),
               ),
-              if (promoError != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(promoError!, style: const TextStyle(color: Colors.red, fontSize: 13))),
-              const SizedBox(height: 16),
-              CheckboxListTile(value: agreeToTerms, onChanged: (v) => setState(() => agreeToTerms = v!), title: Text(loc.acceptTerms)),
-              const Divider(height: 30),
-              Text(loc.orderSummary, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
+              /// PAYMENT
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.paymentMethod, Icons.payment),
+                    RadioListTile(value: 'cod', groupValue: paymentMethod, title: Text(loc.codPayment), onChanged: (v) => setState(() => paymentMethod = v!)),
+                  ],
+                ),
+              ),
+
+              /// PROMO
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.promoCode, Icons.discount),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: TextField(controller: _promoController)),
+                        const SizedBox(width: 8),
+                        ElevatedButton(onPressed: () => applyPromo(cart.totalPrice + shippingPrice), child: Text(loc.apply)),
+                      ],
+                    ),
+                    if (promoError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(promoError!, style: const TextStyle(color: Colors.red)),
+                      ),
+                  ],
+                ),
+              ),
+
+              /// SUMMARY
+              _card(
+                child: Column(
+                  children: [
+                    _title(loc.orderSummary, Icons.receipt_long),
+                    const SizedBox(height: 12),
+                    ...cart.items.map((i) => ListTile(
+                      leading: Image.network('$apiUrl${i.product.images.first}', width: 40, errorBuilder: (_, __, ___) => const Icon(Icons.image)),
+                      title: Text('${i.product.title} x${i.quantity}'),
+                      trailing: Text(i.totalPrice.toStringAsFixed(2)),
+                    )),
+                    const Divider(),
+                    _row(loc.shipping, shippingPrice),
+                    if (discount > 0) _row(loc.discount, -discount, green: true),
+                    const Divider(),
+                    _row(loc.total, total, bold: true),
+                  ],
+                ),
+              ),
+
+              CheckboxListTile(
+                value: agreeToTerms,
+                onChanged: (v) => setState(() => agreeToTerms = v!),
+                title: Text(loc.acceptTerms),
+              ),
+
               const SizedBox(height: 10),
-              ...cart.items.map((item) => ListTile(
-                leading: item.product.images.isNotEmpty ? Image.network('$apiUrl${item.product.images[0]}', width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image)) : const Icon(Icons.image, size: 50),
-                title: Text("${item.product.title} x${item.quantity}"),
-                trailing: Text("${item.totalPrice.toStringAsFixed(2)}"),
-              )),
-              const Divider(),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.shipping), Text("${shippingPrice.toStringAsFixed(2)}")]),
-              if (discount > 0) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.discount, style: const TextStyle(color: Colors.green)), Text("-${discount.toStringAsFixed(2)}", style: const TextStyle(color: Colors.green))]),
-              const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(loc.total, style: const TextStyle(fontSize: 18)), Text("${(totalBeforeDiscount - discount).toStringAsFixed(2)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
-              const SizedBox(height: 20),
-              ElevatedButton(onPressed: loading || !isLoggedIn ? null : () => submitOrder(context, cart), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, minimumSize: const Size(double.infinity, 50)), child: loading ? const CircularProgressIndicator(color: Colors.white) : Text(loc.placeOrder, style: const TextStyle(color: Colors.white, fontSize: 16))),
+              ElevatedButton(
+                onPressed: loading ? null : () => submitOrder(cart),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                child: loading ? const CircularProgressIndicator(color: Colors.white) : Text(loc.placeOrder),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _row(String label, double value, {bool bold = false, bool green = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label),
+        Text(
+          value.toStringAsFixed(2),
+          style: TextStyle(
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            color: green ? Colors.green : null,
+          ),
+        ),
+      ],
     );
   }
 }

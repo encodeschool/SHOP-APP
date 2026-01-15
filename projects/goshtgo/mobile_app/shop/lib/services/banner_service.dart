@@ -11,7 +11,7 @@ class BannerService {
 
   Future<String> _getLangCode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('locale') ?? 'en';
+    return prefs.getString('locale') ?? 'ru';
   }
 
   Future<List<Banner>> fetchAllBanner([String? lang]) async {

@@ -385,7 +385,7 @@ const Checkout = () => {
             {cartItems.map((item) => (
               <tr key={item.id}>
                 <td>{item.title} x {item.quantity}</td>
-                <td className="text-right">${(item.price * item.quantity).toFixed(2)}</td>
+                <td className="text-right">{(item.price * item.quantity).toFixed(2)}</td>
               </tr>
             ))}
 
@@ -404,14 +404,14 @@ const Checkout = () => {
                     />{" "}
                     {t("Standard Shipping")}
                   </span>
-                  <span>$5.00</span>
+                  <span>5.00</span>
                 </label>
                 <label className="flex items-center justify-between mt-2">
                   <span>
                     <input type="radio" value="express" {...register('shippingMethod')} />{" "}
                     {t("Express Shipping")}
                   </span>
-                  <span>$15.00</span>
+                  <span>15.00</span>
                 </label>
               </td>
             </tr>
@@ -476,13 +476,13 @@ const Checkout = () => {
             {discount > 0 && (
               <tr className="text-green-700 font-medium">
                 <td>{t("Discount applied")}</td>
-                <td className="text-right">- ${discount.toFixed(2)}</td>
+                <td className="text-right">- {discount.toFixed(2)}</td>
               </tr>
             )}
 
             <tr className="border-t-2 border-red-800 font-bold">
               <td className="py-4">{t("Total")}:</td>
-              <td className="text-right">${(totalPrice - discount).toFixed(2)}</td>
+              <td className="text-right">{(totalPrice - discount).toFixed(2)}</td>
             </tr>
 
             <tr>

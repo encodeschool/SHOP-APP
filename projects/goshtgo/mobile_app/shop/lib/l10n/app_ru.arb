@@ -226,7 +226,20 @@
                                                                                   "paid": "Оплачено",
                                                                                   "shipped": "Отправлено",
                                                                                   "delivered": "Доставлено",
-                                                                                  "cancelled": "Отменён"
+                                                                                  "cancelled": "Отменён",
+                                                                                  "filters": "Фильтры",
+                                                                                  "priceRange": "Диапазон цен",
+                                                                                  "to": "до",
+                                                                                  "inStockOnly": "Только в наличии",
+                                                                                  "activeFiltersApplied": "Активные фильтры применены",
+                                                                                  "reset": "Сбросить",
+                                                                                  "applyFilters": "Применить фильтры",
+                                                                                  "loadingProducts": "Загрузка товаров...",
+                                                                                  "subcategoriesTitle": "Подкатегории",
+                                                                                  "productsTitle": "Товары",
+                                                                                  "noProductsFound": "Товары не найдены",
+                                                                                  "tryAdjustingFilters": "Попробуйте изменить фильтры",
+                                                                                  "failedToLoadData": "Не удалось загрузить данные"
 
 
 
