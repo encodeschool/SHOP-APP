@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.encode.ecommerce.Currency.dto.CurrencyDTO;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.entity.ProductAttributeTranslation;
 import uz.encode.ecommerce.Product.entity.ProductCondition;
@@ -44,6 +45,7 @@ public class ProductResponseDTO {
     private List<ProductTranslationDTO> translations = new ArrayList<>();
     private String lang;
     private LocationResponseDTO location;
+    private CurrencyDTO currency;
 
     public ProductResponseDTO(Product product, String language) {
         this.id = product.getId();
@@ -96,6 +98,14 @@ public class ProductResponseDTO {
                 .collect(Collectors.toList());
         this.unit = product.getUnit();
         this.location = product.getLocation() != null ? LocationResponseDTO.from(product.getLocation()) : null;
+        if (product.getCurrency() != null) {
+                this.currency = new CurrencyDTO(
+                        product.getCurrency().getCode(),
+                        product.getCurrency().getName(),
+                        product.getCurrency().getSymbol(),
+                        product.getCurrency().isActive()
+                );
+        }
     }
 
 }

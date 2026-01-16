@@ -26,6 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
+import uz.encode.ecommerce.Currency.dto.CurrencyDTO;
+import uz.encode.ecommerce.Currency.entity.Currency;
+import uz.encode.ecommerce.Currency.exception.CurrencyNotFoundException;
+import uz.encode.ecommerce.Currency.repository.CurrencyRepository;
+import uz.encode.ecommerce.Currency.service.CurrencyService;
 import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
@@ -90,6 +95,8 @@ public class ProductServiceImpl implements ProductService {
     private UnitRepository unitRepository;
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    private CurrencyRepository currencyRepository;
 
     @Override
     @Transactional
@@ -120,6 +127,9 @@ public class ProductServiceImpl implements ProductService {
         Brand brand = brandRepository.findById(dto.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
+
+        Currency currency = currencyRepository.findById(dto.getCurrencyId()).orElseThrow(() -> new CurrencyNotFoundException("Currency not found"));
+        product.setCurrency(currency);
 
         // Save product first to get ID
         Product savedProduct = productRepository.save(product);
@@ -240,6 +250,9 @@ public class ProductServiceImpl implements ProductService {
         Brand brand = brandRepository.findById(dto.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
         product.setBrand(brand);
+
+        Currency currency = currencyRepository.findById(dto.getCurrencyId()).orElseThrow(() -> new CurrencyNotFoundException("Currency not found"));
+        product.setCurrency(currency);
 
         if (dto.getLocation() != null) {
             LocationResponseDTO locDto = dto.getLocation();
@@ -386,6 +399,10 @@ public class ProductServiceImpl implements ProductService {
             dto.setBrandId(product.getBrand().getId());
         }
         dto.setLocation(LocationResponseDTO.from(product.getLocation()));
+
+        if (product.getCurrency() != null) {
+            dto.setCurrency(CurrencyDTO.from(product.getCurrency()));
+        }
         return dto;
     }
 

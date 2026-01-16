@@ -23,6 +23,7 @@ export default function Products() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 10;
+  const [currencies, setCurrencies] = useState([]);
 
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -48,10 +49,17 @@ export default function Products() {
       country: '',
       address: '',
       source: 'MANUAL'
-    }
+    },
+    currencyId: '',
   });
 
   const [editingId, setEditingId] = useState(null);
+
+  const fetchCurrencies = () => {
+    axios.get("/currency")
+      .then(res => setCurrencies(res.data))
+      .catch(() => setCurrencies([]));
+  };
 
   const fetchProducts = () => {
     setIsLoading(true);
@@ -185,6 +193,7 @@ export default function Products() {
     fetchUsers();
     fetchBrands();  
     fetchUnits();
+    fetchCurrencies();
   }, []);
 
   const handleInputChange = (e) => {
@@ -274,6 +283,7 @@ export default function Products() {
 
     const productPayload = {
       ...rest,
+      currencyId: newProduct.currencyId,
       featured: newProduct.featured,
       categoryId: finalCategoryId,
       stock: parseInt(newProduct.stock),
@@ -290,6 +300,10 @@ export default function Products() {
       return;
     }
 
+    if (!newProduct.currencyId) {
+      alert("Please select currency");
+      return;
+    }
 
     formData.append('product', new Blob([JSON.stringify(productPayload)], {
       type: 'application/json'
@@ -388,7 +402,8 @@ export default function Products() {
         country: '',
         address: '',
         source: 'MANUAL'
-      }
+      },
+      currencyId: product.currency?.id || '',
     });
 
     if (parentCategoryId) {
@@ -498,7 +513,9 @@ export default function Products() {
                     <td className="p-2">
                       {p.translations?.find((t) => t.language === 'en')?.name || 'N/A'}
                     </td>
-                    <td className="p-2">${p.price}</td>
+                    <td className="p-2">
+                      {p.price} {p.currency?.code}
+                    </td>
                     <td className="p-2">{p.stock}</td>
                     <td className="p-2">{p.condition}</td>
                     <td className="p-2">{p.featured ? 'Yes' : 'No'}</td>
@@ -650,6 +667,20 @@ export default function Products() {
               <select name="condition" className="border p-1 mb-3 w-full" value={newProduct.condition} onChange={handleInputChange}>
                 <option value="NEW">New</option>
                 <option value="USED">Used</option>
+              </select>
+
+              <select
+                name="currencyId"
+                className="border p-1 mb-3 w-full"
+                value={newProduct.currencyId}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Currency</option>
+                {currencies.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.code} ({c.symbol})
+                  </option>
+                ))}
               </select>
 
               <select name="categoryId" className="border p-1 mb-3 w-full" value={newProduct.categoryId} onChange={handleInputChange}>

@@ -361,7 +361,7 @@ const CategoryBar = () => {
                   {totalQuantity}
                 </span>
               )}
-              <span className="ml-2 text-xl font-bold">€{totalPrice.toFixed(2)}</span>
+              <span className="ml-2 text-xl font-bold">{totalPrice.toFixed(2)}</span>
             </Link>
             {/* Tooltip for cart link */}
             <div className="absolute top-full bg-white left-1/2 -translate-x-1/2 mt-2 px-3 py-1  text-red-500 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[101]">
