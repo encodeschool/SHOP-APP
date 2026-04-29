@@ -2,6 +2,7 @@ package uz.encode.ecommerce.User.entity;
 
 public enum Role {
 
-    BUYER, SELLER, ADMIN
+    BUYER, SELLER, ADMIN, 
+    MANAGER, WAREHOUSE, ACCOUNTANT, MODERATOR
 
 }

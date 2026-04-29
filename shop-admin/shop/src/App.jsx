@@ -21,6 +21,7 @@ import Country from "./pages/geo/Country";
 import City from "./pages/geo/City";
 import PostalCode from "./pages/geo/PostalCode";
 import Currency from './pages/currency/Currency';
+import WarehouseLayout from './layouts/WarehouseLayout';
 
 function App() {
   return (
@@ -54,6 +55,20 @@ function App() {
           <Route path="/city" element={<City />} />
           <Route path="/postalCode" element={<PostalCode />} />
           <Route path="/currency" element={<Currency />} />
+        </Route>
+
+
+        <Route
+          path="/warehouse"
+          element={
+            <RoleRoute roles={["WAREHOUSE"]}>
+              <WarehouseLayout />
+            </RoleRoute>
+          }
+        >
+          <Route index element={<div>Warehouse Dashboard</div>} />
+          <Route path="products" element={<div>Stock Management</div>} />
+          <Route path="transactions" element={<div>Transactions</div>} />
         </Route>
 
         <Route path="/unauthorized" element={<Forbidden />} />

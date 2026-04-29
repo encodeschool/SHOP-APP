@@ -153,8 +153,9 @@ public class OrderServiceImpl implements OrderService {
             .orElseThrow(() -> new RuntimeException("Order not found"));
 
         try {
+            BigDecimal paymentAmount = order.getFinalPrice() != null ? order.getFinalPrice() : order.getTotalPrice();
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(order.getTotalPrice().multiply(BigDecimal.valueOf(100)).longValue()) // Convert to cents
+                .setAmount(paymentAmount.multiply(BigDecimal.valueOf(100)).longValue()) // Convert to cents
                 .setCurrency("usd") // Adjust currency as needed
                 .addPaymentMethodType(paymentMethod.equals("card") ? "card" : "paypal")
                 .putAllMetadata(java.util.Map.of("orderId", orderId.toString()))

@@ -155,14 +155,29 @@ const Checkout = () => {
     };
 
     try {
-      const response = await axios.post('/orders', checkoutPayload);
-      const order = response.data;
-      console.log('Order created:', order);
-      dispatch(saveCheckoutInfo(data));
-      localStorage.setItem('checkoutInfo', JSON.stringify(data));
-      navigate('/order-confirmation');
+      const response = await axios.post('/checkout/initiate', checkoutPayload);
+      const { orderId, paymentMethod, paymentUrl, clientSecret, status } = response.data;
+      
+      console.log('Checkout initiated:', { orderId, paymentMethod, status });
+      
+      dispatch(saveCheckoutInfo({ ...data, orderId }));
+      localStorage.setItem('checkoutInfo', JSON.stringify({ ...data, orderId }));
+      localStorage.setItem('currentOrderId', orderId);
+
+      // Handle payment method specific flow
+      if (paymentMethod === 'click' && paymentUrl) {
+        // Redirect to CLICK payment URL
+        window.location.href = paymentUrl;
+      } else if (paymentMethod === 'card' && clientSecret) {
+        // Handle Stripe payment - user will use Stripe modal
+        navigate('/order-confirmation', { state: { orderId, clientSecret } });
+      } else if (paymentMethod === 'cod') {
+        // Cash on Delivery - direct to confirmation
+        navigate('/order-confirmation', { state: { orderId } });
+      }
     } catch (error) {
       console.error('Error submitting checkout:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Checkout failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -431,6 +446,10 @@ const Checkout = () => {
                     defaultChecked
                   />{" "}
                   {t("Credit / Debit Card")}
+                </label>
+                <label className="block mt-2">
+                  <input type="radio" value="click" {...register('paymentMethod')} />{" "}
+                  {t("CLICK Payment")}
                 </label>
                 <label className="block mt-2">
                   <input type="radio" value="cod" {...register('paymentMethod')} />{" "}

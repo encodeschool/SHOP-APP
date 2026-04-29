@@ -1,16 +1,26 @@
 package uz.encode.ecommerce.User.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.encode.ecommerce.Address.entity.Address;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -34,7 +44,8 @@ public class User {
     private String phone;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<Role> roles = new ArrayList<>(); // e.g. ["BUYER", "SELLER"]
+    @Enumerated(EnumType.STRING)
+    private List<Role> roles = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
