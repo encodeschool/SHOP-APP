@@ -22,6 +22,7 @@ import uz.encode.ecommerce.Order.entity.Order;
 import uz.encode.ecommerce.Order.entity.OrderStatus;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Payment.entity.Payment;
+import uz.encode.ecommerce.Payment.entity.PaymentStatus;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 
 @RestController
@@ -54,7 +55,7 @@ public class StripeWebhookController {
                         .orElseThrow(() -> new RuntimeException("Payment not found"));
 
                     payment.setSuccess(true);
-                    payment.setStatus("PAID");
+                    payment.setStatus(PaymentStatus.PAID);
                     payment.setPaidAt(LocalDateTime.now());
                     paymentRepository.save(payment);
 
