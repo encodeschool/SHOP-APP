@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { clearCart } from '../redux/cartSlice';
 import { clearCheckoutInfo } from '../redux/checkoutSlice';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
-import {useCheckoutInfo} from '../hooks/useCheckoutInfo';
+import { useCheckoutInfo } from '../hooks/useCheckoutInfo';
 import { useTranslation } from "react-i18next";
 import axios from '../api/axios';
 
@@ -14,7 +14,6 @@ const OrderConfirmation = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   
-  const reduxCheckoutInfo = useSelector((state) => state.checkout.checkoutInfo);
   const checkoutInfo = useCheckoutInfo();
   const { t } = useTranslation();
   
@@ -28,6 +27,9 @@ const OrderConfirmation = () => {
   const orderId = location.state?.orderId || urlOrderId || storedOrderId;
 
   useEffect(() => {
+    let intervalId;
+    let attempts = 0;
+
     const verifyPaymentStatus = async () => {
       if (!orderId) {
         if (!checkoutInfo?.name || !checkoutInfo?.email) {
@@ -44,11 +46,18 @@ const OrderConfirmation = () => {
         setPaymentStatus(response.data);
         setLoading(false);
 
-        // Clear localStorage after successful verification
         if (response.data.paymentStatus === 'PAID' || response.data.orderStatus === 'PAID') {
           localStorage.removeItem('currentOrderId');
           localStorage.removeItem('checkoutInfo');
           dispatch(clearCart());
+          dispatch(clearCheckoutInfo());
+          clearTimeout(intervalId);
+          return;
+        }
+
+        attempts += 1;
+        if (attempts < 8) {
+          intervalId = setTimeout(verifyPaymentStatus, 3000);
         }
       } catch (err) {
         console.error('Error checking payment status:', err);
@@ -58,6 +67,12 @@ const OrderConfirmation = () => {
     };
 
     verifyPaymentStatus();
+
+    return () => {
+      if (intervalId) {
+        clearTimeout(intervalId);
+      }
+    };
   }, [orderId, checkoutInfo, navigate, dispatch]);
 
   if (loading) {

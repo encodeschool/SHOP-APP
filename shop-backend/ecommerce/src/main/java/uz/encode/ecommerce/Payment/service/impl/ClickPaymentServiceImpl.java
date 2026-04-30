@@ -3,32 +3,29 @@ package uz.encode.ecommerce.Payment.service.impl;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Order.entity.Order;
 import uz.encode.ecommerce.Order.entity.OrderStatus;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Payment.dto.ClickRequestDTO;
 import uz.encode.ecommerce.Payment.dto.ClickResponseDTO;
 import uz.encode.ecommerce.Payment.entity.Payment;
+import uz.encode.ecommerce.Payment.entity.PaymentStatus;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Payment.service.ClickPaymentService;
 
 @Service
+@RequiredArgsConstructor
 public class ClickPaymentServiceImpl implements ClickPaymentService {
 
-    private static final String CLICK_PROVIDER = "CLICK";
-    private static final String STATUS_PREPARED = "PREPARED";
-    private static final String STATUS_PAID = "PAID";
-    private static final String STATUS_FAILED = "FAILED";
+    private static final String PROVIDER = "CLICK";
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
@@ -39,238 +36,192 @@ public class ClickPaymentServiceImpl implements ClickPaymentService {
     @Value("${click.secret-key}")
     private String secretKey;
 
-    public ClickPaymentServiceImpl(OrderRepository orderRepository, PaymentRepository paymentRepository) {
-        this.orderRepository = orderRepository;
-        this.paymentRepository = paymentRepository;
-    }
+    // ================= PREPARE =================
+    @Transactional
+    public ClickResponseDTO handlePrepare(ClickRequestDTO req) {
 
-    @Override
-    public ClickResponseDTO handlePrepare(ClickRequestDTO request) {
-        if (request.getAction() == null || request.getAction() != 0) {
-            return errorResponse(request, -3, "Invalid action for prepare");
+        String sign = buildSign(
+                req.getClickTransId(),
+                serviceId,
+                secretKey,
+                req.getMerchantTransId(),
+                null,
+                req.getAmount(),
+                0,
+                req.getSignTime()
+        );
+
+        if (!sign.equals(req.getSignString())) {
+            return error(req, -1, "SIGN CHECK FAILED");
         }
 
-        if (!verifySign(request, false)) {
-            return errorResponse(request, -1, "Invalid signature");
-        }
+        UUID orderId = UUID.fromString(req.getMerchantTransId());
 
-        if (request.getServiceId() == null || !request.getServiceId().equals(serviceId)) {
-            return errorResponse(request, -2, "Invalid service_id");
-        }
-
-        Order order = loadOrder(request.getMerchantTransId());
+        Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
-            return errorResponse(request, -2, "Order not found");
+            return error(req, -5, "Order not found");
         }
 
-        if (!"click".equalsIgnoreCase(order.getPaymentMethod())) {
-            return errorResponse(request, -3, "Order payment method is not CLICK");
+        BigDecimal expected = order.getFinalPrice() != null
+                ? order.getFinalPrice()
+                : order.getTotalPrice();
+
+        if (expected.subtract(req.getAmount()).abs()
+                .compareTo(new BigDecimal("0.01")) > 0) {
+            return error(req, -2, "Incorrect amount");
         }
 
-        BigDecimal expectedAmount = order.getFinalPrice() != null ? order.getFinalPrice() : order.getTotalPrice();
-        if (expectedAmount == null || request.getAmount() == null || expectedAmount.compareTo(request.getAmount()) != 0) {
-            return errorResponse(request, -2, "Payment amount does not match order amount");
-        }
+        Payment payment = paymentRepository
+                .findByOrder_IdAndProvider(orderId, PROVIDER)
+                .orElse(new Payment());
 
-        if (order.getStatus() == OrderStatus.PAID) {
-            return new ClickResponseDTO(
-                request.getClickTransId(),
-                request.getMerchantTransId(),
-                null,
-                null,
-                -4,
-                "Order already paid"
-            );
-        }
+        payment.setOrder(order);
+        payment.setProvider(PROVIDER);
+        payment.setAmount(req.getAmount());
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setClickTransId(req.getClickTransId());
+        payment.setClickPaydocId(req.getClickPaydocId());
 
-        if (order.getStatus() == OrderStatus.CANCELLED) {
-            return errorResponse(request, -9, "Order is cancelled");
-        }
-
-        Optional<Payment> existingPayment = paymentRepository.findByOrderIdAndProviderAndStatus(order.getId(), CLICK_PROVIDER, STATUS_PREPARED);
-        Payment payment = existingPayment.orElseGet(() -> {
-            Payment newPayment = new Payment();
-            newPayment.setProvider(CLICK_PROVIDER);
-            newPayment.setOrder(order);
-            newPayment.setUser(order.getUser());
-            newPayment.setMethod("CLICK");
-            newPayment.setAmount(expectedAmount);
-            newPayment.setStatus(STATUS_PREPARED);
-            newPayment.setSuccess(false);
-            newPayment.setPaidAt(LocalDateTime.now());
-            return newPayment;
-        });
-
-        if (payment.getClickPrepareId() == null) {
-            payment.setClickPrepareId(generateRequestId());
-        }
-        payment.setClickTransId(request.getClickTransId());
-        payment.setClickPaydocId(request.getClickPaydocId());
-        payment.setMerchantUserId(request.getMerchantUserId());
-        payment.setCardType(request.getCardType());
         paymentRepository.save(payment);
 
-        return new ClickResponseDTO(
-            request.getClickTransId(),
-            request.getMerchantTransId(),
-            payment.getClickPrepareId(),
-            null,
-            0,
-            "Ready for payment"
-        );
+        ClickResponseDTO resp = new ClickResponseDTO();
+        resp.setClickTransId(req.getClickTransId());
+        resp.setMerchantTransId(req.getMerchantTransId());
+        resp.setMerchantPrepareId(payment.getId().toString());
+        resp.setError(0);
+        resp.setErrorNote("Success");
+
+        payment.setClickPrepareId(payment.getId().toString());
+        paymentRepository.save(payment);
+
+        return resp;
     }
 
-    @Override
-    public ClickResponseDTO handleComplete(ClickRequestDTO request) {
-        if (request.getAction() == null || request.getAction() != 1) {
-            return errorResponse(request, -3, "Invalid action for complete");
+    // ================= COMPLETE =================
+    @Transactional
+    public ClickResponseDTO handleComplete(ClickRequestDTO req) {
+
+        String sign = buildSign(
+                req.getClickTransId(),
+                serviceId,
+                secretKey,
+                req.getMerchantTransId(),
+                Integer.toString(req.getMerchantPrepareId()),
+                req.getAmount(),
+                1,
+                req.getSignTime()
+        );
+
+        if (!sign.equals(req.getSignString())) {
+            return error(req, -1, "SIGN CHECK FAILED");
         }
 
-        if (!verifySign(request, true)) {
-            return errorResponse(request, -1, "Invalid signature");
-        }
+        UUID orderId = UUID.fromString(req.getMerchantTransId());
 
-        Order order = loadOrder(request.getMerchantTransId());
+        Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
-            return errorResponse(request, -2, "Order not found");
+            return error(req, -5, "Order not found");
         }
 
-        if (order.getStatus() == OrderStatus.PAID) {
-            return new ClickResponseDTO(
-                request.getClickTransId(),
-                request.getMerchantTransId(),
-                request.getMerchantPrepareId(),
-                null,
-                -4,
-                "Order already paid"
-            );
+        Payment payment = paymentRepository
+                .findByClickTransId(req.getClickTransId())
+                .orElse(null);
+
+        if (payment == null) {
+            return error(req, -6, "Prepare not found");
         }
 
-        Optional<Payment> paymentOptional = paymentRepository.findByOrderIdAndClickPrepareId(order.getId(), request.getMerchantPrepareId());
-        if (paymentOptional.isEmpty()) {
-            return errorResponse(request, -2, "Payment record not found for prepare id");
+        // already paid
+        if (payment.getStatus() == PaymentStatus.PAID) {
+            ClickResponseDTO resp = new ClickResponseDTO();
+            resp.setClickTransId(req.getClickTransId());
+            resp.setMerchantTransId(req.getMerchantTransId());
+            resp.setMerchantConfirmId(payment.getId().toString());
+            resp.setError(0);
+            resp.setErrorNote("Already done");
+            return resp;
         }
 
-        Payment payment = paymentOptional.get();
-
-        if (request.getError() != null && request.getError() != 0) {
-            order.setStatus(OrderStatus.CANCELLED);
-            orderRepository.save(order);
-
-            payment.setStatus(STATUS_FAILED);
-            payment.setSuccess(false);
+        // FAILED
+        if (req.getError() != null && req.getError() < 0) {
+            payment.setStatus(PaymentStatus.FAILED);
             paymentRepository.save(payment);
 
-            return new ClickResponseDTO(
-                request.getClickTransId(),
-                request.getMerchantTransId(),
-                request.getMerchantPrepareId(),
-                null,
-                -9,
-                "Payment canceled by click"
-            );
+            order.setStatus(OrderStatus.PAYMENT_FAILED);
+            orderRepository.save(order);
+
+            return success(req, "Failure recorded");
         }
 
-        if (payment.isSuccess()) {
-            return new ClickResponseDTO(
-                request.getClickTransId(),
-                request.getMerchantTransId(),
-                request.getMerchantPrepareId(),
-                payment.getClickConfirmId(),
-                -4,
-                "Payment already confirmed"
-            );
-        }
+        // SUCCESS
+        payment.setStatus(PaymentStatus.PAID);
+        payment.setPaidAt(LocalDateTime.now());
+        paymentRepository.save(payment);
 
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
 
-        payment.setStatus(STATUS_PAID);
-        payment.setSuccess(true);
-        payment.setClickConfirmId(generateRequestId());
-        payment.setPaidAt(LocalDateTime.now());
-        paymentRepository.save(payment);
+        ClickResponseDTO resp = new ClickResponseDTO();
+        resp.setClickTransId(req.getClickTransId());
+        resp.setMerchantTransId(req.getMerchantTransId());
+        resp.setMerchantConfirmId(payment.getId().toString());
+        resp.setError(0);
+        resp.setErrorNote("Success");
 
-        return new ClickResponseDTO(
-            request.getClickTransId(),
-            request.getMerchantTransId(),
-            request.getMerchantPrepareId(),
-            payment.getClickConfirmId(),
-            0,
-            "Payment completed successfully"
-        );
+        return resp;
     }
 
-    private boolean verifySign(ClickRequestDTO request, boolean complete) {
-        if (request.getSignString() == null || request.getSignTime() == null) {
-            return false;
-        }
-
-        String raw = buildSignString(request, complete);
-        String actual = md5Hex(raw);
-        return actual.equals(request.getSignString().toLowerCase(Locale.ROOT));
-    }
-
-    private String buildSignString(ClickRequestDTO request, boolean complete) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(request.getClickTransId())
-               .append(request.getServiceId())
-               .append(secretKey)
-               .append(request.getMerchantTransId());
-
-        if (complete) {
-            builder.append(request.getMerchantPrepareId());
-        }
-
-        builder.append(request.getAmount().toPlainString())
-               .append(request.getAction())
-               .append(request.getSignTime());
-
-        return builder.toString();
-    }
-
-    private String md5Hex(String text) {
+    // ================= SIGNATURE =================
+    private String buildSign(
+            Long clickTransId,
+            Integer serviceId,
+            String secret,
+            String merchantTransId,
+            String merchantPrepareId,
+            BigDecimal amount,
+            int action,
+            String signTime
+    ) {
         try {
+            String raw = clickTransId +
+                    serviceId +
+                    secret +
+                    merchantTransId +
+                    (merchantPrepareId != null ? merchantPrepareId : "") +
+                    amount.toPlainString() +
+                    action +
+                    signTime;
+
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(text.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
+            byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
+                sb.append(String.format("%02x", b));
             }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("MD5 algorithm not available", e);
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private ClickResponseDTO errorResponse(ClickRequestDTO request, int error, String errorNote) {
-        return new ClickResponseDTO(
-            request.getClickTransId(),
-            request.getMerchantTransId(),
-            null,
-            null,
-            error,
-            errorNote
-        );
+    // ================= HELPERS =================
+    private ClickResponseDTO error(ClickRequestDTO req, int code, String note) {
+        ClickResponseDTO r = new ClickResponseDTO();
+        r.setClickTransId(req.getClickTransId());
+        r.setMerchantTransId(req.getMerchantTransId());
+        r.setError(code);
+        r.setErrorNote(note);
+        return r;
     }
 
-    private Order loadOrder(String merchantTransId) {
-        if (!StringUtils.hasText(merchantTransId)) {
-            return null;
-        }
-        try {
-            UUID orderId = UUID.fromString(merchantTransId);
-            return orderRepository.findById(orderId).orElse(null);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
-    }
-
-    private int generateRequestId() {
-        return (int) (Math.abs(System.currentTimeMillis() % Integer.MAX_VALUE));
+    private ClickResponseDTO success(ClickRequestDTO req, String note) {
+        ClickResponseDTO r = new ClickResponseDTO();
+        r.setClickTransId(req.getClickTransId());
+        r.setMerchantTransId(req.getMerchantTransId());
+        r.setError(0);
+        r.setErrorNote(note);
+        return r;
     }
 }

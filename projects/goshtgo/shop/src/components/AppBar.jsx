@@ -24,7 +24,7 @@ export default function AppBar() {
 
     const [user, setUser] = useState({
         fullName: "Admin",
-        profileImage: "https://via.placeholder.com/40",
+        profileImage: "",
     });
 
     useEffect(() => {

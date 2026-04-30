@@ -1,160 +1,149 @@
-// Order.jsx (main component)
-import { useEffect, useState } from "react";
+// Order.jsx
+import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "../../api/axios";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
   DragOverlay,
   useDraggable,
+  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import StatusColumn from "../../components/StatusColumn";
 
 const STATUSES = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
 
-const STATUS_COLORS = {
-  PENDING: "bg-yellow-100",
-  PAID: "bg-green-100",
-  SHIPPED: "bg-blue-100",
-  DELIVERED: "bg-purple-100",
-  CANCELLED: "bg-red-100",
+const STATUS_META = {
+  PENDING:   { bg: "bg-amber-50",   pill: "bg-amber-100 text-amber-800",   border: "border-amber-400",  header: "bg-amber-400",   label: "Pending"   },
+  PAID:      { bg: "bg-emerald-50", pill: "bg-emerald-100 text-emerald-800", border: "border-emerald-400", header: "bg-emerald-400", label: "Paid"      },
+  SHIPPED:   { bg: "bg-sky-50",     pill: "bg-sky-100 text-sky-800",        border: "border-sky-400",    header: "bg-sky-400",     label: "Shipped"   },
+  DELIVERED: { bg: "bg-violet-50",  pill: "bg-violet-100 text-violet-800",  border: "border-violet-400", header: "bg-violet-400",  label: "Delivered" },
+  CANCELLED: { bg: "bg-rose-50",    pill: "bg-rose-100 text-rose-800",      border: "border-rose-400",   header: "bg-rose-400",    label: "Cancelled" },
 };
 
+// ── Debounce hook ─────────────────────────────────────────────────────────────
+function useDebounce(value, delay) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
+// ── Order Detail Modal ────────────────────────────────────────────────────────
 function OrderDetailModal({ order, onClose }) {
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   if (!order) return null;
+  const meta = STATUS_META[order.status];
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div 
-        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
+      <div
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Order Details</h2>
+        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center rounded-t-2xl">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Order Details</h2>
+            <p className="text-xs text-gray-400 font-mono mt-0.5">{order.id}</p>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors text-lg font-bold"
           >
             ×
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Order Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">Order Information</h3>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Order ID:</span>
-                <span className="font-mono text-sm">{order.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Status:</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[order.status]}`}>
-                  {order.status}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Order Date:</span>
-                <span>{new Date(order.createdAt).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 font-semibold">Total Price:</span>
-                <span className="font-semibold text-lg">${order.totalPrice.toFixed(2)}</span>
-              </div>
-            </div>
+          {/* Status + Date row */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${meta.pill}`}>
+              {meta.label}
+            </span>
+            <span className="text-sm text-gray-500">
+              {new Date(order.createdAt).toLocaleString()}
+            </span>
+            <span className="ml-auto text-2xl font-bold text-gray-900">
+              ${order.totalPrice.toFixed(2)}
+            </span>
           </div>
 
-          {/* Customer Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">Customer Information</h3>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Name:</span>
-                <span className="font-medium">{order.user.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Email:</span>
-                <span>
-                  <a href={`mailTo:${order.user.email}`}>{order.user.email}</a>
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Phone:</span>
-                <span>
-                  <a href={`tel:${order.user.phone}`}>{order.user.phone}</a>
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Username:</span>
-                <span>@{order.user.username}</span>
-              </div>
-            </div>
-          </div>
+          {/* Customer */}
+          <Section title="Customer">
+            <Row label="Name" value={order.user.name} />
+            <Row label="Email" value={
+              <a href={`mailto:${order.user.email}`} className="text-blue-600 hover:underline">
+                {order.user.email}
+              </a>
+            } />
+            {order.user.phone && (
+              <Row label="Phone" value={
+                <a href={`tel:${order.user.phone}`} className="text-blue-600 hover:underline">
+                  {order.user.phone}
+                </a>
+              } />
+            )}
+            <Row label="Username" value={`@${order.user.username}`} />
+          </Section>
 
-          {/* Delivery Info */}
+          {/* Delivery */}
           {order.country && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-700">Delivery Information</h3>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 block mb-1">Address:</span>
-                  <span className="font-medium">{order.country}, {order.city}, {order.zip}</span>
-                </div>
-                {order.notes && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 block mb-1">Delivery Notes:</span>
-                    <span className="italic text-gray-700">{order.notes}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <Section title="Delivery">
+              <Row label="Address" value={[order.country, order.city, order.zip].filter(Boolean).join(", ")} />
+              {order.notes && <Row label="Notes" value={<span className="italic text-gray-600">{order.notes}</span>} />}
+            </Section>
           )}
 
-          {/* Order Items */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">Order Items</h3>
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="text-left p-3 text-sm font-semibold">Product</th>
-                    <th className="text-right p-3 text-sm font-semibold">Qty</th>
-                    <th className="text-right p-3 text-sm font-semibold">Price</th>
-                    <th className="text-right p-3 text-sm font-semibold">Total</th>
+          {/* Items table */}
+          <Section title="Items">
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-4 py-2.5 font-semibold text-gray-600">Product</th>
+                    <th className="text-right px-4 py-2.5 font-semibold text-gray-600">Qty</th>
+                    <th className="text-right px-4 py-2.5 font-semibold text-gray-600">Unit</th>
+                    <th className="text-right px-4 py-2.5 font-semibold text-gray-600">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100">
                   {order.items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-gray-100">
-                      <td className="p-3">{item.productTitle}</td>
-                      <td className="p-3 text-right">{item.quantity}</td>
-                      <td className="p-3 text-right">${item.pricePerUnit.toFixed(2)}</td>
-                      <td className="p-3 text-right font-medium">
-                        ${(item.quantity * item.pricePerUnit).toFixed(2)}
-                      </td>
+                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2.5">{item.productTitle}</td>
+                      <td className="px-4 py-2.5 text-right text-gray-600">{item.quantity}</td>
+                      <td className="px-4 py-2.5 text-right text-gray-600">${item.pricePerUnit.toFixed(2)}</td>
+                      <td className="px-4 py-2.5 text-right font-medium">${(item.quantity * item.pricePerUnit).toFixed(2)}</td>
                     </tr>
                   ))}
-                  <tr className="bg-gray-200 font-bold">
-                    <td colSpan="3" className="p-3 text-right">Total:</td>
-                    <td className="p-3 text-right">${order.totalPrice.toFixed(2)}</td>
-                  </tr>
                 </tbody>
+                <tfoot>
+                  <tr className="bg-gray-50 border-t-2 border-gray-200 font-bold">
+                    <td colSpan="3" className="px-4 py-2.5 text-right">Total</td>
+                    <td className="px-4 py-2.5 text-right">${order.totalPrice.toFixed(2)}</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
-          </div>
+          </Section>
         </div>
 
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex justify-end">
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-100 px-6 py-4 flex justify-end rounded-b-2xl">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-5 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
           >
             Close
           </button>
@@ -164,150 +153,251 @@ function OrderDetailModal({ order, onClose }) {
   );
 }
 
-function OrderCard({ order, isOverlay = false, onClick }) {
-  const [dragDistance, setDragDistance] = useState(0);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: order.id,
-    disabled: order.status === "CANCELLED",
-  });
-
-  const style = {
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  useEffect(() => {
-    if (transform) {
-      const distance = Math.sqrt(transform.x ** 2 + transform.y ** 2);
-      setDragDistance(distance);
-    } else {
-      setDragDistance(0);
-    }
-  }, [transform]);
-
-  const handleClick = (e) => {
-    if (dragDistance < 5 && onClick) {
-      onClick(order);
-    }
-  };
-
+function Section({ title, children }) {
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={handleClick}
-      className={`bg-white p-4 rounded-lg shadow mb-3 border-l-4 cursor-pointer hover:shadow-lg transition-shadow ${isOverlay ? "cursor-grabbing" : "cursor-grab"}`}
-    >
-      <div className="flex justify-between items-start mb-2">
-        <span className="text-xs text-gray-500">
-          {new Date(order.createdAt).toLocaleDateString()}
-        </span>
-      </div>
-      <div className="flex justify-between items-start mb-2">
-        <span className={`text-xs font-semibold px-2 py-1 rounded ${
-          STATUS_COLORS[order.status]
-        }`}>
-          {order.status}
-        </span>
-      </div>
-      <div className="mb-2">
-        <p className="font-semibold text-sm">{order.user.name}</p>
-        <p className="text-xs text-gray-600 break-all">{order.user.email}</p>
-        {order.user.phone && (
-          <p className="text-xs text-gray-600">{order.user.phone}</p>
-        )}
-      </div>
-      <div className="flex justify-between items-center">
-        <span className="text-lg font-bold">${order.totalPrice.toFixed(2)}</span>
-        <span className="text-xs text-gray-500">
-          {order.items.length} item{order.items.length !== 1 ? "s" : ""}
-        </span>
+    <div>
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</h3>
+      <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+        {children}
       </div>
     </div>
   );
 }
 
+function Row({ label, value }) {
+  return (
+    <div className="flex justify-between items-center gap-4">
+      <span className="text-sm text-gray-500 shrink-0">{label}</span>
+      <span className="text-sm font-medium text-gray-900 text-right">{value}</span>
+    </div>
+  );
+}
+
+// ── Order Card ────────────────────────────────────────────────────────────────
+// FIX: Separate drag handle (grip icon) from the clickable card body.
+// The drag listeners ONLY go on the grip handle — the rest of the card is a
+// normal click target. This completely eliminates the click-vs-drag conflict.
+function OrderCard({ order, isOverlay = false, onClick }) {
+  const meta = STATUS_META[order.status];
+  const isCancelled = order.status === "CANCELLED";
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: order.id,
+    disabled: isCancelled,
+  });
+
+  const cardStyle = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={cardStyle}
+      className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${meta.border}
+        transition-all duration-150
+        ${isDragging ? "opacity-40 shadow-none" : "opacity-100"}
+        ${isOverlay ? "shadow-2xl rotate-1 scale-105" : "hover:shadow-md"}
+      `}
+    >
+      {/* Card body — this is what you click to open the modal */}
+      <button
+        type="button"
+        onClick={() => !isDragging && onClick?.(order)}
+        className="w-full text-left p-4 pr-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-gray-900 truncate">{order.user.name}</p>
+            <p className="text-xs text-gray-400 truncate">{order.user.email}</p>
+          </div>
+          <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${meta.pill}`}>
+            {meta.label}
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-lg font-bold text-gray-900">${order.totalPrice.toFixed(2)}</span>
+          <span className="text-xs text-gray-400">
+            {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        <div className="mt-1">
+          <span className="text-xs text-gray-400">
+            {new Date(order.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+      </button>
+
+      {/* Drag handle — ONLY this element has dnd-kit listeners */}
+      {!isCancelled && (
+        <div
+          {...attributes}
+          {...listeners}
+          className={`px-3 py-2 border-t border-gray-100 flex items-center justify-center
+            text-gray-300 hover:text-gray-500 transition-colors
+            ${isOverlay ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing"}
+            rounded-b-xl select-none`}
+          title="Drag to change status"
+        >
+          {/* Grip dots icon */}
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="currentColor">
+            <circle cx="3" cy="3" r="1.5"/><circle cx="10" cy="3" r="1.5"/><circle cx="17" cy="3" r="1.5"/>
+            <circle cx="3" cy="9" r="1.5"/><circle cx="10" cy="9" r="1.5"/><circle cx="17" cy="9" r="1.5"/>
+          </svg>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Status Column ─────────────────────────────────────────────────────────────
+function StatusColumn({ status, children, count }) {
+  const meta = STATUS_META[status];
+  // FIX: useDroppable makes the column a valid drop target
+  const { setNodeRef, isOver } = useDroppable({ id: status });
+
+  return (
+    <div className="flex flex-col min-h-[200px]">
+      {/* Column header */}
+      <div className={`${meta.header} rounded-t-xl px-4 py-2.5 flex items-center justify-between`}>
+        <span className="text-white font-semibold text-sm tracking-wide">{meta.label}</span>
+        <span className="bg-white/30 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+          {count}
+        </span>
+      </div>
+
+      {/* Drop zone */}
+      <div
+        ref={setNodeRef}
+        className={`flex-1 rounded-b-xl p-2 pt-3 transition-colors duration-150 min-h-[120px]
+          ${isOver ? `${meta.bg} ring-2 ring-inset ring-current` : "bg-gray-50/80"}`}
+      >
+        <div className="space-y-2">
+          {children}
+        </div>
+        {count === 0 && (
+          <div className="flex items-center justify-center h-16 text-gray-300 text-xs">
+            Drop here
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Order Page ───────────────────────────────────────────────────────────
 export default function Order() {
   const [orders, setOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [search, setSearch] = useState("");
+  // FIX: Debounce search so we don't fire an API call on every keystroke
+  const debouncedSearch = useDebounce(search, 350);
+
+  // FIX: Use distance activation constraint — must move 8px before drag starts,
+  // so a tap/click never accidentally becomes a drag.
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
 
   useEffect(() => {
-    axios.get("/orders", {
-      params: {
-        search: search.trim() || undefined,
-      },
-    }).then((res) => {
-      setOrders(res.data);
-    });
-  }, [search]);
+    axios
+      .get("/orders", { params: { search: debouncedSearch.trim() || undefined } })
+      .then((res) => setOrders(res.data))
+      .catch(console.error);
+  }, [debouncedSearch]);
 
   const handleDragStart = (event) => {
     const order = orders.find((o) => o.id === event.active.id);
-    setActiveOrder(order);
+    setActiveOrder(order || null);
   };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
     setActiveOrder(null);
-
     if (!over) return;
 
     const orderId = active.id;
-    const newStatus = over.id; // Now over.id will be the status column
+    const newStatus = over.id;
 
-    if (!newStatus || !STATUSES.includes(newStatus)) return;
+    if (!STATUSES.includes(newStatus)) return;
 
     const order = orders.find((o) => o.id === orderId);
-    if (order.status === "CANCELLED" && newStatus !== "CANCELLED") {
-      return;
-    }
+    if (!order) return;
+    if (order.status === "CANCELLED") return; // cancelled orders are locked
+    if (order.status === newStatus) return;   // no-op
 
-    if (order.status === newStatus) return;
-
+    // Optimistic update
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
 
     axios
       .patch(`/orders/${orderId}/status`, { status: newStatus })
-      .then((res) => {
-        console.log("Status updated:", res.data);
-      })
       .catch((err) => {
         console.error("Failed to update status:", err);
+        // Rollback on failure
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, status: order.status } : o))
         );
       });
   };
 
+  const totalOrders = orders.length;
+
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+      {/* Page header */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+          <p className="text-sm text-gray-500">{totalOrders} order{totalOrders !== 1 ? "s" : ""} total</p>
+        </div>
+        {/* FIX: Search input was wired up but never rendered */}
+        <div className="sm:ml-auto relative">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search orders…"
+            className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl bg-white shadow-sm
+              focus:outline-none focus:ring-2 focus:ring-gray-400 w-full sm:w-60 transition-all"
+          />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+          >
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
       <DndContext
-        collisionDetection={closestCenter}
+        sensors={sensors}
+        collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {STATUSES.map((status) => {
             const columnOrders = orders.filter((o) => o.status === status);
-
             return (
-              <StatusColumn key={status} status={status} color={STATUS_COLORS[status]}>
+              <StatusColumn key={status} status={status} count={columnOrders.length}>
                 {columnOrders.map((order) => (
-                  <OrderCard 
-                    key={order.id} 
+                  <OrderCard
+                    key={order.id}
                     order={order}
                     onClick={setSelectedOrder}
                   />
@@ -317,17 +407,19 @@ export default function Order() {
           })}
         </div>
 
-        <DragOverlay>
-          {activeOrder ? <OrderCard order={activeOrder} onClick={setSelectedOrder} isOverlay /> : null}
+        <DragOverlay dropAnimation={null}>
+          {activeOrder
+            ? <OrderCard order={activeOrder} isOverlay onClick={() => {}} />
+            : null}
         </DragOverlay>
-
-        {selectedOrder && (
-          <OrderDetailModal
-            order={selectedOrder}
-            onClose={() => setSelectedOrder(null)}
-          />
-        )}
       </DndContext>
+
+      {selectedOrder && (
+        <OrderDetailModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
     </div>
   );
 }

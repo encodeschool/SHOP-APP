@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -48,14 +50,17 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private String method;  // CARD, STRIPE, CASH etc.
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
-    private String status;  // PAID, FAILED, PENDING
+    private String method;  // CARD, STRIPE, CASH etc.
 
     private Long clickTransId;
     private Long clickPaydocId;
-    private Integer clickPrepareId;
-    private Integer clickConfirmId;
+
+    private String clickPrepareId;
+    private String clickConfirmId;
+
     private String merchantUserId;
     private String cardType;
 

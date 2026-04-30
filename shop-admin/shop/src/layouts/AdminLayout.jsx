@@ -31,7 +31,7 @@ export default function AdminLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [user, setUser] = useState({
     fullName: "Admin",
-    profileImage: "https://via.placeholder.com/40",
+    profileImage: "",
   });
 
   useEffect(() => {
@@ -307,10 +307,10 @@ export default function AdminLayout() {
 
           <div className="flex items-center space-x-4">
             <img
-              src={user.profilePictureUrl ? `${BASE_URL}${user.profilePictureUrl}` : 'https://via.placeholder.com/40'}
+              src={user.profilePictureUrl ? `${BASE_URL}${user.profilePictureUrl}` : ''}
               alt="User"
               className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
-              onError={(e) => e.target.src = 'https://via.placeholder.com/40'}
+              onError={(e) => e.target.src = ''}
             />
             <span className="font-medium text-gray-700 hidden sm:block">
               {user.name}

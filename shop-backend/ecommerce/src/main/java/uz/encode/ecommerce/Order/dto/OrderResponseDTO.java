@@ -36,4 +36,5 @@ public class OrderResponseDTO {
     private String vatNumber;
     private String legalAddress;
     private boolean agreeToTerms;
+    private BigDecimal finalPrice;
 }

@@ -1,7 +1,6 @@
 package uz.encode.ecommerce.Order.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,6 +30,7 @@ import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Order.repository.PromoCodeRepository;
 import uz.encode.ecommerce.Order.service.OrderService;
 import uz.encode.ecommerce.Payment.entity.Payment;
+import uz.encode.ecommerce.Payment.entity.PaymentStatus;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
@@ -89,34 +89,34 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal finalPrice = totalPrice;
 
         if (dto.getPromoCode() != null && !dto.getPromoCode().isBlank()) {
-
             PromoCode promo = promoCodeRepository.findByCodeIgnoreCase(dto.getPromoCode())
                 .orElseThrow(() -> new RuntimeException("Invalid promo code"));
-
+    
             if (!promo.isValidNow()) {
                 throw new RuntimeException("Promo code expired or inactive");
             }
-
+    
+            BigDecimal discount = BigDecimal.ZERO;
             if (promo.getDiscountAmount() != null) {
-                discountAmount = promo.getDiscountAmount();
+                discount = promo.getDiscountAmount();
             } else if (promo.getDiscountPercent() != null) {
-                discountAmount = totalPrice
+                discount = totalPrice
                     .multiply(BigDecimal.valueOf(promo.getDiscountPercent()))
                     .divide(BigDecimal.valueOf(100));
             }
-
-            finalPrice = totalPrice.subtract(discountAmount).max(BigDecimal.ZERO);
-
-            promo.setTimesUsed(promo.getTimesUsed() + 1);
-            promoCodeRepository.save(promo);
-
+    
+            finalPrice = totalPrice.subtract(discount).max(BigDecimal.ZERO);
+            discountAmount = discount;
+    
+            // FIX: Do NOT increment timesUsed here. Save promo reference only.
+            // timesUsed is incremented in ClickPaymentService.handleComplete()
+            // after payment is confirmed.
             order.setPromoCode(promo);
         }
-
+    
         order.setDiscountAmount(discountAmount);
         order.setFinalPrice(finalPrice);
-
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING_PAYMENT);
         order.setCountry(dto.getCountry());
         order.setCity(dto.getCity());
         order.setZip(dto.getZip());
@@ -139,8 +139,6 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(items);
         orderRepository.save(order);
 
-        emailService.sendOrderConfirmation(user.getEmail(), order);
-        emailService.sendOrderRequest(order);
 
         return mapToDTO(order);
     }
@@ -172,10 +170,9 @@ public class OrderServiceImpl implements OrderService {
             payment.setProvider("Stripe");
             payment.setPaymentId(paymentIntent.getId());
             payment.setSuccess(false); // Will be updated on webhook
-            payment.setAmount(order.getTotalPrice());
+            payment.setAmount(paymentAmount);
             payment.setMethod(paymentMethod);
-            payment.setStatus("PENDING");
-            payment.setPaidAt(LocalDateTime.now());
+            payment.setStatus(PaymentStatus.PENDING);
             paymentRepository.save(payment);
 
             return paymentIntent.getClientSecret();
@@ -263,7 +260,8 @@ public class OrderServiceImpl implements OrderService {
             order.getRegistrationNr(),
             order.getVatNumber(),
             order.getLegalAddress(),
-            order.isAgreeToTerms()
+            order.isAgreeToTerms(),
+            order.getFinalPrice()
         );
     }
 
@@ -275,23 +273,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public BigDecimal applyPromo(String code, BigDecimal orderTotal) {
         PromoCode promo = promoCodeRepository.findByCodeIgnoreCase(code)
-                .orElseThrow(() -> new RuntimeException("Invalid promo code"));
-
+            .orElseThrow(() -> new RuntimeException("Invalid promo code"));
+ 
         if (!promo.isValidNow()) {
             throw new RuntimeException("Promo code expired or inactive");
         }
-
+ 
         BigDecimal discount = BigDecimal.ZERO;
         if (promo.getDiscountAmount() != null) {
             discount = promo.getDiscountAmount();
         } else if (promo.getDiscountPercent() != null) {
-            discount = orderTotal.multiply(BigDecimal.valueOf(promo.getDiscountPercent())).divide(BigDecimal.valueOf(100));
+            discount = orderTotal
+                .multiply(BigDecimal.valueOf(promo.getDiscountPercent()))
+                .divide(BigDecimal.valueOf(100));
         }
-
-        // Update usage
-        promo.setTimesUsed(promo.getTimesUsed() + 1);
-        promoCodeRepository.save(promo);
-
+ 
+        // FIX: Do NOT increment timesUsed here — this endpoint is called
+        // by the frontend to preview the discount. Usage is confirmed in handleComplete().
+        // REMOVE: promo.setTimesUsed(promo.getTimesUsed() + 1);
+        // REMOVE: promoCodeRepository.save(promo);
+ 
         return orderTotal.subtract(discount).max(BigDecimal.ZERO);
     }
 
