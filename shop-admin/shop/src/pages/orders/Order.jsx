@@ -12,9 +12,11 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 
-const STATUSES = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+const STATUSES = ["PENDING_PAYMENT", "PAYMENT_FAILED", "PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 const STATUS_META = {
+  PENDING_PAYMENT: { bg: "bg-amber-50",   pill: "bg-amber-100 text-amber-800",   border: "border-amber-400",  header: "bg-amber-400",   label: "Pending Payment" },
+  PAYMENT_FAILED: { bg: "bg-rose-50",    pill: "bg-rose-100 text-rose-800",      border: "border-rose-400",   header: "bg-rose-400",    label: "Payment Failed" },
   PENDING:   { bg: "bg-amber-50",   pill: "bg-amber-100 text-amber-800",   border: "border-amber-400",  header: "bg-amber-400",   label: "Pending"   },
   PAID:      { bg: "bg-emerald-50", pill: "bg-emerald-100 text-emerald-800", border: "border-emerald-400", header: "bg-emerald-400", label: "Paid"      },
   SHIPPED:   { bg: "bg-sky-50",     pill: "bg-sky-100 text-sky-800",        border: "border-sky-400",    header: "bg-sky-400",     label: "Shipped"   },
@@ -43,6 +45,7 @@ function OrderDetailModal({ order, onClose }) {
 
   if (!order) return null;
   const meta = STATUS_META[order.status];
+  const BASE_URL = process.env.REACT_APP_BASE_URL || '';
 
   return (
     <div
@@ -77,9 +80,23 @@ function OrderDetailModal({ order, onClose }) {
               {new Date(order.createdAt).toLocaleString()}
             </span>
             <span className="ml-auto text-2xl font-bold text-gray-900">
-              ${order.totalPrice.toFixed(2)}
+              {order.totalPrice.toFixed(2)}
             </span>
           </div>
+
+          <Section title="Payment">
+            <Row
+              label="Method"
+              value={
+                <span className="capitalize">
+                  {order.paymentMethod === "CARD" && "💳 Card"}
+                  {order.paymentMethod === "CLiCK" && "📱 CLICK"}
+                  {order.paymentMethod === "COD" && "💵 Cash on Delivery"}
+                  {!order.paymentMethod && "UNKNOWN"}
+                </span>
+              }
+            />
+          </Section>
 
           {/* Customer */}
           <Section title="Customer">
@@ -122,17 +139,21 @@ function OrderDetailModal({ order, onClose }) {
                 <tbody className="divide-y divide-gray-100">
                   {order.items.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-2.5">{item.productTitle}</td>
+                      <td className="px-4 py-2.5">
+                        {item.productImages && item.productImages.length > 0 && (
+                          <img src={`${BASE_URL}${item.productImages[0]}`} alt={item.productTitle} className="w-16 h-16 object-cover rounded-lg" />
+                        )}
+                      </td>
                       <td className="px-4 py-2.5 text-right text-gray-600">{item.quantity}</td>
-                      <td className="px-4 py-2.5 text-right text-gray-600">${item.pricePerUnit.toFixed(2)}</td>
-                      <td className="px-4 py-2.5 text-right font-medium">${(item.quantity * item.pricePerUnit).toFixed(2)}</td>
+                      <td className="px-4 py-2.5 text-right text-gray-600">{item.pricePerUnit.toFixed(2)}</td>
+                      <td className="px-4 py-2.5 text-right font-medium">{(item.quantity * item.pricePerUnit).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-50 border-t-2 border-gray-200 font-bold">
                     <td colSpan="3" className="px-4 py-2.5 text-right">Total</td>
-                    <td className="px-4 py-2.5 text-right">${order.totalPrice.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 text-right">{order.totalPrice.toFixed(2)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -217,7 +238,7 @@ function OrderCard({ order, isOverlay = false, onClick }) {
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-lg font-bold text-gray-900">${order.totalPrice.toFixed(2)}</span>
+          <span className="text-lg font-bold text-gray-900">{order.totalPrice.toFixed(2)}</span>
           <span className="text-xs text-gray-400">
             {order.items.length} item{order.items.length !== 1 ? "s" : ""}
           </span>

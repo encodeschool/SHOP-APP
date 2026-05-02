@@ -34,6 +34,7 @@ import uz.encode.ecommerce.Payment.entity.PaymentStatus;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Product.entity.Product;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
+import uz.encode.ecommerce.ProductImage.entity.ProductImage;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
@@ -122,7 +123,11 @@ public class OrderServiceImpl implements OrderService {
         order.setZip(dto.getZip());
         order.setNotes(dto.getNotes());
         order.setShippingMethod(dto.getShippingMethod());
-        order.setPaymentMethod(dto.getPaymentMethod());
+        String method = dto.getPaymentMethod() != null
+            ? dto.getPaymentMethod().toUpperCase()
+            : "UNKNOWN";
+
+        order.setPaymentMethod(method);
         order.setLegalEntity(dto.isLegalEntity());
         order.setCompanyName(dto.getCompanyName());
         order.setRegistrationNr(dto.getRegistrationNr());
@@ -138,6 +143,52 @@ public class OrderServiceImpl implements OrderService {
 
         order.setItems(items);
         orderRepository.save(order);
+
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setUser(user);
+        payment.setAmount(finalPrice);
+        payment.setMethod(method);
+        payment.setStatus(PaymentStatus.PENDING);
+
+        switch (method) {
+
+            case "CLICK":
+                payment.setProvider("CLICK");
+
+                emailService.sendClickPaymentInstructions(user.getEmail(), order);
+
+                break;
+
+            case "COD":
+                payment.setProvider("CASH");
+
+                emailService.sendCashOnDeliveryEmail(
+                    user.getEmail(),
+                    order
+                );
+
+                break;
+
+            case "CARD":
+            case "STRIPE":
+                payment.setProvider("STRIPE");
+
+                // ⚠️ Do NOT mark as paid yet
+                // Stripe webhook will update this later
+
+                emailService.sendStripePaymentEmail(
+                    user.getEmail(),
+                    order
+                );
+
+                break;
+
+            default:
+                payment.setProvider("UNKNOWN");
+        }
+
+        paymentRepository.save(payment);
 
 
         return mapToDTO(order);
@@ -238,7 +289,8 @@ public class OrderServiceImpl implements OrderService {
                 item.getProduct().getId(),
                 item.getProduct().getTitle(),
                 item.getQuantity(),
-                item.getPricePerUnit()
+                item.getPricePerUnit(),
+                item.getProduct().getImages().stream().map(ProductImage::getUrl).toList()
             )).toList();
 
         return new OrderResponseDTO(

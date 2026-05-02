@@ -15,38 +15,66 @@ public class EmailContentBuilder {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public EmailContentBuilder(TemplateEngine templateEngine) {
-        this.templateEngine = templateEngine;
-    }
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public String buildOrderConfirmationEmail(Order order) {
+    // =========================
+    // COMMON CONTEXT BUILDER
+    // =========================
+    private Context buildBaseContext(Order order) {
         Context context = new Context();
-        context.setVariable("order", order);
-        // Pre-format the date and total
-        String formattedDate = order.getCreatedAt()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
-        String formattedTotal = String.format("%.2f", order.getTotalPrice());
+        String formattedDate = order.getCreatedAt() != null
+                ? order.getCreatedAt().format(FORMATTER)
+                : "N/A";
+
+        String formattedTotal = order.getTotalPrice() != null
+                ? String.format("%.2f", order.getTotalPrice())
+                : "0.00";
 
         context.setVariable("order", order);
         context.setVariable("formattedDate", formattedDate);
         context.setVariable("formattedTotal", formattedTotal);
         context.setVariable("shippingMethod", order.getShippingMethod());
 
+        return context;
+    }
+
+    // =========================
+    // ORDER EMAILS
+    // =========================
+
+    public String buildOrderConfirmationEmail(Order order) {
+        Context context = buildBaseContext(order);
         return templateEngine.process("email/order-confirmation", context);
     }
 
     public String buildOrderRequest(Order order) {
-        Context context = new Context();
-        context.setVariable("order", order);
-        String formattedDate = order.getCreatedAt()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-
-        String formattedTotal = String.format("%.2f", order.getTotalPrice());
-        context.setVariable("order", order);
-        context.setVariable("formattedDate", formattedDate);
-        context.setVariable("formattedTotal", formattedTotal);
+        Context context = buildBaseContext(order);
         return templateEngine.process("email/order-request", context);
     }
-}
 
+    // =========================
+    // PAYMENT EMAILS
+    // =========================
+
+    public String buildClickPaymentEmail(Order order) {
+        Context context = buildBaseContext(order);
+        return templateEngine.process("email/paymentMethods/payment-click", context);
+    }
+
+    public String buildCashPaymentEmail(Order order) {
+        Context context = buildBaseContext(order);
+        return templateEngine.process("email/paymentMethods/payment-cash", context);
+    }
+
+    public String buildStripePaymentEmail(Order order) {
+        Context context = buildBaseContext(order);
+        return templateEngine.process("email/paymentMethods/payment-stripe", context);
+    }
+
+    public String buildPaymentSuccessEmail(Order order) {
+        Context context = buildBaseContext(order);
+        return templateEngine.process("email/paymentMethods/payment-success", context);
+    }
+}

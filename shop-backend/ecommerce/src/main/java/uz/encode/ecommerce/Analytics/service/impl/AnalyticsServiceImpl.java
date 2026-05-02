@@ -2,7 +2,6 @@ package uz.encode.ecommerce.Analytics.service.impl;
 
 import java.time.Month;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,11 +12,13 @@ import lombok.AllArgsConstructor;
 import uz.encode.ecommerce.Analytics.dto.CategoryDistirbutionDTO;
 import uz.encode.ecommerce.Analytics.dto.DashboardStatsDTO;
 import uz.encode.ecommerce.Analytics.dto.MonthlyCountDTO;
-import uz.encode.ecommerce.Analytics.dto.MonthlyRevenueDTO;
 import uz.encode.ecommerce.Analytics.dto.OrderStatusCountDTO;
+import uz.encode.ecommerce.Analytics.dto.PaymentMethodDTO;
 import uz.encode.ecommerce.Analytics.dto.TopProductDTO;
 import uz.encode.ecommerce.Analytics.service.AnalyticsService;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
+import uz.encode.ecommerce.Payment.dto.PaymentResponseDTO;
+import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.User.repository.UserRepository;
 
@@ -28,6 +29,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public List<MonthlyCountDTO> getProductCreationStats() {
@@ -44,6 +46,22 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .mapToObj(month -> new MonthlyCountDTO(
                         Month.of(month).name(),
                         orderRepository.countByMonth(month)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MonthlyCountDTO> getPaymentStats() {
+        return IntStream.rangeClosed(1, 12)
+                .mapToObj(month -> new MonthlyCountDTO(
+                        Month.of(month).name(),
+                        paymentRepository.countByMonth(month)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PaymentMethodDTO> getPaymentMethodStats() {
+        return paymentRepository.countByMethod().stream()
+                .map(pm -> new PaymentMethodDTO(pm.getMethod(), pm.getCount()))
                 .collect(Collectors.toList());
     }
 
@@ -90,6 +108,25 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     public List<TopProductDTO> findTopSellingProducts(PageRequest pageRequest) {
         return productRepository.findTopSellingProducts(pageRequest);
+    }
+
+    @Override
+    public List<PaymentResponseDTO> getAllPayments() {
+        return paymentRepository.findAll().stream()
+                .map(payment -> new PaymentResponseDTO(
+                        payment.getId(),
+                        payment.getOrder() != null ? payment.getOrder().getId() : null,
+                        payment.getUser() != null ? payment.getUser().getName() : null,
+                        payment.getUser() != null ? payment.getUser().getEmail() : null,
+                        payment.getMethod(),
+                        payment.getAmount(),
+                        payment.getStatus() != null ? payment.getStatus().name() : null,
+                        payment.getPaidAt(),
+                        payment.getCardType(),
+                        payment.getProvider(),
+                        payment.getClickTransId()
+                ))
+                .collect(Collectors.toList());
     }
 
 }

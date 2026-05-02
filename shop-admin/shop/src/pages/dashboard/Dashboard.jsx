@@ -15,13 +15,14 @@ export default function Dashboard() {
   const [userStats, setUserStats] = useState([]);
   const [revenueStats, setRevenueStats] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
-
+  const [paymentStats, setPaymentStats] = useState([]);  const [paymentMethodStats, setPaymentMethodStats] = useState([]);
   const [totals, setTotals] = useState({
     users: 0,
     orders: 0,
     revenue: 0,
     products: 0
   });
+  const [orderStatusStats, setOrderStatusStats] = useState([]);
 
   useEffect(() => {
     axios.get('/admin/analytics/products/monthly').then(res => setProductStats(res.data));
@@ -29,6 +30,9 @@ export default function Dashboard() {
     axios.get('/admin/analytics/orders/monthly').then(res => setOrderStats(res.data));
     axios.get('/admin/analytics/products/category').then(res => setCategoryStats(res.data));
     axios.get('/admin/analytics/products/top').then(res => setTopProducts(res.data));
+    axios.get('/admin/analytics/payments/monthly').then(res => setPaymentStats(res.data));
+    axios.get('/admin/analytics/payments/method').then(res => setPaymentMethodStats(res.data));
+    axios.get('/admin/analytics/orders/status').then(res => setOrderStatusStats(res.data));
     // axios.get('/admin/analytics/totals').then(res => setTotals(res.data));
   }, []);
 
@@ -122,6 +126,69 @@ export default function Dashboard() {
               <Tooltip />
               <Bar dataKey="totalSold" fill="#82ca9d" /> {/* matches your API */}
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Payment Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Payments per Month</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={paymentStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="monthName" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#ff8042" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Payment Methods</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={paymentMethodStats}
+                dataKey="count"
+                nameKey="method"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#ffc658"
+                label
+              >
+                {paymentMethodStats.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white p-4 shadow rounded">
+          <h2 className="text-lg font-semibold mb-2">Order Status Distribution</h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={orderStatusStats}
+                dataKey="count"
+                nameKey="status"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {orderStatusStats.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+
+              <Tooltip />
+              <Legend />
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </div>

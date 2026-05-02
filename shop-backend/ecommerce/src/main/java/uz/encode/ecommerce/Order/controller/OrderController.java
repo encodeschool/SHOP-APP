@@ -2,10 +2,8 @@ package uz.encode.ecommerce.Order.controller;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +63,12 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search
     ) {
+        if (search != null && !search.trim().isEmpty()) {
+            return ResponseEntity.ok(orderService.searchOrders(search.trim(), status, page, size));
+        }
         return ResponseEntity.ok(orderService.getAllOrders(page, size, status));
     }
 

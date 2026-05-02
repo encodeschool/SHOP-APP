@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Subscription Confirmed</title>
+    <title>Complete Card Payment</title>
 </head>
 
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; color: #333;">
@@ -20,42 +20,53 @@
         </div>
 
         <!-- HEADER -->
-        <h2 style="color: #aa282c; text-align:center; margin-bottom: 10px;">
-            🎉 Subscription Confirmed
+        <h2 style="color: #6a1b9a; text-align:center; margin-bottom: 10px;">
+            💳 Complete Your Card Payment
         </h2>
 
         <p style="text-align:center; color:#666;">
-            Thank you for subscribing! You’re now part of our community.
+            Your order is reserved. Please complete payment to confirm it.
         </p>
 
-        <!-- SUBSCRIPTION INFO CARD -->
+        <!-- ORDER INFO CARD -->
         <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:20px;">
-            <h3 style="margin-top:0;">Subscription Details</h3>
+            <h3 style="margin-top:0;">Order Information</h3>
 
-            <p><strong>Email:</strong> <span th:text="${email}"></span></p>
-            <p><strong>Status:</strong> Active</p>
+            <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
+            <p><strong>Date:</strong> <span th:text="${formattedDate}"></span></p>
         </div>
 
-        <!-- BENEFITS CARD -->
+        <!-- PAYMENT CARD -->
         <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:15px;">
-            <h3 style="margin-top:0;">What you will get</h3>
+            <h3 style="margin-top:0;">Payment Details</h3>
 
-            <p>📦 Early access to new products</p>
-            <p>💸 Exclusive discounts & offers</p>
-            <p>📢 Important updates and news</p>
+            <p><strong>Total Amount:</strong> <span th:text="${formattedTotal}"></span></p>
+
+            <p style="margin-top:10px; color:#6a1b9a; font-weight:bold;">
+                💳 Payment Method: Card / Stripe
+            </p>
+
+            <p style="margin-top:10px; color:#555;">
+                Please complete your payment using the secure Stripe checkout link.
+            </p>
+
+            <p style="margin-top:10px; font-size:14px; color:#777;">
+                ⚠️ Your order will be confirmed only after successful payment.
+            </p>
         </div>
 
-        <!-- INFO CARD -->
-        <div style="border:1px solid #e3f2fd; background:#f5fbff; border-radius:8px; padding:15px; margin-top:15px;">
-            <p style="margin:0; color:#1976d2;">
-                🔔 We will notify you whenever we have something special for you.
-            </p>
+        <!-- ACTION BUTTON (IMPORTANT UPGRADE) -->
+        <div style="text-align:center; margin-top:20px;">
+            <a th:href="${paymentLink}"
+               style="background:#6a1b9a; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; display:inline-block;">
+                Pay Now
+            </a>
         </div>
 
         <!-- APP DOWNLOAD CARD -->
         <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:20px; text-align:center;">
-            <h3>📱 Stay connected via our app</h3>
-            <p>Get offers, updates & new arrivals first</p>
+            <h3>📱 Track your order anytime</h3>
+            <p>Get updates, receipts & order tracking</p>
 
             <a href="https://play.google.com/store/apps/details?id=uz.goshtgo.shop.shop&hl=en"
                style="display:inline-block; margin:10px;">
@@ -72,7 +83,7 @@
 
         <!-- FOOTER -->
         <p style="margin-top:30px; text-align:center; color:#777;">
-            Thanks for joining us ❤️<br><br>
+            Secure payment powered by Stripe.<br><br>
             <strong>Your Shop Team</strong>
         </p>
 

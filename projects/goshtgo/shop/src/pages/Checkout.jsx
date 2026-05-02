@@ -196,19 +196,19 @@ const Checkout = () => {
       localStorage.setItem('checkoutInfo', JSON.stringify({ ...data, orderId }));
       localStorage.setItem('currentOrderId', orderId);
 
+      // ALWAYS go to success page after order creation
+      dispatch(saveCheckoutInfo({ ...data, orderId }));
+      localStorage.setItem('checkoutInfo', JSON.stringify({ ...data, orderId }));
+      localStorage.setItem('currentOrderId', orderId);
+
+      // If CLICK → redirect to external payment first
       if (pm === 'click' && paymentUrl) {
-        // ── CLICK payment flow (FIXED) ──────────────────────────────────────
-        // The order is created with status PENDING_PAYMENT.
-        // User pays on CLICK's side. CLICK calls your backend webhook to confirm.
-        // CLICK then redirects back to /order-confirmation?orderId=XXX
-        // On that page, poll GET /checkout/payment-status/{orderId} until PAID.
-        // Do NOT navigate here — let CLICK handle the return redirect.
         window.location.href = paymentUrl;
-      } else if (pm === 'card' && clientSecret) {
-        navigate('/order-confirmation', { state: { orderId, clientSecret } });
-      } else if (pm === 'cod') {
-        navigate('/order-confirmation', { state: { orderId } });
+        return;
       }
+
+      // For CARD & COD → go to success page
+      navigate(`/order-confirmation?orderId=${orderId}`);
     } catch (error) {
       alert(error.response?.data?.message || t('Checkout failed. Please try again.'));
     } finally {
@@ -234,7 +234,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 items-start">
+    <div className="container mx-auto md:px-10 py-6 px-4 py-10 grid md:grid-cols-3 gap-8 items-start">
 
       {/* ── Left: Checkout Form ─────────────────────────────────────────────── */}
       <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-8">
@@ -408,7 +408,7 @@ const Checkout = () => {
       </form>
 
       {/* ── Right: Order Summary ────────────────────────────────────────────── */}
-      <aside className="sticky top-6 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <aside className="sticky top-[100px] bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-red-800 bg-red-800">
           <h2 className="text-white font-bold text-lg">{t("Order Summary")}</h2>
         </div>

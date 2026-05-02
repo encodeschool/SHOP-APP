@@ -33,6 +33,7 @@ export default function AdminLayout() {
     fullName: "Admin",
     profileImage: "",
   });
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     setIsMobileSidebarOpen(false);
@@ -191,6 +192,10 @@ export default function AdminLayout() {
                   <NavLink to="/orders" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <FaClipboardList />
                     <span>Orders</span>
+                  </NavLink>
+                  <NavLink to="/payments" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
+                    <MdCurrencyExchange />
+                    <span>Payments</span>
                   </NavLink>
                   <NavLink to="/promos" className={subLinkClass} onClick={() => setIsMobileSidebarOpen(false)}>
                     <RiDiscountPercentLine />

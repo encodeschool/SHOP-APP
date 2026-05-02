@@ -2,70 +2,110 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Order Confirmation</title>
+    <title>New Order Request</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; color: #333;">
-    <div style="max-width: 600px; margin: auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
 
-        <!-- Logo -->
-        <div style="text-align: center; margin-bottom: 30px;">
-            <img src="https://goshtgo.uz/static/media/logo.9e21dd66be2aa089c105.png" alt="Shop Logo" style="width: 150px;">
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; color: #333;">
+
+<div style="max-width: 700px; margin: auto;">
+
+    <!-- MAIN CARD -->
+    <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+
+        <!-- LOGO -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://goshtgo.uz/static/media/logo.9e21dd66be2aa089c105.png"
+                 alt="Shop Logo"
+                 style="width: 140px;">
         </div>
 
-        <!-- Heading -->
-        <h2 style="color: #aa282c;">You have new order request! Please review!</h2>
+        <!-- HEADER -->
+        <h2 style="color: #aa282c; text-align:center; margin-bottom: 10px;">
+            🚨 New Order Request Received
+        </h2>
 
-        <!-- Order Info -->
-        <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
-        <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
-        <p><strong>Order Date:</strong> <span th:text="${formattedDate}"></span></p>
-        <p><strong>Shipping Method:</strong> <span th:text="${order.shippingMethod}"></span></p>
-        <p><strong>Payment Method: </strong><span th:text="${order.paymentMethod}"></span></p>
-
-        <!-- Address of delivery -->
-        <p style="margin-top: 20px; font-size: 16px;">
-            <strong>Address: <span th:text="|${order.country ?: ''}, ${order.city ?: ''}, ${order.zip ?: ''}|"></span></strong>
+        <p style="text-align:center; color:#666;">
+            Please review and process this order.
         </p>
 
-        <!-- Table -->
-        <h3 style="margin-top: 30px;">Order Summary</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-                <tr style="background-color: #aa282c; color: white;">
-                    <th style="padding: 10px; text-align: left;">Product</th>
-                    <th style="padding: 10px; text-align: right;">Quantity</th>
-                    <th style="padding: 10px; text-align: right;">Unit Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="item : ${order.items}" style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;" th:text="${item.product.title}"></td>
-                    <td style="padding: 10px; text-align: right;" th:text="${item.quantity}"></td>
-                    <td style="padding: 10px; text-align: right;" th:text="${item.pricePerUnit}"></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- ORDER INFO CARD -->
+        <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:20px;">
+            <h3 style="margin-top:0;">Order Information</h3>
 
-        <!-- Total -->
-        <p style="margin-top: 20px; font-size: 16px;"><strong>Total:</strong><span th:text="${formattedTotal}"></span></p>
-        <p style="margin-top: 20px; font-size: 16px;"><strong>Discount: </strong><span th:text="${order.discountAmount}"></span></p>
-        <p style="margin-top: 20px; font-size: 16px;"><strong>Final Price: </strong><span th:text="${order.finalPrice}"></span></p>
+            <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
+            <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
+            <p><strong>Date:</strong> <span th:text="${formattedDate}"></span></p>
+            <p><strong>Shipping:</strong> <span th:text="${order.shippingMethod}"></span></p>
+            <p><strong>Payment:</strong> <span th:text="${order.paymentMethod}"></span></p>
+        </div>
 
-        <!-- Message -->
-        <p style="margin-top: 30px;">
-            Let the client know about your decision.
-            You can always get in touch with client by mail
-            <a th:href="|mailto:${order.user.email}|"
-            th:text="${order.user.email}"></a>
-            or you can call by
-            <a th:href="|tel:${order.user.phone}|"
-            th:text="${order.user.phone}"></a>.
-            The client name is
-            <span th:text="${order.user.name}"></span>.
+        <!-- CUSTOMER CARD -->
+        <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:15px;">
+            <h3 style="margin-top:0;">Customer Information</h3>
+
+            <p><strong>Name:</strong> <span th:text="${order.user.name}"></span></p>
+            <p><strong>Email:</strong>
+                <a th:href="|mailto:${order.user.email}|" th:text="${order.user.email}"></a>
+            </p>
+            <p><strong>Phone:</strong>
+                <a th:href="|tel:${order.user.phone}|" th:text="${order.user.phone}"></a>
+            </p>
+        </div>
+
+        <!-- ADDRESS CARD -->
+        <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:15px;">
+            <h3 style="margin-top:0;">Delivery Address</h3>
+
+            <p th:text="|${order.country ?: ''}, ${order.city ?: ''}, ${order.zip ?: ''}|"></p>
+        </div>
+
+        <!-- ITEMS CARD -->
+        <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:15px;">
+            <h3 style="margin-top:0;">Order Items</h3>
+
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                <tr style="background:#aa282c; color:white;">
+                    <th style="padding:10px; text-align:left;">Product</th>
+                    <th style="padding:10px; text-align:right;">Qty</th>
+                    <th style="padding:10px; text-align:right;">Price</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="item : ${order.items}" style="border-bottom:1px solid #eee;">
+                    <td style="padding:10px;" th:text="${item.product.title}"></td>
+                    <td style="padding:10px; text-align:right;" th:text="${item.quantity}"></td>
+                    <td style="padding:10px; text-align:right;" th:text="${item.pricePerUnit}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TOTAL CARD -->
+        <div style="border:1px solid #eee; border-radius:8px; padding:15px; margin-top:15px;">
+            <p><strong>Total:</strong> <span th:text="${formattedTotal}"></span></p>
+            <p><strong>Discount:</strong> <span th:text="${order.discountAmount}"></span></p>
+            <p style="font-size:18px; color:#aa282c;">
+                <strong>Final Price:</strong> <span th:text="${order.finalPrice}"></span>
+            </p>
+        </div>
+
+        <!-- ACTION MESSAGE -->
+        <div style="border:1px solid #fff3cd; background:#fff8e1; border-radius:8px; padding:15px; margin-top:20px;">
+            <p style="margin:0;">
+                ⚠️ Please review this order and take appropriate action.
+            </p>
+        </div>
+
+        <!-- FOOTER -->
+        <p style="margin-top:30px; text-align:center; color:#777;">
+            Best regards,<br>
+            <strong>Your Shop System</strong>
         </p>
 
-        <!-- Footer -->
-        <p style="margin-top: 40px;">Best regards,<br><strong>Your Shop Team</strong></p>
     </div>
+</div>
+
 </body>
 </html>

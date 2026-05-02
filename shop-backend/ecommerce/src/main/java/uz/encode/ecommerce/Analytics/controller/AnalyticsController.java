@@ -1,21 +1,24 @@
 package uz.encode.ecommerce.Analytics.controller;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
 import uz.encode.ecommerce.Analytics.dto.CategoryDistirbutionDTO;
 import uz.encode.ecommerce.Analytics.dto.DashboardStatsDTO;
 import uz.encode.ecommerce.Analytics.dto.DashboardTotalsDTO;
 import uz.encode.ecommerce.Analytics.dto.MonthlyCountDTO;
-import uz.encode.ecommerce.Analytics.dto.MonthlyRevenueDTO;
 import uz.encode.ecommerce.Analytics.dto.OrderStatusCountDTO;
+import uz.encode.ecommerce.Analytics.dto.PaymentMethodDTO;
 import uz.encode.ecommerce.Analytics.dto.TopProductDTO;
 import uz.encode.ecommerce.Analytics.service.AnalyticsService;
-
-import java.util.List;
+import uz.encode.ecommerce.Payment.dto.PaymentResponseDTO;
 
 @RestController
 @RequestMapping("/api/admin/analytics")
@@ -33,6 +36,16 @@ public class AnalyticsController {
     @GetMapping("/orders/monthly")
     public ResponseEntity<List<MonthlyCountDTO>> getOrderStats() {
         return ResponseEntity.ok(analyticsService.getOrderStats());
+    }
+
+    @GetMapping("/payments/monthly")
+    public ResponseEntity<List<MonthlyCountDTO>> getPaymentStats() {
+        return ResponseEntity.ok(analyticsService.getPaymentStats());
+    }
+
+    @GetMapping("/payments/method")
+    public ResponseEntity<List<PaymentMethodDTO>> getPaymentMethodStats() {
+        return ResponseEntity.ok(analyticsService.getPaymentMethodStats());
     }
 
     @GetMapping("/products/category")
@@ -65,5 +78,10 @@ public class AnalyticsController {
         double totalRevenue = analyticsService.sumTotalRevenue();
 
         return new DashboardTotalsDTO(totalUsers, totalOrders, totalProducts, totalRevenue);
+    }
+
+    @GetMapping("/payments")
+    public List<PaymentResponseDTO> getAllPayments() {
+        return analyticsService.getAllPayments();
     }
 }

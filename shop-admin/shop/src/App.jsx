@@ -7,6 +7,7 @@ import Categories from "./pages/category/Category";
 import Login from './pages/authorization/Login';
 import Register from './pages/authorization/Registration';
 import Orders from "./pages/orders/Order";
+import Payment from "./pages/payments/Payment";
 import AttributeManagement from './pages/products/AttributeManagement';
 import Brand from './pages/products/Brand';
 import Banner from "./pages/banner/Banner";
@@ -46,6 +47,7 @@ function App() {
           <Route path="users" element={<Users />} />
           <Route path="categories" element={<Categories />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="payments" element={<Payment />} />
           <Route path="product_attribute" element={<AttributeManagement />} />
           <Route path="brand" element={<Brand />} />
           <Route path="banner" element={<Banner />} />
