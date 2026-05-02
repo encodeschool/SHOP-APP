@@ -1,6 +1,7 @@
 package uz.encode.ecommerce.Order.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -247,18 +248,40 @@ public class OrderServiceImpl implements OrderService {
             .toList();
     }
 
-    @Override
+    @Transactional
     public OrderResponseDTO updateStatus(UUID orderId, String status) {
+
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        try {
-            order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status");
+        OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
+        order.setStatus(newStatus);
+
+        Payment payment = paymentRepository.findByOrder(order).orElse(null);
+
+        if (payment != null) {
+
+            switch (newStatus) {
+
+                case PAID -> {
+                    payment.setStatus(PaymentStatus.PAID);
+                    payment.setPaidAt(LocalDateTime.now());
+                }
+
+                case CANCELLED -> {
+                    if (payment.getStatus() == PaymentStatus.PENDING) {
+                        payment.setStatus(PaymentStatus.FAILED);
+                    }
+                }
+
+                default -> {}
+            }
+
+            paymentRepository.save(payment);
         }
 
         orderRepository.save(order);
+
         return mapToDTO(order);
     }
 

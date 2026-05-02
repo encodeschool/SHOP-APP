@@ -64,7 +64,7 @@ export default function Payment() {
         <h1 className="text-2xl font-bold">Payments</h1>
         <div className="text-right">
           <p className="text-sm text-gray-500">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600">${totalRevenue.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-green-600">{totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 
@@ -188,7 +188,7 @@ export default function Payment() {
                     })()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${parseFloat(payment.amount).toFixed(2)}
+                    {parseFloat(payment.amount).toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${

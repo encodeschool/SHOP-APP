@@ -18,6 +18,7 @@ import uz.encode.ecommerce.Analytics.dto.TopProductDTO;
 import uz.encode.ecommerce.Analytics.service.AnalyticsService;
 import uz.encode.ecommerce.Order.repository.OrderRepository;
 import uz.encode.ecommerce.Payment.dto.PaymentResponseDTO;
+import uz.encode.ecommerce.Payment.entity.PaymentStatus;
 import uz.encode.ecommerce.Payment.repository.PaymentRepository;
 import uz.encode.ecommerce.Product.repository.ProductRepository;
 import uz.encode.ecommerce.User.repository.UserRepository;
@@ -60,9 +61,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Override
     public List<PaymentMethodDTO> getPaymentMethodStats() {
-        return paymentRepository.countByMethod().stream()
+        return paymentRepository.countByMethod(PaymentStatus.PAID)
+                .stream()
                 .map(pm -> new PaymentMethodDTO(pm.getMethod(), pm.getCount()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

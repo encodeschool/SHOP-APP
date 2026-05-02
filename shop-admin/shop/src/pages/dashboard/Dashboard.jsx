@@ -15,7 +15,8 @@ export default function Dashboard() {
   const [userStats, setUserStats] = useState([]);
   const [revenueStats, setRevenueStats] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
-  const [paymentStats, setPaymentStats] = useState([]);  const [paymentMethodStats, setPaymentMethodStats] = useState([]);
+  const [paymentStats, setPaymentStats] = useState([]);  
+  const [paymentMethodStats, setPaymentMethodStats] = useState([]);
   const [totals, setTotals] = useState({
     users: 0,
     orders: 0,
@@ -52,7 +53,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Revenue</h3>
-          <p className="text-2xl font-bold">${totals.totalRevenue?.toFixed(2)}</p>
+          <p className="text-2xl font-bold">{totals.totalRevenue?.toFixed(2)}</p>
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-sm text-gray-500">Total Products</h3>

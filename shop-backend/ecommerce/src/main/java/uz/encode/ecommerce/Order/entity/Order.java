@@ -14,11 +14,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.encode.ecommerce.Payment.entity.Payment;
 import uz.encode.ecommerce.User.entity.User;
 
 
@@ -47,6 +49,9 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
+
+    @OneToOne(mappedBy = "order")
+    private Payment payment;
 
     private String clientSecret;
 

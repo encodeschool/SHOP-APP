@@ -444,7 +444,7 @@ const AttributeManagement = () => {
   const unsavedCount = attributes.filter(a => !a.id).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium
@@ -454,7 +454,7 @@ const AttributeManagement = () => {
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto">
+      <div className="">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Product Attributes</h1>
