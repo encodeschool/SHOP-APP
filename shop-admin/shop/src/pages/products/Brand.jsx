@@ -96,7 +96,7 @@ export default function Brand() {
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <table className="w-full border bg-white shadow">
+          <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-200 text-left">
                 <th className="p-2">Icon</th>
