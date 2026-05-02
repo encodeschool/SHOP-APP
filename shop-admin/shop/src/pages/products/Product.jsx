@@ -490,8 +490,10 @@ export default function Products() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="h-full flex gap-4">
+      <Toast msg={toast?.msg} type={toast?.type} />
+      
       <div className='w-[100%]'>
-        <Toast msg={toast?.msg} type={toast?.type} />
+        
         <h1 className="text-xl font-bold">Products</h1>
         <p className="text-sm text-slate-500 mb-4">{products.length} shown</p>
 
