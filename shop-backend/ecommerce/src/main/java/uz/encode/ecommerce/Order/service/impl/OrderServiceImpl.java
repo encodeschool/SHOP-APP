@@ -1,7 +1,6 @@
 package uz.encode.ecommerce.Order.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -139,7 +138,18 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = dto.getItems().stream().map(i -> {
             Product product = productRepository.findById(i.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-            return new OrderItem(null, order, product, i.getQuantity(), i.getPricePerUnit());
+
+            product.decreaseStock(i.getQuantity());
+
+            productRepository.save(product);
+
+            return new OrderItem(
+                null,
+                order,
+                product,
+                i.getQuantity(),
+                i.getPricePerUnit()
+            );
         }).collect(Collectors.toList());
 
         order.setItems(items);
@@ -254,30 +264,25 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        OrderStatus oldStatus = order.getStatus();
         OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
+
         order.setStatus(newStatus);
 
-        Payment payment = paymentRepository.findByOrder(order).orElse(null);
-
-        if (payment != null) {
-
-            switch (newStatus) {
-
-                case PAID -> {
-                    payment.setStatus(PaymentStatus.PAID);
-                    payment.setPaidAt(LocalDateTime.now());
-                }
-
-                case CANCELLED -> {
-                    if (payment.getStatus() == PaymentStatus.PENDING) {
-                        payment.setStatus(PaymentStatus.FAILED);
-                    }
-                }
-
-                default -> {}
+        if (newStatus == OrderStatus.CANCELLED && oldStatus != OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.increaseStock(item.getQuantity());
+                productRepository.save(product);
             }
+        }
 
-            paymentRepository.save(payment);
+        if (oldStatus == OrderStatus.CANCELLED && newStatus != OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.decreaseStock(item.getQuantity());
+                productRepository.save(product);
+            }
         }
 
         orderRepository.save(order);

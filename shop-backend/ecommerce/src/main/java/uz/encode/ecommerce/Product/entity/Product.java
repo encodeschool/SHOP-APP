@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -112,6 +111,21 @@ public class Product {
         pav.setValue(value);
         pav.setProduct(this);
         this.attributes.add(pav);
+    }
+
+    public void decreaseStock(int qty) {
+        if (this.stock == null) this.stock = 0;
+
+        if (this.stock < qty) {
+            throw new RuntimeException("Not enough stock for product: " + this.title);
+        }
+
+        this.stock -= qty;
+    }
+
+    public void increaseStock(int qty) {
+        if (this.stock == null) this.stock = 0;
+        this.stock += qty;
     }
 
 }
