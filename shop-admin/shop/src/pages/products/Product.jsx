@@ -135,21 +135,44 @@ const inputCls = (err) =>
 
 // ─── Image preview ────────────────────────────────────────────────────────────
 function ImagePreviews({ files, existing, onRemoveFile, onRemoveExisting }) {
+  const BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
   return (
     <div className="flex flex-wrap gap-3 mt-2">
+      {/* existing images */}
       {existing?.map((url, i) => (
-        <div key={`ex-${i}`} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-          <img src={url} alt="" className="w-full h-full object-cover" />
-          <button onClick={() => onRemoveExisting(i)}
-            className="absolute inset-0 bg-black/50 text-white text-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">×</button>
+        <div key={`ex-${i}`} className="relative group w-20 h-20 rounded-xl overflow-hidden border shadow-sm">
+          <img
+            src={url.startsWith('http') ? url : `${BASE_URL}${url}`}
+            alt="existing"
+            className="w-full h-full object-cover"
+          />
+          <button
+            onClick={() => onRemoveExisting(i)}
+            className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center"
+          >
+            ×
+          </button>
         </div>
       ))}
+
+      {/* new files */}
       {files.map((f, i) => (
-        <div key={`new-${i}`} className="relative group w-20 h-20 rounded-xl overflow-hidden border-2 border-dashed border-indigo-300 shadow-sm">
-          <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
-          <button onClick={() => onRemoveFile(i)}
-            className="absolute inset-0 bg-black/50 text-white text-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">×</button>
-          <span className="absolute bottom-0 left-0 right-0 bg-indigo-600/80 text-white text-[9px] text-center py-0.5">new</span>
+        <div key={`new-${i}`} className="relative group w-20 h-20 rounded-xl overflow-hidden border-2 border-dashed border-indigo-300">
+          <img
+            src={URL.createObjectURL(f)}
+            alt="new"
+            className="w-full h-full object-cover"
+          />
+          <button
+            onClick={() => onRemoveFile(i)}
+            className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center"
+          >
+            ×
+          </button>
+          <span className="absolute bottom-0 w-full text-center text-[9px] bg-indigo-600 text-white">
+            new
+          </span>
         </div>
       ))}
     </div>
