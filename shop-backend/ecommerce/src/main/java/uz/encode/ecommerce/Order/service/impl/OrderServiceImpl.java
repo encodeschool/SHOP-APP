@@ -18,6 +18,9 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import jakarta.transaction.Transactional;
+import uz.encode.ecommerce.Inventory.entity.Warehouse;
+import uz.encode.ecommerce.Inventory.repository.WarehouseRepository;
+import uz.encode.ecommerce.Inventory.service.InventoryService;
 import uz.encode.ecommerce.Order.dto.OrderItemResponseDTO;
 import uz.encode.ecommerce.Order.dto.OrderRequestDTO;
 import uz.encode.ecommerce.Order.dto.OrderResponseDTO;
@@ -55,6 +58,10 @@ public class OrderServiceImpl implements OrderService {
     private PaymentRepository paymentRepository;
     @Autowired
     private PromoCodeRepository promoCodeRepository;
+    @Autowired
+    private InventoryService inventoryService;
+    @Autowired
+    private WarehouseRepository warehouseRepository;
 
     @Value("${stripe.secret-key}")
     private String stripeSecretKey;
@@ -138,11 +145,6 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = dto.getItems().stream().map(i -> {
             Product product = productRepository.findById(i.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-
-            product.decreaseStock(i.getQuantity());
-
-            productRepository.save(product);
-
             return new OrderItem(
                 null,
                 order,
@@ -269,19 +271,34 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(newStatus);
 
-        if (newStatus == OrderStatus.CANCELLED && oldStatus != OrderStatus.CANCELLED) {
+        Warehouse warehouse = warehouseRepository.findAll()
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No warehouse found"));
+
+        if (newStatus == OrderStatus.PAID && oldStatus != OrderStatus.PAID) {
+
             for (OrderItem item : order.getItems()) {
-                Product product = item.getProduct();
-                product.increaseStock(item.getQuantity());
-                productRepository.save(product);
+
+                inventoryService.decreaseStock(
+                    item.getProduct().getId(),
+                    warehouse.getId(),
+                    item.getQuantity(),
+                    order
+                );
             }
         }
 
-        if (oldStatus == OrderStatus.CANCELLED && newStatus != OrderStatus.CANCELLED) {
+        if (newStatus == OrderStatus.CANCELLED && oldStatus == OrderStatus.PAID) {
+
             for (OrderItem item : order.getItems()) {
-                Product product = item.getProduct();
-                product.decreaseStock(item.getQuantity());
-                productRepository.save(product);
+
+                inventoryService.increaseStock(
+                    item.getProduct().getId(),
+                    warehouse.getId(),
+                    item.getQuantity(),
+                    "CANCEL ORDER: " + order.getId()
+                );
             }
         }
 

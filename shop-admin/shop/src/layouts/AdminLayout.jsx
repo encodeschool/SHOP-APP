@@ -15,6 +15,11 @@ import {
   FaShoppingCart,
   FaCodepen 
 } from "react-icons/fa";
+
+import { FaWarehouse } from "react-icons/fa";
+import { MdOutlineInventory2 } from "react-icons/md";
+import { AiOutlineSwap } from "react-icons/ai";
+
 import { useEffect, useState } from "react";
 import { TbRulerMeasure } from "react-icons/tb";
 import { RiDiscountPercentLine } from "react-icons/ri";
@@ -45,6 +50,7 @@ export default function AdminLayout() {
     sales: false,
     content: false,
     settings: false,
+    inventory: false,
   });
 
   // Auto-expand section if current route matches
@@ -75,6 +81,8 @@ export default function AdminLayout() {
       setExpandedSections(prev => ({ ...prev, sales: true }));
     } else if (path.includes('/home-widget') || path.includes('/banner')) {
       setExpandedSections(prev => ({ ...prev, content: true }));
+    } else if (path.includes('/inventory') || path.includes('/warehouse')) {
+      setExpandedSections(prev => ({ ...prev, inventory: true }));
     }
   }, [location.pathname]);
 
@@ -253,6 +261,44 @@ export default function AdminLayout() {
               <FaUsers />
               <span>Users</span>
             </NavLink>
+
+            {/* Inventory Section */}
+            <div>
+              <button
+                onClick={() => toggleSection('inventory')}
+                className={sectionButtonClass(expandedSections.inventory)}
+              >
+                <div className="flex items-center space-x-3">
+                  <FaWarehouse />
+                  <span>Inventory</span>
+                </div>
+                {expandedSections.inventory ? <FaChevronDown /> : <FaChevronRight />}
+              </button>
+
+              {expandedSections.inventory && (
+                <div className="mt-1 space-y-1">
+                  <NavLink to="/inventory/stock" className={subLinkClass}>
+                    <MdOutlineInventory2 />
+                    <span>Stock</span>
+                  </NavLink>
+
+                  <NavLink to="/inventory/movements" className={subLinkClass}>
+                    <FaStream />
+                    <span>Movements</span>
+                  </NavLink>
+
+                  <NavLink to="/inventory/warehouse" className={subLinkClass}>
+                    <FaWarehouse />
+                    <span>Warehouses</span>
+                  </NavLink>
+
+                  <NavLink to="/inventory/transfers" className={subLinkClass}>
+                    <AiOutlineSwap />
+                    <span>Transfers</span>
+                  </NavLink>
+                </div>
+              )}
+            </div>
 
             {/* Settings Section (Optional) */}
             <div>
