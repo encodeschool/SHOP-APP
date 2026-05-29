@@ -115,17 +115,13 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponseDTO>> getAllFiltered(
             @RequestParam(required = false) List<String> brands,
             @RequestParam(required = false) Boolean inStock,
+            @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) String sort,
-            @RequestParam(defaultValue = "0") int page, // Add page parameter
-            @RequestParam(defaultValue = "12") int size) { // Add size parameter
-        
-        // Create a Pageable object
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        // Call a new service method that handles pagination
-        Page<ProductResponseDTO> filteredProductsPage = productService.getFiltered(brands, inStock, maxPrice, sort, pageable);
-        
+        Page<ProductResponseDTO> filteredProductsPage = productService.getFiltered(brands, inStock, maxPrice, categoryId, sort, pageable);
         return ResponseEntity.ok(filteredProductsPage);
     }
 

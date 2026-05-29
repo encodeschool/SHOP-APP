@@ -29,6 +29,7 @@ import Delivery from './pages/Delivery';
 import Contact from './pages/Contact';
 import DeleteAccount from './pages/DeleteAccount';
 import AiHelpScreen from './pages/AiHelpScreen';
+import UnderDevelopmentBanner from './components/UnderDevelopmentBanner';
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
                 <div className="flex flex-col min-h-screen">
                     <AppBar />
                     <CategoryBar />
+                    <UnderDevelopmentBanner />
                     <main className="flex-grow">
                         <Routes>
                             <Route path='/' element={<Home />} />

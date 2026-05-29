@@ -35,6 +35,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public void increaseStock(UUID productId, UUID warehouseId, Integer qty, String reason) {
 
+        validateQty(qty);
+
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new InventoryException("Product not found"));
 
@@ -49,10 +51,15 @@ public class InventoryServiceImpl implements InventoryService {
         tx.setReason(reason);
 
         inventoryRepo.save(tx);
+        refreshProductAvailability(product);
     }
 
+    // ─────────────────────────────
+    // DECREASE STOCK
+    // ─────────────────────────────
     @Override
-    public void decreaseStock(UUID productId, UUID warehouseId, Integer qty, Order order) {
+    public void decreaseStock(UUID productId, UUID warehouseId, Integer qty, String reason) {
+        validateQty(qty);
 
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new InventoryException("Product not found"));
@@ -60,10 +67,39 @@ public class InventoryServiceImpl implements InventoryService {
         Warehouse warehouse = warehouseRepo.findById(warehouseId)
                 .orElseThrow(() -> new InventoryException("Warehouse not found"));
 
-        int currentStock = getStockForProduct(productId, warehouseId);
-
+        int currentStock = inventoryRepo.getStock(productId, warehouseId);
         if (currentStock < qty) {
-            throw new InventoryException("Not enough stock");
+            throw new InventoryException(
+                "Insufficient stock. Available: " + currentStock + ", requested: " + qty
+            );
+        }
+
+        InventoryTransaction tx = new InventoryTransaction();
+        tx.setProduct(product);
+        tx.setWarehouse(warehouse);
+        tx.setType(InventoryType.OUT);
+        tx.setQuantity(qty);
+        tx.setReason(reason);
+
+        inventoryRepo.save(tx);
+        refreshProductAvailability(product);
+    }
+
+    @Override
+    public void decreaseStock(UUID productId, UUID warehouseId, Integer qty, Order order) {
+        validateQty(qty);
+
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new InventoryException("Product not found"));
+
+        Warehouse warehouse = warehouseRepo.findById(warehouseId)
+                .orElseThrow(() -> new InventoryException("Warehouse not found"));
+
+        int currentStock = inventoryRepo.getStock(productId, warehouseId);
+        if (currentStock < qty) {
+            throw new InventoryException(
+                "Insufficient stock. Available: " + currentStock + ", requested: " + qty
+            );
         }
 
         InventoryTransaction tx = new InventoryTransaction();
@@ -75,24 +111,37 @@ public class InventoryServiceImpl implements InventoryService {
         tx.setReason("Order deduction");
 
         inventoryRepo.save(tx);
+        refreshProductAvailability(product);
     }
 
+    // ─────────────────────────────
+    // TRANSFER STOCK
+    // ─────────────────────────────
     @Override
     public void transfer(TransferRequestDTO dto) {
 
+        validateQty(dto.getQuantity());
+
         if (dto.getFromWarehouseId().equals(dto.getToWarehouseId())) {
-            throw new InventoryException("Same warehouse transfer not allowed");
+            throw new InventoryException("Cannot transfer to same warehouse");
         }
 
-        int stock = getStockForProduct(dto.getProductId(), dto.getFromWarehouseId());
+        int stock = inventoryRepo.getStock(dto.getProductId(), dto.getFromWarehouseId());
 
         if (stock < dto.getQuantity()) {
-            throw new InventoryException("Insufficient stock");
+            throw new InventoryException(
+                "Insufficient stock. Available: " + stock + ", requested: " + dto.getQuantity()
+            );
         }
 
-        Product product = productRepo.findById(dto.getProductId()).orElseThrow();
-        Warehouse from = warehouseRepo.findById(dto.getFromWarehouseId()).orElseThrow();
-        Warehouse to = warehouseRepo.findById(dto.getToWarehouseId()).orElseThrow();
+        Product product = productRepo.findById(dto.getProductId())
+                .orElseThrow(() -> new InventoryException("Product not found"));
+
+        Warehouse from = warehouseRepo.findById(dto.getFromWarehouseId())
+                .orElseThrow(() -> new InventoryException("From warehouse not found"));
+
+        Warehouse to = warehouseRepo.findById(dto.getToWarehouseId())
+                .orElseThrow(() -> new InventoryException("To warehouse not found"));
 
         // OUT
         InventoryTransaction out = new InventoryTransaction();
@@ -115,6 +164,28 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    public int getStock(UUID productId, UUID warehouseId) {
+        return inventoryRepo.getStock(productId, warehouseId);
+    }
+
+    @Override
+    public int getTotalStock(UUID productId) {
+        return inventoryRepo.getTotalStock(productId);
+    }
+
+    private void refreshProductAvailability(Product product) {
+        int totalStock = inventoryRepo.getTotalStock(product.getId());
+        product.setAvailable(totalStock > 0);
+        productRepo.save(product);
+    }
+
+    private void validateQty(Integer qty) {
+        if (qty == null || qty <= 0) {
+            throw new InventoryException("Quantity must be greater than zero");
+        }
+    }
+
+    @Override
     public List<StockResponseDTO> getStock() {
         return inventoryRepo.getStock();
     }
@@ -128,20 +199,6 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     private int getStockForProduct(UUID productId, UUID warehouseId) {
-
-        List<InventoryTransaction> list =
-                inventoryRepo.findAll().stream()
-                        .filter(t ->
-                                t.getProduct().getId().equals(productId)
-                                && t.getWarehouse().getId().equals(warehouseId))
-                        .toList();
-
-        return list.stream()
-                .mapToInt(t -> {
-                    if (t.getType() == InventoryType.IN || t.getType() == InventoryType.TRANSFER_IN)
-                        return t.getQuantity();
-                    else
-                        return -t.getQuantity();
-                }).sum();
+        return inventoryRepo.getStock(productId, warehouseId);
     }
 }

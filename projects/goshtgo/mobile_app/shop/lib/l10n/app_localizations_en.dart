@@ -93,6 +93,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About Us';
 
   @override
+  String get websiteUnderDevelopmentMessage => 'This website is under development. Thank you for your patience.';
+
+  @override
   String get aboutSubtitle => '🥩 About Us — Honest meat of a new generation';
 
   @override

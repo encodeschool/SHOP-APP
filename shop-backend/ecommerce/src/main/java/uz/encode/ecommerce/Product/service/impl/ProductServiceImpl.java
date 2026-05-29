@@ -6,31 +6,30 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.persistence.criteria.Predicate;
 import uz.encode.ecommerce.Category.entity.Category;
 import uz.encode.ecommerce.Category.repository.CategoryRepository;
 import uz.encode.ecommerce.Currency.dto.CurrencyDTO;
 import uz.encode.ecommerce.Currency.entity.Currency;
 import uz.encode.ecommerce.Currency.exception.CurrencyNotFoundException;
 import uz.encode.ecommerce.Currency.repository.CurrencyRepository;
-import uz.encode.ecommerce.Currency.service.CurrencyService;
 import uz.encode.ecommerce.Product.dto.AttributeTranslationDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueDTO;
 import uz.encode.ecommerce.Product.dto.AttributeValueResponseDTO;
@@ -59,19 +58,9 @@ import uz.encode.ecommerce.Units.entity.Unit;
 import uz.encode.ecommerce.Units.repository.UnitRepository;
 import uz.encode.ecommerce.User.entity.User;
 import uz.encode.ecommerce.User.repository.UserRepository;
-
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import uz.encode.ecommerce.Product.dto.ProductResponseDTO;
-import uz.encode.ecommerce.Product.entity.Product;
-import uz.encode.ecommerce.Product.repository.ProductRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import uz.encode.ecommerce.Inventory.entity.Warehouse;
+import uz.encode.ecommerce.Inventory.repository.WarehouseRepository;
+import uz.encode.ecommerce.Inventory.service.InventoryService;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -97,6 +86,10 @@ public class ProductServiceImpl implements ProductService {
     private LocationRepository locationRepository;
     @Autowired
     private CurrencyRepository currencyRepository;
+    @Autowired
+    private InventoryService inventoryService;
+    @Autowired
+    private WarehouseRepository warehouseRepository;
 
     @Override
     @Transactional
@@ -111,9 +104,9 @@ public class ProductServiceImpl implements ProductService {
         product.setTitle(dto.getTitle());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
-        product.setQuantity(dto.getQuantity());
+        // product.setQuantity(dto.getQuantity());
         product.setAvailable(dto.getQuantity() > 0);
-        product.setStock(dto.getStock());
+        // product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
         product.setUser(user);
         product.setCategory(category);
@@ -133,6 +126,12 @@ public class ProductServiceImpl implements ProductService {
 
         // Save product first to get ID
         Product savedProduct = productRepository.save(product);
+
+        if (dto.getQuantity() > 0) {
+            Warehouse warehouse = warehouseRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new RuntimeException("No warehouse found"));
+            inventoryService.increaseStock(savedProduct.getId(), warehouse.getId(), dto.getQuantity(), "Initial product stock");
+        }
 
         if (dto.getLocation() != null) {
             LocationResponseDTO locDto = dto.getLocation();
@@ -237,9 +236,9 @@ public class ProductServiceImpl implements ProductService {
         product.setTitle(dto.getTitle());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
-        product.setQuantity(dto.getQuantity());
+        // product.setQuantity(dto.getQuantity());
         product.setAvailable(dto.getQuantity() > 0);
-        product.setStock(dto.getStock());
+        // product.setStock(dto.getStock());
         product.setCondition(dto.getCondition());
         product.setFeatured(dto.isFeatured());
         Unit unit = unitRepository.findById(dto.getUnitId())
@@ -347,6 +346,19 @@ public class ProductServiceImpl implements ProductService {
             product.getTranslations().clear();
         }
 
+        int currentStock = inventoryService.getTotalStock(id);
+        int requestedQty = dto.getQuantity();
+        Warehouse warehouse = warehouseRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("No warehouse found"));
+
+        if (requestedQty > currentStock) {
+            inventoryService.increaseStock(id, warehouse.getId(), requestedQty - currentStock, "Product stock update");
+        } else if (requestedQty < currentStock) {
+            inventoryService.decreaseStock(id, warehouse.getId(), currentStock - requestedQty, "Product stock update");
+        }
+
+        product.setAvailable(requestedQty > 0);
+
         Product savedProduct = productRepository.save(product);
 
         return mapToDto(savedProduct);
@@ -364,9 +376,9 @@ public class ProductServiceImpl implements ProductService {
         dto.setTitle(product.getTitle());
         dto.setDescription(product.getDescription());
         dto.setPrice(product.getPrice());
-        dto.setQuantity(product.getQuantity());
+        // dto.setQuantity(product.getQuantity());
         dto.setAvailable(product.isAvailable());
-        dto.setStock(product.getStock());
+        // dto.setStock(product.getStock());
         dto.setCondition(product.getCondition());
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUser(product.getUser());
@@ -383,6 +395,10 @@ public class ProductServiceImpl implements ProductService {
                             attrDto.setValue(attr.getValue());
                             return attrDto;
                         }).collect(Collectors.toList()));
+        int totalStock = inventoryService.getTotalStock(product.getId());
+        dto.setStock(totalStock);
+        dto.setQuantity(totalStock);
+        dto.setAvailable(totalStock > 0);
         // Add translations
         dto.setTranslations(
             product.getTranslations().stream()
@@ -414,7 +430,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort, Pageable pageable) {
+    public Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, UUID categoryId, String sort, Pageable pageable) {
         // Create a Specification to build the dynamic query
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -428,6 +444,10 @@ public class ProductServiceImpl implements ProductService {
             // Filter by in-stock status
             if (inStock != null && inStock) {
                 predicates.add(cb.isTrue(root.get("inStock")));
+            }
+
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("category").get("id"), categoryId));
             }
 
             // Filter by maximum price

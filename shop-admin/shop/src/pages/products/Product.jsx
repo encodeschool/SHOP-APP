@@ -470,7 +470,7 @@ export default function Products() {
     const finalCatId = product.subsubcategoryId || product.subcategoryId || product.categoryId;
     const payload = {
       title: product.title, description: product.description,
-      price: parseFloat(product.price), stock: parseInt(product.stock),
+      price: parseFloat(product.price), quantity: parseInt(product.stock), stock: parseInt(product.stock),
       condition: product.condition, categoryId: finalCatId,
       userId: product.userId, featured: product.featured,
       brandId: product.brandId || null, unitId: product.unitId || null,

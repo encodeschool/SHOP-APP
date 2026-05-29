@@ -93,6 +93,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutTitle => 'О нас';
 
   @override
+  String get websiteUnderDevelopmentMessage => 'Сайт находится в разработке. Спасибо за ваше терпение.';
+
+  @override
   String get aboutSubtitle => '🥩 О нас — Честное мясо нового поколения';
 
   @override

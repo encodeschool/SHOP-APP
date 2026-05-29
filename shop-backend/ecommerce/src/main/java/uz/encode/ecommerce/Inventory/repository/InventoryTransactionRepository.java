@@ -37,4 +37,31 @@ public interface InventoryTransactionRepository extends JpaRepository<InventoryT
     """)
     List<StockResponseDTO> getStock();
 
+    @Query("""
+        SELECT COALESCE(SUM(
+            CASE 
+                WHEN t.type IN (uz.encode.ecommerce.Inventory.entity.InventoryType.IN, uz.encode.ecommerce.Inventory.entity.InventoryType.TRANSFER_IN) THEN t.quantity
+                WHEN t.type IN (uz.encode.ecommerce.Inventory.entity.InventoryType.OUT, uz.encode.ecommerce.Inventory.entity.InventoryType.TRANSFER_OUT) THEN -t.quantity
+                ELSE 0
+            END
+        ), 0)
+        FROM InventoryTransaction t
+        WHERE t.product.id = :productId
+        AND t.warehouse.id = :warehouseId
+    """)
+    int getStock(UUID productId, UUID warehouseId);
+
+    @Query("""
+        SELECT COALESCE(SUM(
+            CASE 
+                WHEN t.type IN (uz.encode.ecommerce.Inventory.entity.InventoryType.IN, uz.encode.ecommerce.Inventory.entity.InventoryType.TRANSFER_IN) THEN t.quantity
+                WHEN t.type IN (uz.encode.ecommerce.Inventory.entity.InventoryType.OUT, uz.encode.ecommerce.Inventory.entity.InventoryType.TRANSFER_OUT) THEN -t.quantity
+                ELSE 0
+            END
+        ), 0)
+        FROM InventoryTransaction t
+        WHERE t.product.id = :productId
+    """)
+    int getTotalStock(UUID productId);
+
 }

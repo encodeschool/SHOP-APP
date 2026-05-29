@@ -93,6 +93,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get aboutTitle => 'Biz haqimizda';
 
   @override
+  String get websiteUnderDevelopmentMessage => 'Veb-sayt ishlab chiqilmoqda. Sabringiz uchun rahmat.';
+
+  @override
   String get aboutSubtitle => '🥩 Biz haqimizda — Yangi avlodning halol go‘shti';
 
   @override

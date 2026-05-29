@@ -43,6 +43,15 @@ public class InventoryController {
         return inventoryService.getStock();
     }
 
+    @PostMapping("/receive")
+    public void receiveStock(
+            @RequestParam UUID productId,
+            @RequestParam UUID warehouseId,
+            @RequestParam Integer qty
+    ) {
+        inventoryService.increaseStock(productId, warehouseId, qty, "Stock received");
+    }
+
     @GetMapping("/movements")
     public List<InventoryTransactionDTO> movements() {
         return inventoryService.getMovements();

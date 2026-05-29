@@ -21,6 +21,7 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState('specification');
   const [brand, setBrand] = useState(null);
   const [weight, setWeight] = useState(1);
+  const isAvailable = product?.available && (product?.stock ?? 0) > 0;
   const { setLoading } = useLoading();
   const [favorites, setFavorites] = useState([]);
   const [options, setOptions] = useState({
@@ -124,6 +125,7 @@ const ProductDetail = () => {
   }, [product]);
 
   const handleAddToCart = () => {
+    if (!isAvailable) return;
     const totalPrice = getTotalPrice();
     dispatch(addToCart({ ...product, weight, options, totalPrice }));
   };
@@ -213,6 +215,11 @@ const ProductDetail = () => {
             )}
 
             <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
+            <div className="mb-3">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {isAvailable ? t('In stock') : t('Out of stock')}
+              </span>
+            </div>
 
             {/* Weight / Quantity selector */}
             {isKgUnit ? (
@@ -294,10 +301,11 @@ const ProductDetail = () => {
             </div>
 
             <button
-              className="bg-red-700 text-white px-6 py-3 rounded-full text-lg flex items-center justify-center w-full hover:bg-red-800 transition"
+              className={`text-white px-6 py-3 rounded-full text-lg flex items-center justify-center w-full transition ${isAvailable ? 'bg-red-700 hover:bg-red-800' : 'bg-gray-400 cursor-not-allowed'}`}
               onClick={handleAddToCart}
+              disabled={!isAvailable}
             >
-              <FaCartPlus className="mr-2" /> {t('Add to Cart')}
+              <FaCartPlus className="mr-2" /> {isAvailable ? t('Add to Cart') : t('Sold Out')}
             </button>
 
             <CompareButton product={product} />

@@ -97,10 +97,11 @@ const CategoryPage = () => {
   useEffect(() => {
       const fetchFilteredProducts = async () => {
           try {
-              const params = new URLSearchParams();
+                      const params = new URLSearchParams();
 
               if (brands.length) brands.forEach((b) => params.append('brands', b));
               if (inStock) params.set('inStock', true);
+              if (categoryId) params.set('categoryId', categoryId);
               if (priceRange[1] < 220) params.set('maxPrice', priceRange[1]);
               if (sort && sort !== 'default') params.set('sort', sort);
 
@@ -116,7 +117,7 @@ const CategoryPage = () => {
       };
 
       fetchFilteredProducts();
-  }, [brands, inStock, priceRange, sort, currentPage]); // <-- 'sort' is added here
+  }, [brands, inStock, priceRange, sort, currentPage, categoryId]); // <-- include categoryId
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
@@ -139,10 +140,6 @@ const CategoryPage = () => {
           setCategoryName(currentCategory.name);
           setSubcategories(currentCategory.subcategories);
         }
-
-        // Fetch products for the current category
-        const productRes = await axios.get(`/products/category/${categoryId}`);
-        setProducts(productRes.data);
 
       } catch (err) {
         console.error('Error fetching data', err);
@@ -194,7 +191,7 @@ const CategoryPage = () => {
         </aside>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold">{t("Collectible Figures")}</h1>
+            <h1 className="text-2xl font-semibold">{categoryName || t("Collectible Figures")}</h1>
             <select
               className="border px-3 py-2 rounded"
               value={sort}

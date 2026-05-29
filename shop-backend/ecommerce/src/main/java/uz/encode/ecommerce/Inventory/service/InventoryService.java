@@ -12,11 +12,17 @@ public interface InventoryService {
 
     void increaseStock(UUID productId, UUID warehouseId, Integer qty, String reason);
 
+    void decreaseStock(UUID productId, UUID warehouseId, Integer qty, String reason);
+
     void decreaseStock(UUID productId, UUID warehouseId, Integer qty, Order order);
 
     void transfer(TransferRequestDTO dto);
 
     List<StockResponseDTO> getStock();
 
+    int getTotalStock(UUID productId);
+
     List<InventoryTransactionDTO> getMovements();
+
+    int getStock(UUID productId, UUID warehouseId);
 }

@@ -29,9 +29,11 @@ const ProductCard = ({ product }) => {
 
     fetchFavorites();
   }, []);
+  const isOutOfStock = !product.available || (product.stock ?? 0) <= 0;
+
   return (
     <Link to={`/product/${product.id}`}>
-      <div className="border relative rounded shadow p-3 hover:shadow-md">
+      <div className={`border relative rounded shadow p-3 hover:shadow-md ${isOutOfStock ? 'opacity-70' : ''}`}>
         <FavoriteButton
           productId={product.id}
           favorites={favorites}
@@ -46,6 +48,11 @@ const ProductCard = ({ product }) => {
           alt={product.title}
           className="w-full h-48 object-contain mb-2"
         />
+        <div className="mb-2">
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${isOutOfStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+            {isOutOfStock ? 'Out of stock' : 'In stock'}
+          </span>
+        </div>
         <h2 className="font-bold text-lg">{product.title}</h2>
         <p className="text-green-600">{product.price}</p>
       </div>

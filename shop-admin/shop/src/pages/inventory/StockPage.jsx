@@ -47,7 +47,10 @@ export default function StockPage() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [adjustQty, setAdjustQty] = useState("");
+  const [qty, setQty] = useState("");
+
+  // NEW: mode = "adjust" | "receive"
+  const [mode, setMode] = useState("adjust");
 
   const [toast, setToast] = useState(null);
 
@@ -82,15 +85,17 @@ export default function StockPage() {
     setFiltered(f);
   }, [search, stocks]);
 
-  /* ================= ADJUST ================= */
-  const openAdjust = (item) => {
+  /* ================= OPEN ACTION ================= */
+  const openAction = (item, type) => {
     setSelected(item);
-    setAdjustQty("");
+    setQty("");
+    setMode(type);
     setDrawerOpen(true);
   };
 
+  /* ================= ADJUST ================= */
   const handleAdjust = async () => {
-    if (!adjustQty) {
+    if (!qty) {
       showToast("Enter quantity", "error");
       return;
     }
@@ -100,17 +105,46 @@ export default function StockPage() {
         params: {
           productId: selected.productId,
           warehouseId: selected.warehouseId,
-          qty: adjustQty,
+          qty: qty,
           reason: "Manual adjustment",
         },
       });
 
-      showToast("Stock updated");
+      showToast("Stock adjusted");
       setDrawerOpen(false);
       fetchStock();
     } catch {
       showToast("Adjustment failed", "error");
     }
+  };
+
+  /* ================= RECEIVE ================= */
+  const handleReceive = async () => {
+    if (!qty) {
+      showToast("Enter quantity", "error");
+      return;
+    }
+
+    try {
+      await axios.post("/inventory/receive", null, {
+        params: {
+          productId: selected.productId,
+          warehouseId: selected.warehouseId,
+          qty: qty,
+        },
+      });
+
+      showToast("Stock received");
+      setDrawerOpen(false);
+      fetchStock();
+    } catch {
+      showToast("Receive failed", "error");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (mode === "adjust") handleAdjust();
+    else handleReceive();
   };
 
   return (
@@ -124,21 +158,17 @@ export default function StockPage() {
         <h2 className="text-xl font-bold">Stock</h2>
         <p className="text-sm text-slate-500 mb-4">{stocks.length} records</p>
 
-        {/* HEADER */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-3 text-slate-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search stock..."
-                className="border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
-            </div>
+        {/* SEARCH */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-3 text-slate-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search stock..."
+              className="border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
           </div>
-
         </div>
 
         {/* TABLE */}
@@ -167,12 +197,19 @@ export default function StockPage() {
                     <td className="px-4 py-3 font-bold text-indigo-600">
                       {s.quantity}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 flex gap-2">
                       <button
-                        onClick={() => openAdjust(s)}
+                        onClick={() => openAction(s, "adjust")}
                         className="px-3 py-1 text-xs bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100"
                       >
                         Adjust
+                      </button>
+
+                      <button
+                        onClick={() => openAction(s, "receive")}
+                        className="px-3 py-1 text-xs bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100"
+                      >
+                        Receive
                       </button>
                     </td>
                   </tr>
@@ -200,7 +237,9 @@ export default function StockPage() {
         {/* HEADER */}
         <div className="flex justify-between px-6 py-4 border-b">
           <div>
-            <h2 className="text-lg font-bold">Adjust Stock</h2>
+            <h2 className="text-lg font-bold">
+              {mode === "adjust" ? "Adjust Stock" : "Receive Stock"}
+            </h2>
             <p className="text-xs text-slate-400">
               {selected?.productName} ({selected?.warehouseName})
             </p>
@@ -211,26 +250,26 @@ export default function StockPage() {
 
         {/* BODY */}
         <div className="p-6 space-y-4">
-
           <Field label="Quantity">
             <input
               type="number"
-              value={adjustQty}
-              onChange={(e) => setAdjustQty(e.target.value)}
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
               className={inputCls}
               placeholder="Enter quantity"
             />
           </Field>
-
         </div>
 
         {/* FOOTER */}
         <div className="p-6 border-t">
           <button
-            onClick={handleAdjust}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl"
+            onClick={handleSubmit}
+            className={`w-full text-white py-2 rounded-xl
+              ${mode === "adjust" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-emerald-600 hover:bg-emerald-700"}
+            `}
           >
-            Confirm Adjustment
+            {mode === "adjust" ? "Confirm Adjustment" : "Confirm Receive"}
           </button>
         </div>
 

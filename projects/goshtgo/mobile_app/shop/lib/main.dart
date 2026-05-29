@@ -34,6 +34,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/locale_provider.dart';
 import 'core/network_manager.dart';
 import 'l10n/app_localizations.dart';
+import 'widgets/under_development_banner.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -187,7 +188,12 @@ class MyApp extends StatelessWidget {
           builder: (context, child) {
             return Stack(
               children: [
-                child ?? const SizedBox(),
+                Column(
+                  children: [
+                    const UnderDevelopmentBanner(),
+                    Expanded(child: child ?? const SizedBox()),
+                  ],
+                ),
                 if (!hasInternet) NoInternetOverlay(),
               ],
             );

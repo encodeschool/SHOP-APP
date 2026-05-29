@@ -39,7 +39,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> getFeatured();
 
-    Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, String sort, Pageable pageable);
+    Page<ProductResponseDTO> getFiltered(List<String> brands, Boolean inStock, Double maxPrice, UUID categoryId, String sort, Pageable pageable);
 
     List<ProductAttributeDTO> findByCategoryId(UUID categoryId); // UPDATED: Use DTO
 

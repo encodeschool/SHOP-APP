@@ -61,10 +61,10 @@ public class ProductResponseDTO {
         this.lang = language;
         
         this.price = product.getPrice();
-        this.quantity = product.getQuantity();
+        this.quantity = 0;
         this.available = product.isAvailable();
         this.featured = product.isFeatured();
-        this.stock = product.getStock();
+        this.stock = null;
         this.condition = product.getCondition() != null ? product.getCondition() : null;
         this.createdAt = product.getCreatedAt();
         this.user = product.getUser() != null ? product.getUser() : null;

@@ -265,6 +265,12 @@ abstract class AppLocalizations {
   /// **'About Us'**
   String get aboutTitle;
 
+  /// No description provided for @websiteUnderDevelopmentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This website is under development. Thank you for your patience.'**
+  String get websiteUnderDevelopmentMessage;
+
   /// No description provided for @aboutSubtitle.
   ///
   /// In en, this message translates to:

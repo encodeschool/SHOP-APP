@@ -49,11 +49,9 @@ public class Product {
     private String description;
 
     private BigDecimal price;
-    private int quantity;
-    private boolean available = true;
-    private boolean featured; // Flag for featured products
 
-    private Integer stock;
+    private boolean available = true;
+    private boolean featured;
 
     @Enumerated(EnumType.STRING)
     private ProductCondition condition;
@@ -90,10 +88,10 @@ public class Product {
 
     private boolean isInStock;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductAttributeValue> attributes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductTranslation> translations = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -112,20 +110,4 @@ public class Product {
         pav.setProduct(this);
         this.attributes.add(pav);
     }
-
-    public void decreaseStock(int qty) {
-        if (this.stock == null) this.stock = 0;
-
-        if (this.stock < qty) {
-            throw new RuntimeException("Not enough stock for product: " + this.title);
-        }
-
-        this.stock -= qty;
-    }
-
-    public void increaseStock(int qty) {
-        if (this.stock == null) this.stock = 0;
-        this.stock += qty;
-    }
-
 }
