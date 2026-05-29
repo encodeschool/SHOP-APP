@@ -93,31 +93,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About Us';
 
   @override
-  String get websiteUnderDevelopmentMessage => 'This website is under development. Thank you for your patience.';
+  String get websiteUnderDevelopmentMessage =>
+      'This website is under development. Thank you for your patience.';
 
   @override
   String get aboutSubtitle => '🥩 About Us — Honest meat of a new generation';
 
   @override
-  String get aboutDescription => 'We created GoshtGo to change the meat buying culture in Uzbekistan. It is important for us that every family gets fresh, halal, and safe meat, without compromises or disappointments.';
+  String get aboutDescription =>
+      'We created GoshtGo to change the meat buying culture in Uzbekistan. It is important for us that every family gets fresh, halal, and safe meat, without compromises or disappointments.';
 
   @override
   String get aboutStopTitle => 'What we want to stop forever';
 
   @override
-  String get aboutStopList => 'We don\'t want to see:\n\n• meat wrapped in old paper at the market;\n• people touching products with bare hands;\n• flies around, ruining quality;\n• meat staying in heat for 1–2 hours in summer, losing freshness and taste;\n• customers being cheated with bones, fat or extra pieces.';
+  String get aboutStopList =>
+      'We don\'t want to see:\n\n• meat wrapped in old paper at the market;\n• people touching products with bare hands;\n• flies around, ruining quality;\n• meat staying in heat for 1–2 hours in summer, losing freshness and taste;\n• customers being cheated with bones, fat or extra pieces.';
 
   @override
   String get aboutSolutionTitle => 'Our solution';
 
   @override
-  String get aboutSolutionList => '• Meat undergoes halal slaughter and sterile processing.\n• Each order is hermetically packed and delivered in chilled containers at no more than +4 °C.\n• The process is transparent — from receipt to delivery.\n• You always get accurate weight and honest price, without bones or extra fat.';
+  String get aboutSolutionList =>
+      '• Meat undergoes halal slaughter and sterile processing.\n• Each order is hermetically packed and delivered in chilled containers at no more than +4 °C.\n• The process is transparent — from receipt to delivery.\n• You always get accurate weight and honest price, without bones or extra fat.';
 
   @override
   String get aboutPhilosophyTitle => 'Our philosophy';
 
   @override
-  String get aboutPhilosophyText => 'For us, meat is purity, respect, and trust. We want every family to know: for their money, they buy affordable, premium, and truly halal meat. We don’t just sell a product — we change consumption culture, making purchases safe, honest, and worthy of modern Tashkent. 💡 GoshtGo — new quality of meat market in Uzbekistan. From farm to kitchen, we control every step so your table always has clean, fresh, honest meat — without deception or compromises.';
+  String get aboutPhilosophyText =>
+      'For us, meat is purity, respect, and trust. We want every family to know: for their money, they buy affordable, premium, and truly halal meat. We don’t just sell a product — we change consumption culture, making purchases safe, honest, and worthy of modern Tashkent. 💡 GoshtGo — new quality of meat market in Uzbekistan. From farm to kitchen, we control every step so your table always has clean, fresh, honest meat — without deception or compromises.';
 
   @override
   String get cartTitle => 'Your Cart';
@@ -252,7 +257,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactTitle => 'Contacts';
 
   @override
-  String get contactSubtitle => 'We are always happy to answer your questions, suggestions, and feedback. Contact us in any convenient way — we will respond as soon as possible.';
+  String get contactSubtitle =>
+      'We are always happy to answer your questions, suggestions, and feedback. Contact us in any convenient way — we will respond as soon as possible.';
 
   @override
   String get contactUs => 'Contact Us';
@@ -288,73 +294,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliveryTitle => 'Delivery';
 
   @override
-  String get deliveryHeader => '🚚 GoshtGo delivery — freshness straight to your table';
+  String get deliveryHeader =>
+      '🚚 GoshtGo delivery — freshness straight to your table';
 
   @override
-  String get deliveryText1 => 'We deliver fresh meat in Tashkent with quality guarantee and punctuality.';
+  String get deliveryText1 =>
+      'We deliver fresh meat in Tashkent with quality guarantee and punctuality.';
 
   @override
   String get standardDelivery => 'Standard Delivery';
 
   @override
-  String get standardDeliveryText => '• Free in Tashkent — for orders over 300,000 UZS.\n• 20,000 UZS — for orders under 300,000 UZS.\n• Minimum order amount excludes delivery cost.';
+  String get standardDeliveryText =>
+      '• Free in Tashkent — for orders over 300,000 UZS.\n• 20,000 UZS — for orders under 300,000 UZS.\n• Minimum order amount excludes delivery cost.';
 
   @override
   String get expressDelivery => 'Express Delivery';
 
   @override
-  String get expressDeliveryText => '• 40,000 UZS — delivery on the day of order.\n• 3–5 hours — if order is placed before 18:00.\n• Payment — online by card or QR after preparation.';
+  String get expressDeliveryText =>
+      '• 40,000 UZS — delivery on the day of order.\n• 3–5 hours — if order is placed before 18:00.\n• Payment — online by card or QR after preparation.';
 
   @override
   String get customDelivery => 'Custom Solutions';
 
   @override
-  String get customDeliveryText => 'Want delivery exactly on time or outside standard Tashkent zone? Contact our manager — we will adjust the route and offer the best solution.';
+  String get customDeliveryText =>
+      'Want delivery exactly on time or outside standard Tashkent zone? Contact our manager — we will adjust the route and offer the best solution.';
 
   @override
   String get guaranteeHeader => '💡 GoshtGo guarantees:';
 
   @override
-  String get guaranteeText => 'Every order arrives fresh, neatly packaged, and on time.';
+  String get guaranteeText =>
+      'Every order arrives fresh, neatly packaged, and on time.';
 
   @override
   String get noteHeader => 'ℹ️ Please note';
 
   @override
-  String get noteText => 'Each meat is cut manually specifically for your order to preserve taste and texture.\n\nThe final weight may differ ±10–15 %. We will inform the exact amount after preparation and agree if difference exceeds 10%.';
+  String get noteText =>
+      'Each meat is cut manually specifically for your order to preserve taste and texture.\n\nThe final weight may differ ±10–15 %. We will inform the exact amount after preparation and agree if difference exceeds 10%.';
 
   @override
-  String get additionalGuarantee => '💡 GoshtGo guarantees: honesty, transparency, and taste born at cutting time.';
+  String get additionalGuarantee =>
+      '💡 GoshtGo guarantees: honesty, transparency, and taste born at cutting time.';
 
   @override
-  String get appBenefitsHeader => '📱 More convenient and profitable in the GoshtGo app';
+  String get appBenefitsHeader =>
+      '📱 More convenient and profitable in the GoshtGo app';
 
   @override
-  String get appBenefitsText => '• Increased cashback on all orders.\n• Easy reorder in one click.\n• Fast notifications about status and promotions.\n\nDownload GoshtGo app for iOS or Android — your favorite steak at one touch.';
+  String get appBenefitsText =>
+      '• Increased cashback on all orders.\n• Easy reorder in one click.\n• Fast notifications about status and promotions.\n\nDownload GoshtGo app for iOS or Android — your favorite steak at one touch.';
 
   @override
   String get cashbackHeader => '💎 Cashback for purchases';
 
   @override
-  String get cashbackText => 'Pay via QR and receive 1% cashback from order amount. Additionally, cashback is applied to products with \'Cashback\' icon.\n\nHow to use bonuses:\n• 1 bonus = 1 UZS — can pay up to 100% of order.\n• Bonuses valid 1 year from accrual.\n• Bonuses and promo codes do not combine.\n• Check balance in GoshtGo app.\n\n💡 Every purchase — tasty and profitable.';
+  String get cashbackText =>
+      'Pay via QR and receive 1% cashback from order amount. Additionally, cashback is applied to products with \'Cashback\' icon.\n\nHow to use bonuses:\n• 1 bonus = 1 UZS — can pay up to 100% of order.\n• Bonuses valid 1 year from accrual.\n• Bonuses and promo codes do not combine.\n• Check balance in GoshtGo app.\n\n💡 Every purchase — tasty and profitable.';
 
   @override
   String get cardPaymentHeader => '💳 Payment by bank card';
 
   @override
-  String get cardPaymentText => 'We accept UZCARD, HUMO, Uzum Bank, Mastercard, Visa, etc. Withdrawals only after preparation.\n\n💡 GoshtGo tip: pay by card or QR — faster, safer, and more profitable.';
+  String get cardPaymentText =>
+      'We accept UZCARD, HUMO, Uzum Bank, Mastercard, Visa, etc. Withdrawals only after preparation.\n\n💡 GoshtGo tip: pay by card or QR — faster, safer, and more profitable.';
 
   @override
-  String get chilledDeliveryHeader => '❄️ Chilled delivery — freshness under control';
+  String get chilledDeliveryHeader =>
+      '❄️ Chilled delivery — freshness under control';
 
   @override
-  String get chilledDeliveryText => 'Orders are packed in containers below +4°C and delivered in refrigerated trucks. Even in heat, meat stays perfectly fresh.\n\n💡 GoshtGo guarantees: from factory to door — perfect freshness.';
+  String get chilledDeliveryText =>
+      'Orders are packed in containers below +4°C and delivered in refrigerated trucks. Even in heat, meat stays perfectly fresh.\n\n💡 GoshtGo guarantees: from factory to door — perfect freshness.';
 
   @override
   String get qualityHeader => '🏆 Quality guarantee 100%';
 
   @override
-  String get qualityText => 'We offer only top-quality meat. If product doesn’t meet expectations — we refund 100% or replace.\n\n💡 Your peace of mind is our main quality standard.\n\n✨ GoshtGo guarantees: every purchase should delight.';
+  String get qualityText =>
+      'We offer only top-quality meat. If product doesn’t meet expectations — we refund 100% or replace.\n\n💡 Your peace of mind is our main quality standard.\n\n✨ GoshtGo guarantees: every purchase should delight.';
 
   @override
   String get appTitle => 'GoshtGo';
@@ -502,34 +523,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qualityTitle => 'Quality';
 
   @override
-  String get qualityHeader1 => '🌿 GoshtGo — a new name in premium meat in Uzbekistan';
+  String get qualityHeader1 =>
+      '🌿 GoshtGo — a new name in premium meat in Uzbekistan';
 
   @override
-  String get qualityText1 => 'We start today to set the future of quality. From day one, we operate with principles that make the global gastronomic market a standard: honest origin, respect for nature, and taste created by time, not haste.';
+  String get qualityText1 =>
+      'We start today to set the future of quality. From day one, we operate with principles that make the global gastronomic market a standard: honest origin, respect for nature, and taste created by time, not haste.';
 
   @override
   String get qualityHeader2 => 'Clean from farm to plate';
 
   @override
-  String get qualityText2 => 'Meat quality begins with the land on which the feed grows. Our farmer partners grow it on their own fields, free from pesticides, where animals live on open pastures, move naturally, and never encounter growth hormones, antibiotics, or appetite stimulants.';
+  String get qualityText2 =>
+      'Meat quality begins with the land on which the feed grows. Our farmer partners grow it on their own fields, free from pesticides, where animals live on open pastures, move naturally, and never encounter growth hormones, antibiotics, or appetite stimulants.';
 
   @override
   String get qualityHeader3 => 'Natural rhythm';
 
   @override
-  String get qualityText3 => 'We believe great meat is not born in a hurry. Healthy animals grow in harmony and without stress, creating subtle taste, proper texture, and natural aroma unreachable with industrial methods.';
+  String get qualityText3 =>
+      'We believe great meat is not born in a hurry. Healthy animals grow in harmony and without stress, creating subtle taste, proper texture, and natural aroma unreachable with industrial methods.';
 
   @override
   String get qualityHeader4 => 'Master handwork';
 
   @override
-  String get qualityText4 => 'Each delivery is select meat of young animals, delivered daily and butchered by experienced hands. This preserves texture and rich flavor valued by chefs and true gourmets.';
+  String get qualityText4 =>
+      'Each delivery is select meat of young animals, delivered daily and butchered by experienced hands. This preserves texture and rich flavor valued by chefs and true gourmets.';
 
   @override
   String get qualityHeader5 => '💡 GoshtGo is more than a store.';
 
   @override
-  String get qualityText5 => 'It is a culture of responsible meat in Tashkent: from pasture to your kitchen — without compromise, intermediaries, or loss of freshness.';
+  String get qualityText5 =>
+      'It is a culture of responsible meat in Tashkent: from pasture to your kitchen — without compromise, intermediaries, or loss of freshness.';
 
   @override
   String get skip => 'Skip';
@@ -544,19 +571,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboarding_title_1 => 'Welcome to Gosht Go!';
 
   @override
-  String get onboarding_subtitle_1 => 'Your trusted marketplace for fresh meat and groceries.';
+  String get onboarding_subtitle_1 =>
+      'Your trusted marketplace for fresh meat and groceries.';
 
   @override
   String get onboarding_title_2 => 'Buy & Sell Easily';
 
   @override
-  String get onboarding_subtitle_2 => 'Join our community of local sellers and discover great deals.';
+  String get onboarding_subtitle_2 =>
+      'Join our community of local sellers and discover great deals.';
 
   @override
   String get onboarding_title_3 => 'Fast & Reliable Delivery';
 
   @override
-  String get onboarding_subtitle_3 => 'Get your orders delivered quickly right to your doorstep.';
+  String get onboarding_subtitle_3 =>
+      'Get your orders delivered quickly right to your doorstep.';
 
   @override
   String get notHaveAnAccount => 'Don\'t have an account? Create a new one.';
@@ -604,7 +634,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyTitle => 'Ask me anything about meals!';
 
   @override
-  String get emptySubtitle => 'Try: \"Quick dinner under 30 mins\" or \"Healthy snacks\"';
+  String get emptySubtitle =>
+      'Try: \"Quick dinner under 30 mins\" or \"Healthy snacks\"';
 
   @override
   String get loadingText => 'Chef AI is thinking...';
@@ -625,7 +656,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get availableInShop => 'Available in shop';
 
   @override
-  String get notAvailable => 'None of the suggested meats are currently available.';
+  String get notAvailable =>
+      'None of the suggested meats are currently available.';
 
   @override
   String get pending => 'Pending';

@@ -93,31 +93,37 @@ class AppLocalizationsUz extends AppLocalizations {
   String get aboutTitle => 'Biz haqimizda';
 
   @override
-  String get websiteUnderDevelopmentMessage => 'Veb-sayt ishlab chiqilmoqda. Sabringiz uchun rahmat.';
+  String get websiteUnderDevelopmentMessage =>
+      'Veb-sayt ishlab chiqilmoqda. Sabringiz uchun rahmat.';
 
   @override
-  String get aboutSubtitle => '🥩 Biz haqimizda — Yangi avlodning halol go‘shti';
+  String get aboutSubtitle =>
+      '🥩 Biz haqimizda — Yangi avlodning halol go‘shti';
 
   @override
-  String get aboutDescription => 'Biz GoshtGo\'ni O‘zbekistonda go‘sht xarid qilish madaniyatini o‘zgartirish uchun yaratdik. Har bir oilaga yangi, halol va xavfsiz go‘sht yetib borishini ta’minlash biz uchun muhim, kompromislar yoki hafsalasizlik bo‘lmasin.';
+  String get aboutDescription =>
+      'Biz GoshtGo\'ni O‘zbekistonda go‘sht xarid qilish madaniyatini o‘zgartirish uchun yaratdik. Har bir oilaga yangi, halol va xavfsiz go‘sht yetib borishini ta’minlash biz uchun muhim, kompromislar yoki hafsalasizlik bo‘lmasin.';
 
   @override
   String get aboutStopTitle => 'Biz doimiy ravishda nimani to‘xtatmoqchimiz';
 
   @override
-  String get aboutStopList => 'Biz buni ko‘rishni xohlamaymiz:\n\n• bozorda go‘shtning eski qog‘ozga o‘ralishi;\n• mahsulotni yalang‘och qo‘llar bilan ushlash;\n• sifatga zarar beruvchi chumolilar;\n• yozda go‘sht 1–2 soat issiqda qolishi;\n• mijozlarga suyak, yog‘ yoki ortiqcha bo‘laklar qo‘shilishi.';
+  String get aboutStopList =>
+      'Biz buni ko‘rishni xohlamaymiz:\n\n• bozorda go‘shtning eski qog‘ozga o‘ralishi;\n• mahsulotni yalang‘och qo‘llar bilan ushlash;\n• sifatga zarar beruvchi chumolilar;\n• yozda go‘sht 1–2 soat issiqda qolishi;\n• mijozlarga suyak, yog‘ yoki ortiqcha bo‘laklar qo‘shilishi.';
 
   @override
   String get aboutSolutionTitle => 'Bizning yechimimiz';
 
   @override
-  String get aboutSolutionList => '• Go‘sht halol so‘yish va steril sharoitda kesishdan o‘tadi.\n• Har bir buyurtma muhrlangan holda +4 °C dan oshmaydigan sovutilgan konteynerlarda yetkaziladi.\n• Jarayon shaffof — qabul qilishdan yetkazib berishgacha.\n• Siz har doim aniq vazn va halol narx olasiz, suyak va ortiqcha yog‘siz.';
+  String get aboutSolutionList =>
+      '• Go‘sht halol so‘yish va steril sharoitda kesishdan o‘tadi.\n• Har bir buyurtma muhrlangan holda +4 °C dan oshmaydigan sovutilgan konteynerlarda yetkaziladi.\n• Jarayon shaffof — qabul qilishdan yetkazib berishgacha.\n• Siz har doim aniq vazn va halol narx olasiz, suyak va ortiqcha yog‘siz.';
 
   @override
   String get aboutPhilosophyTitle => 'Bizning falsafamiz';
 
   @override
-  String get aboutPhilosophyText => 'Biz uchun go‘sht tozalik, hurmat va ishonchdir. Har bir oilaga shuni bilishini istaymiz: o‘z pullari evaziga ular arzon, premium va haqiqatan halol go‘sht sotib olishadi. Biz faqat mahsulot sotmaymiz — biz iste’mol madaniyatini o‘zgartiramiz, xaridlar xavfsiz, halol va zamonaviy Toshkentga loyiq bo‘lsin. 💡 GoshtGo — O‘zbekiston go‘sht bozorining yangi sifati. Ferma’dan oshxonangizgacha har bir qadamni nazorat qilamiz, shunda stolingizda doimo toza, yangi va halol go‘sht bo‘ladi — aldamchilik va kompromisslarsiz.';
+  String get aboutPhilosophyText =>
+      'Biz uchun go‘sht tozalik, hurmat va ishonchdir. Har bir oilaga shuni bilishini istaymiz: o‘z pullari evaziga ular arzon, premium va haqiqatan halol go‘sht sotib olishadi. Biz faqat mahsulot sotmaymiz — biz iste’mol madaniyatini o‘zgartiramiz, xaridlar xavfsiz, halol va zamonaviy Toshkentga loyiq bo‘lsin. 💡 GoshtGo — O‘zbekiston go‘sht bozorining yangi sifati. Ferma’dan oshxonangizgacha har bir qadamni nazorat qilamiz, shunda stolingizda doimo toza, yangi va halol go‘sht bo‘ladi — aldamchilik va kompromisslarsiz.';
 
   @override
   String get cartTitle => 'Savatingiz';
@@ -240,7 +246,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get termsRequired => 'Siz shartlarni qabul qilishingiz kerak';
 
   @override
-  String get userNotFound => 'Foydalanuvchi topilmadi. Iltimos, qayta tizimga kiring.';
+  String get userNotFound =>
+      'Foydalanuvchi topilmadi. Iltimos, qayta tizimga kiring.';
 
   @override
   String get paymentSuccess => 'To\'lov muvaffaqiyatli amalga oshirildi';
@@ -252,7 +259,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get contactTitle => 'Kontaktlar';
 
   @override
-  String get contactSubtitle => 'Savollaringiz, takliflaringiz va fikr-mulohazalaringiz uchun doimo tayyormiz. Biz bilan qulay yo‘l bilan bog‘laning — biz iloji boricha tezroq javob beramiz.';
+  String get contactSubtitle =>
+      'Savollaringiz, takliflaringiz va fikr-mulohazalaringiz uchun doimo tayyormiz. Biz bilan qulay yo‘l bilan bog‘laning — biz iloji boricha tezroq javob beramiz.';
 
   @override
   String get contactUs => 'Biz bilan bog‘laning';
@@ -288,73 +296,87 @@ class AppLocalizationsUz extends AppLocalizations {
   String get deliveryTitle => 'Yetkazib berish';
 
   @override
-  String get deliveryHeader => '🚚 GoshtGo yetkazib berish — to‘g‘ridan-to‘g‘ri stolingizga';
+  String get deliveryHeader =>
+      '🚚 GoshtGo yetkazib berish — to‘g‘ridan-to‘g‘ri stolingizga';
 
   @override
-  String get deliveryText1 => 'Biz Toshkentda yangi go‘shtni sifat kafolati va aniq vaqt bilan yetkazib beramiz.';
+  String get deliveryText1 =>
+      'Biz Toshkentda yangi go‘shtni sifat kafolati va aniq vaqt bilan yetkazib beramiz.';
 
   @override
   String get standardDelivery => 'Standart yetkazib berish';
 
   @override
-  String get standardDeliveryText => '• Toshkent bo‘ylab bepul — buyurtma 300 000 so‘mdan oshsa.\n• 20 000 so‘m — buyurtma 300 000 so‘mgacha.\n• Minimal buyurtma summasi yetkazib berish xarajatini o‘z ichiga olmaydi.';
+  String get standardDeliveryText =>
+      '• Toshkent bo‘ylab bepul — buyurtma 300 000 so‘mdan oshsa.\n• 20 000 so‘m — buyurtma 300 000 so‘mgacha.\n• Minimal buyurtma summasi yetkazib berish xarajatini o‘z ichiga olmaydi.';
 
   @override
   String get expressDelivery => 'Ekspress yetkazib berish';
 
   @override
-  String get expressDeliveryText => '• 40 000 so‘m — buyurtma berilgan kun yetkazib berish.\n• 3–5 soat — buyurtma 18:00 gacha qilingan bo‘lsa.\n• To‘lov — tayyorlashdan keyin karta yoki QR orqali.';
+  String get expressDeliveryText =>
+      '• 40 000 so‘m — buyurtma berilgan kun yetkazib berish.\n• 3–5 soat — buyurtma 18:00 gacha qilingan bo‘lsa.\n• To‘lov — tayyorlashdan keyin karta yoki QR orqali.';
 
   @override
   String get customDelivery => 'Individual yechimlar';
 
   @override
-  String get customDeliveryText => 'Aniq vaqtda yoki standart hududdan tashqarida yetkazib berishni xohlaysizmi? Bizning menejer bilan bog‘laning — marshrutni moslashtiramiz va eng yaxshi yechimni taklif qilamiz.';
+  String get customDeliveryText =>
+      'Aniq vaqtda yoki standart hududdan tashqarida yetkazib berishni xohlaysizmi? Bizning menejer bilan bog‘laning — marshrutni moslashtiramiz va eng yaxshi yechimni taklif qilamiz.';
 
   @override
   String get guaranteeHeader => '💡 GoshtGo kafolatlaydi:';
 
   @override
-  String get guaranteeText => 'Har bir buyurtma yangi, tartibli qadoqlangan va o‘z vaqtida yetkaziladi.';
+  String get guaranteeText =>
+      'Har bir buyurtma yangi, tartibli qadoqlangan va o‘z vaqtida yetkaziladi.';
 
   @override
   String get noteHeader => 'ℹ️ E’tibor bering';
 
   @override
-  String get noteText => 'Har bir go‘sht sizning buyurtmangiz uchun maxsus qo‘lda kesiladi, ta’m va tuzilishini saqlash uchun.\n\nYakuni og‘irligi ±10–15 % farq qilishi mumkin. Tayyorlashdan so‘ng aniq summani xabar qilamiz va farq 10 % dan oshsa kelishamiz.';
+  String get noteText =>
+      'Har bir go‘sht sizning buyurtmangiz uchun maxsus qo‘lda kesiladi, ta’m va tuzilishini saqlash uchun.\n\nYakuni og‘irligi ±10–15 % farq qilishi mumkin. Tayyorlashdan so‘ng aniq summani xabar qilamiz va farq 10 % dan oshsa kelishamiz.';
 
   @override
-  String get additionalGuarantee => '💡 GoshtGo kafolatlaydi: halollik, oshkoralik va kesilgan paytdagi ta’m.';
+  String get additionalGuarantee =>
+      '💡 GoshtGo kafolatlaydi: halollik, oshkoralik va kesilgan paytdagi ta’m.';
 
   @override
   String get appBenefitsHeader => '📱 GoshtGo ilovasida qulay va foydali';
 
   @override
-  String get appBenefitsText => '• Barcha buyurtmalarda yuqori cashback.\n• Bir klikda oson qayta buyurtma.\n• Holat va aktsiyalar bo‘yicha tezkor bildirishnomalar.\n\niOS yoki Android uchun GoshtGo ilovasini yuklab oling — sevimli steyk bir tegish bilan.';
+  String get appBenefitsText =>
+      '• Barcha buyurtmalarda yuqori cashback.\n• Bir klikda oson qayta buyurtma.\n• Holat va aktsiyalar bo‘yicha tezkor bildirishnomalar.\n\niOS yoki Android uchun GoshtGo ilovasini yuklab oling — sevimli steyk bir tegish bilan.';
 
   @override
   String get cashbackHeader => '💎 Xaridlarda cashback';
 
   @override
-  String get cashbackText => 'QR orqali to‘lang va buyurtma summasidan 1% cashback oling. Qo‘shimcha, «Cashback» belgisiga ega mahsulotlarga ham cashback beriladi.\n\nBonuslardan foydalanish:\n• 1 bonus = 1 so‘m — buyurtmaning 100 % gacha to‘lash mumkin.\n• Bonuslar 1 yil davomida amal qiladi.\n• Bonuslar va promo kodlar birlashtirilmaydi.\n• Balansni GoshtGo ilovasida tekshiring.\n\n💡 Har bir xarid — mazali va foydali.';
+  String get cashbackText =>
+      'QR orqali to‘lang va buyurtma summasidan 1% cashback oling. Qo‘shimcha, «Cashback» belgisiga ega mahsulotlarga ham cashback beriladi.\n\nBonuslardan foydalanish:\n• 1 bonus = 1 so‘m — buyurtmaning 100 % gacha to‘lash mumkin.\n• Bonuslar 1 yil davomida amal qiladi.\n• Bonuslar va promo kodlar birlashtirilmaydi.\n• Balansni GoshtGo ilovasida tekshiring.\n\n💡 Har bir xarid — mazali va foydali.';
 
   @override
   String get cardPaymentHeader => '💳 Bank kartasi orqali to‘lov';
 
   @override
-  String get cardPaymentText => 'UZCARD, HUMO, Uzum Bank, Mastercard, Visa va boshqalarni qabul qilamiz. Faqat tayyorlashdan keyin yechib olinadi.\n\n💡 GoshtGo tavsiyasi: kartasi yoki QR orqali to‘lovni tanlang — tez, xavfsiz va foydali.';
+  String get cardPaymentText =>
+      'UZCARD, HUMO, Uzum Bank, Mastercard, Visa va boshqalarni qabul qilamiz. Faqat tayyorlashdan keyin yechib olinadi.\n\n💡 GoshtGo tavsiyasi: kartasi yoki QR orqali to‘lovni tanlang — tez, xavfsiz va foydali.';
 
   @override
-  String get chilledDeliveryHeader => '❄️ Sovutilgan yetkazib berish — nazorat ostida yangi';
+  String get chilledDeliveryHeader =>
+      '❄️ Sovutilgan yetkazib berish — nazorat ostida yangi';
 
   @override
-  String get chilledDeliveryText => 'Har bir buyurtma +4 °C dan yuqori bo‘lmagan konteynerlarda qadoqlanadi va sovutgichli mashinalarda yetkaziladi. Hatto issiqda go‘sht mukammal yangi bo‘ladi.\n\n💡 GoshtGo kafolatlaydi: zavoddan eshikgacha — mukammal yangi.';
+  String get chilledDeliveryText =>
+      'Har bir buyurtma +4 °C dan yuqori bo‘lmagan konteynerlarda qadoqlanadi va sovutgichli mashinalarda yetkaziladi. Hatto issiqda go‘sht mukammal yangi bo‘ladi.\n\n💡 GoshtGo kafolatlaydi: zavoddan eshikgacha — mukammal yangi.';
 
   @override
   String get qualityHeader => '🏆 100 % sifat kafolati';
 
   @override
-  String get qualityText => 'Faqat eng yuqori sifatli go‘shtni taklif qilamiz. Mahsulot kutilgan natijaga javob bermasa — 100 % qaytariladi yoki almashtiriladi.\n\n💡 Sizning xotirjamligingiz — bizning asosiy sifat standarti.\n\n✨ GoshtGo kafolatlaydi: har bir xarid zavq bag‘ishlashi kerak.';
+  String get qualityText =>
+      'Faqat eng yuqori sifatli go‘shtni taklif qilamiz. Mahsulot kutilgan natijaga javob bermasa — 100 % qaytariladi yoki almashtiriladi.\n\n💡 Sizning xotirjamligingiz — bizning asosiy sifat standarti.\n\n✨ GoshtGo kafolatlaydi: har bir xarid zavq bag‘ishlashi kerak.';
 
   @override
   String get appTitle => 'GoshtGo';
@@ -466,7 +488,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get productDetailTitle => 'Mahsulot tafsiloti';
 
   @override
-  String get pleaseLoginFavorite => 'Iltimos, sevimlilardan foydalanish uchun tizimga kiring.';
+  String get pleaseLoginFavorite =>
+      'Iltimos, sevimlilardan foydalanish uchun tizimga kiring.';
 
   @override
   String get addedToFavorites => 'Sevimlilarga qo\'shildi';
@@ -502,34 +525,40 @@ class AppLocalizationsUz extends AppLocalizations {
   String get qualityTitle => 'Sifat';
 
   @override
-  String get qualityHeader1 => '🌿 GoshtGo — Oʻzbekistonda premium goʻshtning yangi nomi';
+  String get qualityHeader1 =>
+      '🌿 GoshtGo — Oʻzbekistonda premium goʻshtning yangi nomi';
 
   @override
-  String get qualityText1 => 'Biz bugundan sifat kelajagini belgilashni boshlaymiz. Dastlabki kundan boshlab, biz jahon gastronomiya bozorini namunaga aylantiradigan tamoyillarga amal qilamiz: halol kelib chiqishi, tabiatga hurmat va vaqt bilan yaratilgan ta’m, shoshilmasdan.';
+  String get qualityText1 =>
+      'Biz bugundan sifat kelajagini belgilashni boshlaymiz. Dastlabki kundan boshlab, biz jahon gastronomiya bozorini namunaga aylantiradigan tamoyillarga amal qilamiz: halol kelib chiqishi, tabiatga hurmat va vaqt bilan yaratilgan ta’m, shoshilmasdan.';
 
   @override
   String get qualityHeader2 => 'Togʻdan idishga tozaligi';
 
   @override
-  String get qualityText2 => 'Goʻsht sifati yemlar oʻsadigan yer bilan boshlanadi. Bizning fermer hamkorlarimiz ularni pestitsidsiz maydonlarda yetishtiradilar, hayvonlar ochiq yaylovlarda yashaydi, tabiiy harakat qiladi va o‘sish gormonlari, antibiotiklar yoki ishtahani rag‘batlantiruvchi vositalar bilan tanishmaydi.';
+  String get qualityText2 =>
+      'Goʻsht sifati yemlar oʻsadigan yer bilan boshlanadi. Bizning fermer hamkorlarimiz ularni pestitsidsiz maydonlarda yetishtiradilar, hayvonlar ochiq yaylovlarda yashaydi, tabiiy harakat qiladi va o‘sish gormonlari, antibiotiklar yoki ishtahani rag‘batlantiruvchi vositalar bilan tanishmaydi.';
 
   @override
   String get qualityHeader3 => 'Tabiiy ritm';
 
   @override
-  String get qualityText3 => 'Biz ishonamiz: ajoyib goʻsht shoshilish bilan tugʻilmaydi. Sogʻlom hayvonlar uygʻunlik va stresssiz oʻsadi, bu nozik ta’m, to‘g‘ri tuzilma va tabiiy aromani yaratadi, sanoat usullari bilan erishib bo‘lmaydi.';
+  String get qualityText3 =>
+      'Biz ishonamiz: ajoyib goʻsht shoshilish bilan tugʻilmaydi. Sogʻlom hayvonlar uygʻunlik va stresssiz oʻsadi, bu nozik ta’m, to‘g‘ri tuzilma va tabiiy aromani yaratadi, sanoat usullari bilan erishib bo‘lmaydi.';
 
   @override
   String get qualityHeader4 => 'Ustalar qoʻli';
 
   @override
-  String get qualityText4 => 'Har bir yetkazib berish — bu yosh hayvonlarning saralangan goʻshti, u har kuni yetkazib beriladi va tajribali usta go‘shtchilar tomonidan qo‘lda bo‘linadi. Shu yo‘l bilan faqat haqiqiy to‘qimalar va boy ta’m saqlanadi, bu oshpazlar va haqiqiy gurmanlar qadrlaydi.';
+  String get qualityText4 =>
+      'Har bir yetkazib berish — bu yosh hayvonlarning saralangan goʻshti, u har kuni yetkazib beriladi va tajribali usta go‘shtchilar tomonidan qo‘lda bo‘linadi. Shu yo‘l bilan faqat haqiqiy to‘qimalar va boy ta’m saqlanadi, bu oshpazlar va haqiqiy gurmanlar qadrlaydi.';
 
   @override
   String get qualityHeader5 => '💡 GoshtGo — bu doʻkondan koʻproq.';
 
   @override
-  String get qualityText5 => 'Bu Toshkentda mas’uliyatli goʻsht madaniyati: yaylovdan oshxonangizgacha — kompromissiz, ortiqcha vositachisiz va yangilikni yo‘qotmasdan.';
+  String get qualityText5 =>
+      'Bu Toshkentda mas’uliyatli goʻsht madaniyati: yaylovdan oshxonangizgacha — kompromissiz, ortiqcha vositachisiz va yangilikni yo‘qotmasdan.';
 
   @override
   String get skip => 'O‘tkazib yuborish';
@@ -544,19 +573,22 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onboarding_title_1 => 'Gosht Go! ga xush kelibsiz!';
 
   @override
-  String get onboarding_subtitle_1 => 'Go‘sht va oziq-ovqat mahsulotlari uchun ishonchli bozor joyingiz.';
+  String get onboarding_subtitle_1 =>
+      'Go‘sht va oziq-ovqat mahsulotlari uchun ishonchli bozor joyingiz.';
 
   @override
   String get onboarding_title_2 => 'Oson xarid va savdo qiling';
 
   @override
-  String get onboarding_subtitle_2 => 'Mahalliy sotuvchilar hamjamiyatiga qo‘shiling va ajoyib takliflarni toping.';
+  String get onboarding_subtitle_2 =>
+      'Mahalliy sotuvchilar hamjamiyatiga qo‘shiling va ajoyib takliflarni toping.';
 
   @override
   String get onboarding_title_3 => 'Tez va ishonchli yetkazib berish';
 
   @override
-  String get onboarding_subtitle_3 => 'Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz.';
+  String get onboarding_subtitle_3 =>
+      'Buyurtmalaringizni tezda eshigingizgacha yetkazib beramiz.';
 
   @override
   String get notHaveAnAccount => 'Akauntingiz yo\'qmi? Yangisini yarating.';
@@ -583,7 +615,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get registrationSuccess => 'Siz muvaffaqiyatli ro‘yxatdan o‘tdingiz';
 
   @override
-  String get registrationFailed => 'Ro‘yxatdan o‘tish muvaffaqiyatsiz. Qayta urinib ko‘ring.';
+  String get registrationFailed =>
+      'Ro‘yxatdan o‘tish muvaffaqiyatsiz. Qayta urinib ko‘ring.';
 
   @override
   String get aiHelp => 'AI yordami';
@@ -604,7 +637,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get emptyTitle => 'Ovqatlar haqida istalgan narsani so‘rang!';
 
   @override
-  String get emptySubtitle => 'Masalan: \"30 daqiqada tez kechki ovqat\" yoki \"Sog‘lom gazaklar\"';
+  String get emptySubtitle =>
+      'Masalan: \"30 daqiqada tez kechki ovqat\" yoki \"Sog‘lom gazaklar\"';
 
   @override
   String get loadingText => 'AI oshpaz o‘ylamoqda...';
@@ -625,7 +659,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get availableInShop => 'Do‘konda mavjud';
 
   @override
-  String get notAvailable => 'Taklif etilgan go‘sht turlari hozircha mavjud emas.';
+  String get notAvailable =>
+      'Taklif etilgan go‘sht turlari hozircha mavjud emas.';
 
   @override
   String get pending => 'Kutilmoqda';
