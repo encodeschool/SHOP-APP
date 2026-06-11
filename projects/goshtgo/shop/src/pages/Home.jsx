@@ -278,7 +278,7 @@ const Home = () => {
                       : '/placeholder.jpg'
                   }
                   alt={product.title}
-                  className="h-40 object-cover w-full"
+                  className="object-cover w-full"
                 />
                 <div className="flex items-stretch justify-between">
                   <div>
@@ -321,27 +321,27 @@ const Home = () => {
       {/* Meal Section Goes Here */}
       <div className='container mx-auto px-4 md:px-10 py-3'>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 py-10">
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/100/rkcgt2qjs04d6hft2ryxqaw4tvfenzmf/midi_uzhin.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/159/ruq2jn4e1apspv1bjjqir47o0yncqjup/banner_749x360_2023.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('For Home Supper')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/3ca/fs4l14f2mwzdiy0datcbsr3bcy5kwoij/banner_360kh360_shashlyk_new.webp)"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/3ca/fs4l14f2mwzdiy0datcbsr3bcy5kwoij/banner_360kh360_shashlyk_new.webp)"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('For Shashlik')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/f71/42ili6yme5omfvd7xagaei11c46rk3ph/banner_360kh360_kotlety_new.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/f71/42ili6yme5omfvd7xagaei11c46rk3ph/banner_360kh360_kotlety_new.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('For Burgers')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ed7/l9p288v02doy0y7nppl6zhjndil3tn0o/kolbaski.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ed7/l9p288v02doy0y7nppl6zhjndil3tn0o/kolbaski.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Sausages')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/560/ijvhpcbgsk23pabzooybqgyd2h2g5lr6/banner_360kh360_kulinaria.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/560/ijvhpcbgsk23pabzooybqgyd2h2g5lr6/banner_360kh360_kulinaria.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Cooking')}
             </p>
@@ -417,11 +417,17 @@ const Home = () => {
                           </>
                         )}
                       </p>
-                      <FavoriteButton
-                        productId={product.id}
-                        favorites={favorites}
-                        setFavorites={setFavorites}
-                      />
+                      <button
+                        className={`absolute top-2 right-2 z-10 bg-white rounded-full p-3 ${
+                          favorites.includes(product.id) ? 'text-red-500' : 'text-gray-400'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleFavoriteToggle(product.id);
+                        }}
+                      >
+                        <FaHeart size={25} />
+                      </button>
                       <img
                         src={
                           product.imageUrls?.[0]
@@ -429,7 +435,7 @@ const Home = () => {
                             : '/placeholder.jpg'
                         }
                         alt={product.title}
-                        className="h-40 object-contain w-full"
+                        className="object-contain w-full"
                       />
                       <div className="flex items-center justify-between">
                         <div>
@@ -437,6 +443,11 @@ const Home = () => {
                           <p className="text-red-600 text-3xl font-bold mt-2">{product.price} {product.currency?.symbol}</p>
                           <CompareButton product={product} />
                         </div>
+                        <FavoriteButton
+                          productId={product.id}
+                          favorites={favorites}
+                          setFavorites={setFavorites}
+                        />
                         <button
                           className="bg-red-600 p-3 flex items-center justify-center absolute bottom-0 right-0 rounded-br-xl h-[50px] w-[50px] text-white hover:bg-red-600"
                           onClick={(e) => {
@@ -632,7 +643,7 @@ const Home = () => {
                           : '/placeholder.jpg'
                       }
                       alt={product.title}
-                      className="h-40 object-contain w-full"
+                      className="object-contain w-full"
                     />
                     <div className="flex items-center justify-between">
                       <div>
@@ -664,28 +675,28 @@ const Home = () => {
       {/* Accessories Section Goes Here */}
       <div className='container mx-auto px-4 md:px-10 py-3'>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 py-10">
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[300px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/6b6/tp1awwjksxtpr9oogj8f5jgw90ovfvhj/banner_360kh360_2023_kolbasa.webp)"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[400px]" style={{backgroundImage: "url(https://primemeat.ru/upload/webp/iblock/6b6/tp1awwjksxtpr9oogj8f5jgw90ovfvhj/banner_360kh360_2023_kolbasa.webp)"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Gostronom of Meats')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[300px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/d28/lbc4wal6ijqvj2p7wpwje006khaalrlp/mini_pelmeni_hinkali.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center md:h-[350px] h-[400px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/d28/lbc4wal6ijqvj2p7wpwje006khaalrlp/mini_pelmeni_hinkali.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Pelmen & Hinkali')}
             </p>
           </Link>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10'>
-            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ccf/category_img_8_1.webp')"}}>
+            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 md:col-span-2 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/ccf/category_img_8_1.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
                 {t('Oil & Marinads')}
               </p>
             </Link>
-            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/6fd/category_img_8_2.webp')"}}>
+            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/6fd/category_img_8_2.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
                 {t('Spicies')}
               </p>
             </Link>
-            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/997/category_img_8_3.webp')"}}>
+            <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-auto" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/997/category_img_8_3.webp')"}}>
               <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
                 {t('Souces')}
               </p>
@@ -693,22 +704,22 @@ const Home = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-10">
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/b80/3hbrzlcvwrzup0z36gribden4pge1btw/banner_263kh263_2023_kids.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/b80/3hbrzlcvwrzup0z36gribden4pge1btw/banner_263kh263_2023_kids.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Child menu')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/a10/k6q33pr90byyp6nj42h2o28bkuu136uo/banner_263kh263_2023_promo.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/a10/k6q33pr90byyp6nj42h2o28bkuu136uo/banner_263kh263_2023_promo.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Promocodes')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/c34/wssp1kposjps0t4tpchae3utrimbtn95/novinki25.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/c34/wssp1kposjps0t4tpchae3utrimbtn95/novinki25.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('New')}
             </p>
           </Link>
-          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[300px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/e5a/prz8jvpamc3jzc6rsf6pnjdehrv63jfn/banner_263kh263_2023_spice.webp')"}}>
+          <Link to='/filtered' className="text-white hover:bg-bottom transition-anim duration-300 delay-150 relative text-center rounded-lg uppercase text-2xl py-4 bg-red-600 bg-no-repeat bg-cover bg-center h-[400px] md:h-[250px]" style={{backgroundImage: "url('https://primemeat.ru/upload/webp/iblock/e5a/prz8jvpamc3jzc6rsf6pnjdehrv63jfn/banner_263kh263_2023_spice.webp')"}}>
             <p className='absolute bottom-0 left-0 right-0 primary-gradient py-4 rounded-b-lg'>
               {t('Seasoning of primemeat')}
             </p>

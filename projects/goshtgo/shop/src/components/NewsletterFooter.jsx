@@ -34,8 +34,8 @@ export default function NewsletterFooter() {
   };
 
   return (
-    <div className="bloody md:px-10 shadow-md text-white px-4 py-3">
-      <div className="flex flex-wrap justify-between container mx-auto items-center">
+    <div className="bloody md:px-10 shadow-md text-white py-3">
+      <div className="flex flex-wrap justify-between px-4 md:px-10 container mx-auto items-center">
         <div className="my-2">
           <p className="flex items-center">
             <LiaTelegramPlane size={45} className="mr-2" />
