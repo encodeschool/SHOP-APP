@@ -106,7 +106,7 @@ const CategorySection = ({ title, icon: Icon, products, categoryId, BASE_URL, fa
                   <img
                     src={product.imageUrls?.[0] ? `${BASE_URL}${product.imageUrls[0]}` : "/placeholder.jpg"}
                     alt={product.title}
-                    className="h-40 object-contain w-full"
+                    className="object-contain w-full"
                   />
 
                   <div className="flex items-center justify-between">

@@ -278,7 +278,7 @@ const Home = () => {
                       : '/placeholder.jpg'
                   }
                   alt={product.title}
-                  className="object-cover w-full"
+                  className="object-contain w-full"
                 />
                 <div className="flex items-stretch justify-between">
                   <div>
